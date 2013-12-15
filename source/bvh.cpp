@@ -340,6 +340,16 @@ void Bvh::DumpFrames(BONE_ID frameId, int depth) const
 	}
 }
 
+void Bvh::ParseMotion(const char *p)
+{
+	char *m = (char*)strstr(p, "MOTION");
+	motionFrames = _getI(m);
+	frameTime = _getF(m);
+	while (m && *m) {
+		motion.push_back(_getF(m));
+	}
+}
+
 void Bvh::LoadSub(const char *fileName)
 {
 	void *img = LoadFile(fileName);
@@ -350,7 +360,7 @@ void Bvh::LoadSub(const char *fileName)
 	char* body = (char*)img;
 
 	ParseFrame("ROOT", body, -1);
-
+	ParseMotion(body);
 	free(img);
 
 	printf("===============DumpFrames begin\n");

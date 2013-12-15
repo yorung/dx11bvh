@@ -22,8 +22,13 @@ private:
 	void CalcAnimation(int animId, double time);
 	void CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent);
 	void DumpFrames(BONE_ID frameId, int depth) const;
+	void ParseMotion(const char *p);
 
 	std::vector<BvhFrame> m_frames;
+	std::vector<float> motion;
+	int motionFrames;
+	float frameTime;
+
 public:
 	Bvh(const char *fileName);
 	~Bvh();
