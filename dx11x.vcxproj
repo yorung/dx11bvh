@@ -86,6 +86,7 @@
     <ClInclude Include="dx11x.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="source\app.h" />
+    <ClInclude Include="source\bvh.h" />
     <ClInclude Include="source\device_man11.h" />
     <ClInclude Include="source\matrix_man.h" />
     <ClInclude Include="source\mat_man.h" />
@@ -99,6 +100,7 @@
   <ItemGroup>
     <ClCompile Include="dx11x.cpp" />
     <ClCompile Include="source\app.cpp" />
+    <ClCompile Include="source\bvh.cpp" />
     <ClCompile Include="source\device_man11.cpp" />
     <ClCompile Include="source\matirx_man.cpp" />
     <ClCompile Include="source\mat_man.cpp" />

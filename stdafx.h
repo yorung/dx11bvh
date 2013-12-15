@@ -41,6 +41,7 @@ using namespace DirectX;
 #include "source/matrix_man.h"
 #include "source/mesh_renderer11.h"
 #include "source/mesh_x.h"
+#include "source/bvh.h"
 
 #include "source/app.h"
 

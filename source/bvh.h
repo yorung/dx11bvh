@@ -1,0 +1,32 @@
+struct BvhFrame
+{
+	char name[32];
+	XMFLOAT3 offset;
+	BONE_ID parentId;
+	BONE_ID childId;
+	BONE_ID siblingId;
+};
+
+class Bvh : public Mesh
+{
+private:
+	MeshRenderer m_meshRenderer;
+
+private:
+	bool ParseMesh(char* imgFrame, Block& block, BONE_ID frameId);
+	void ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId);
+	void LoadSub(const char* fileName);
+	BONE_ID _getFrameIdByName(const char* name);
+	void _linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId);
+	void _storeWeight(MeshVertex& v, int frameId, float weight);
+	void CalcAnimation(int animId, double time);
+	void CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent);
+	void DumpFrames(BONE_ID frameId, int depth) const;
+
+	std::vector<BvhFrame> m_frames;
+public:
+	Bvh(const char *fileName);
+	~Bvh();
+	void Draw(int animId, double time);
+};
+
