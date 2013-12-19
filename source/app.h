@@ -1,5 +1,5 @@
 class App {
-	MeshX* mesh;
+	Mesh* mesh;
 	float scale;
 	float lastX;
 	float lastY;

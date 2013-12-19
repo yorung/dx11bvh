@@ -2,6 +2,7 @@ struct BvhFrame
 {
 	char name[32];
 	XMFLOAT3 offset;
+	XMFLOAT3 offsetCombined;
 	BONE_ID parentId;
 	BONE_ID childId;
 	BONE_ID siblingId;
@@ -9,9 +10,6 @@ struct BvhFrame
 
 class Bvh : public Mesh
 {
-private:
-	MeshRenderer m_meshRenderer;
-
 private:
 	bool ParseMesh(char* imgFrame, Block& block, BONE_ID frameId);
 	void ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId);
@@ -29,7 +27,10 @@ private:
 	int motionFrames;
 	float frameTime;
 
+	MeshRenderer m_meshRenderer;
+	Block m_block;
 public:
+	const Block& GetRawDatas() const { return m_block; }
 	Bvh(const char *fileName);
 	~Bvh();
 	void Draw(int animId, double time);

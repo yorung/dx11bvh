@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-static float CalcRadius(const MeshX* m)
+static float CalcRadius(const Mesh* m)
 {
 	const Block& b = m->GetRawDatas();
 	float maxSq = 0;
@@ -26,11 +26,10 @@ void App::Init(const char* fileName)
 
 	const char* ext = strrchr(fileName, '.');
 	if (ext && !_stricmp(ext, ".bvh")) {
-		Bvh b(fileName);
-		return;
+		mesh = new Bvh(fileName);
+	} else {
+		mesh = new MeshX(fileName);
 	}
-
-	mesh = new MeshX(fileName);
 	float radius = CalcRadius(mesh);
 	scale = 1 / std::max(0.00001f, radius);
 

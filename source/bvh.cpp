@@ -200,7 +200,17 @@ static char* _searchChildTag(char* from, const char *tag, std::string* name = nu
 	return nullptr;
 }
 
-
+static void InitVertex(MeshVertex& v, BONE_ID boneId)
+{
+	v.blendIndices.x = v.blendIndices.y = v.blendIndices.z = v.blendIndices.w = boneId;
+	v.color = 0xffffffff;
+	v.blendWeights.x = v.blendWeights.y = v.blendWeights.z = 0;
+	v.normal.x = 1;
+	v.normal.y = 0;
+	v.normal.z = 0;
+	v.uv.x = v.uv.y = 0;
+	v.xyz.x = v.xyz.y = v.xyz.z = 0;
+}
 
 Bvh::Bvh(const char *fileName)
 {
@@ -223,7 +233,58 @@ Bvh::Bvh(const char *fileName)
 	
     SetCurrentDirectoryA(strCWD);
 
-//	m_meshRenderer.Init(sizeVertices, sizeIndices, &m_block.vertices[0], &m_block.indices[0]);
+	unsigned idx = 0;
+	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+		BvhFrame& f2 = m_frames[i];
+		int p = f2.parentId;
+		if (p < 0) {
+			continue;
+		}
+		BvhFrame& f1 = m_frames[p];
+		XMVECTOR v1 = XMLoadFloat3(&f1.offsetCombined);
+		XMVECTOR v2 = XMLoadFloat3(&f2.offsetCombined);
+		XMVECTOR sub = XMVectorSubtract(v2, v1);
+		XMVECTOR eyeDir = XMVectorSet(0, 0, 0.1f, 0);
+		XMVECTOR v1L = XMVector3Cross(sub, eyeDir);
+		XMVECTOR v1R = XMVector3Cross(eyeDir, sub);
+		MeshVertex vert[3];
+		for (auto& it : vert) {
+			InitVertex(it, i);
+		}
+		XMStoreFloat3(&vert[0].xyz, XMVectorAdd(v1, v1L));
+		XMStoreFloat3(&vert[1].xyz, XMVectorAdd(v1, v1R));
+		XMStoreFloat3(&vert[2].xyz, v2);
+		for (auto& it : vert) {
+			m_block.vertices.push_back(it);
+			m_block.indices.push_back(idx++);
+		}
+	}
+
+	int sizeVertices = m_block.vertices.size() * sizeof(m_block.vertices[0]);
+	int sizeIndices = m_block.indices.size() * sizeof(m_block.indices[0]);
+	m_meshRenderer.Init(sizeVertices, sizeIndices, &m_block.vertices[0], &m_block.indices[0]);
+
+	Material mat;
+	mat.faceColor.x = 1.0f;
+	mat.faceColor.y = 1.0f;
+	mat.faceColor.z = 1.0f;
+	mat.faceColor.w = 1.0f;
+	mat.power = 1.0f;
+	mat.specular.x = 1.0f;
+	mat.specular.y = 1.0f;
+	mat.specular.z = 1.0f;
+	mat.specular.w = 1.0f;
+	mat.emissive.x = 1.0f;
+	mat.emissive.y = 1.0f;
+	mat.emissive.z = 1.0f;
+	mat.emissive.w = 1.0f;
+	mat.tmid = texMan.Create("white.bmp", true);
+
+	MaterialMap map;
+	map.materialId = matMan.Create(mat);
+	map.faceStartIndex = 0;
+	map.faces = m_block.indices.size() / 3;
+	m_block.materialMaps.push_back(map);
 }
 
 static DWORD _conv1To255(float f, int bit)
@@ -285,6 +346,8 @@ void Bvh::_linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId)
 	BvhFrame* frameChild = &m_frames[childFrameId];
 
 	frameChild->parentId = parentFrameId;
+	XMStoreFloat3(&frameChild->offsetCombined, XMVectorAdd(XMLoadFloat3(&frameParent->offsetCombined), XMLoadFloat3(&frameChild->offset)));
+
 	if (frameParent->childId < 0) {
 		frameParent->childId = childFrameId;
 	} else {
@@ -304,17 +367,19 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 		if (child) {
 			BONE_ID frameId = _getFrameIdByName(name.c_str());
 			BvhFrame& frame = m_frames[frameId];
-			if (parentFrameId >= 0) {
-				_linkFrame(parentFrameId, frameId);
-			}
 
 			_getToken(child);	// "OFFSET"
 			frame.offset.x = _getF(child);
 			frame.offset.y = _getF(child);
 			frame.offset.z = _getF(child);
 
-//			Block b;
-//			ParseMesh(child, b, frameId);
+			frame.offsetCombined.x = 0;
+			frame.offsetCombined.y = 0; 
+			frame.offsetCombined.z = 0;
+
+			if (parentFrameId >= 0) {
+				_linkFrame(parentFrameId, frameId);
+			}
 
 			ParseFrame("JOINT", child, frameId);
 		}
@@ -330,7 +395,8 @@ void Bvh::DumpFrames(BONE_ID frameId, int depth) const
 	}
 	printf("%s(%d) p=%d s=%d c=%d ", f.name, frameId, f.parentId, f.siblingId, f.childId);
 	const XMFLOAT3& m = f.offset;
-	printf("(%f,%f,%f)", m.x, m.y, m.z);
+	const XMFLOAT3& m2 = f.offsetCombined;
+	printf("(%3.3f,%3.3f,%3.3f) (%3.3f,%3.3f,%3.3f)", m.x, m.y, m.z, m2.x, m2.y, m2.z);
 	printf("\n");
 	if (f.siblingId >= 0) {
 		DumpFrames(f.siblingId, depth);
@@ -462,7 +528,6 @@ void Bvh::CalcAnimation(int animId, double time)
 
 void Bvh::Draw(int animId, double time)
 {
-/*
 	if (!m_block.indices.size()) {
 		return;
 	}
@@ -470,16 +535,21 @@ void Bvh::Draw(int animId, double time)
 	XMMATRIX BoneMatrices[50];
 	assert(m_frames.size() <= dimof(BoneMatrices));
 
+	for (auto& it : BoneMatrices) {
+		it = XMMatrixIdentity();
+	}
+
+	/*
 	CalcAnimation(animId, time * m_animTicksPerSecond);
 	CalcFrameMatrices(0, XMMatrixIdentity());
 
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-		Frame& f = m_frames[i];
+		BvhFrame& f = m_frames[i];
 		XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
 		XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
 		BoneMatrices[i] = boneOffset * frameTransform;
 	}
 
-	m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
 */
+	m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
 }

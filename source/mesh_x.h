@@ -3,6 +3,7 @@ class Mesh
 public:
 	virtual ~Mesh() {}
 	virtual void Draw(int animId, double time) = 0;
+	virtual const struct Block& GetRawDatas() const = 0;
 };
 
 struct TimedFloatKeys
