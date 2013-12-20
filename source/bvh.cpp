@@ -309,6 +309,12 @@ BONE_ID Bvh::_getFrameIdByName(const char* name)
 	f.parentId = -1;
 	f.childId = -1;
 	f.siblingId = -1;
+	f.rotIndies.x = -1;
+	f.rotIndies.y = -1;
+	f.rotIndies.z = -1;
+	f.posIndies.x = -1;
+	f.posIndies.y = -1;
+	f.posIndies.z = -1;
 	m_frames.push_back(f);
 	return m_frames.size() - 1;
 }
@@ -381,6 +387,28 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 				_linkFrame(parentFrameId, frameId);
 			}
 
+			XMVECTOR dummy;
+			XMStoreFloat4x4(&frame.boneOffsetMatrix, XMMatrixInverse(&dummy, (XMMatrixTranslation(frame.offsetCombined.x, frame.offsetCombined.y, frame.offsetCombined.z))));
+
+			_getToken(child);	// "CHANNELS"
+			int nChannels = _getI(child);
+			for (int i = 0; i < nChannels; i++) {
+				std::string t = _getToken(child);
+				if (t == "Xposition") {
+					frame.posIndies.x = channels++;
+				} else if (t == "Yposition") {
+					frame.posIndies.y = channels++;
+				} else if (t == "Zposition") {
+					frame.posIndies.z = channels++;
+				} else if (t == "Xrotation") {
+					frame.rotIndies.x = channels++;
+				} else if (t == "Yrotation") {
+					frame.rotIndies.y = channels++;
+				} else if (t == "Zrotation") {
+					frame.rotIndies.z = channels++;
+				}
+			}
+
 			ParseFrame("JOINT", child, frameId);
 		}
 		p = _leaveBrace(child);
@@ -425,6 +453,7 @@ void Bvh::LoadSub(const char *fileName)
 
 	char* body = (char*)img;
 
+	channels = 0;
 	ParseFrame("ROOT", body, -1);
 	ParseMotion(body);
 	free(img);
@@ -442,8 +471,7 @@ Bvh::~Bvh()
 
 void Bvh::CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent)
 {
-/*
-	Frame& f = m_frames[frameId];
+	BvhFrame& f = m_frames[frameId];
 	XMMATRIX result = XMLoadFloat4x4(&f.frameTransformMatrix) * parent;
 	XMStoreFloat4x4(&f.result, result);
 	if (f.siblingId >= 0) {
@@ -452,7 +480,6 @@ void Bvh::CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent)
 	if (f.childId >= 0) {
 		CalcFrameMatrices(f.childId, result);
 	}
-*/
 }
 
 static XMMATRIX Interpolate(const XMMATRIX& m1, const XMMATRIX& m2, float ratio)
@@ -470,59 +497,25 @@ static XMMATRIX Interpolate(const XMMATRIX& m1, const XMMATRIX& m2, float ratio)
 	return m3;
 }
 
-void Bvh::CalcAnimation(int animId, double time)
+void Bvh::CalcAnimation(double time)
 {
-/*
-	if (animId < 0 || animId >= (int)m_animationSets.size()) {
-		return;
-	}
-	int revAnimId = m_animationSets.size() - animId - 1;
+	int frame = (int)(time / frameTime);
+	frame %= motionFrames;
 
-	for (auto itAnimation : m_animationSets[revAnimId].animations)
-	{
-		Frame& f = m_frames[itAnimation.first];
-		Animation& anim = itAnimation.second;
-		if (anim.animationKeys.size() == 0) {
-			continue;
-		}
-		if (anim.animationKeys.begin()->timedFloatKeys.size() == 0) {
-			continue;
-		}
+	const float* mot = &motion[frame * channels];
 
-		bool stored = false;
+	for (auto& it : m_frames) {
 		XMMATRIX rotMat = XMMatrixIdentity(), scaleMat = XMMatrixIdentity(), transMat = XMMatrixIdentity();
-		for (auto itKey : anim.animationKeys) {
-
-			double maxTime = itKey.timedFloatKeys.rbegin()->time;
-			if (maxTime <= 0) {
-				continue;
-			}
-			int iTime = (int)time % (int)maxTime;
-			double timeMod = fmod(time, maxTime);
-	
-			for (int i = 0; i < (int)itKey.timedFloatKeys.size() - 1; i++) {
-				TimedFloatKeys& t1 = itKey.timedFloatKeys[i];
-				TimedFloatKeys& t2 = itKey.timedFloatKeys[i + 1];
-				if (iTime < (int)t1.time || iTime >= (int)t2.time) {
-					continue;
-				}
-				XMMATRIX mat = Interpolate(XMLoadFloat4x4(&t1.mat), XMLoadFloat4x4(&t2.mat), (float)((timeMod - t1.time) / (t2.time - t1.time)));
-				XMFLOAT4X4 f4x4;
-				XMStoreFloat4x4(&f4x4, mat);
-				switch (itKey.keyType) {
-				case 3: f.frameTransformMatrix = f4x4; stored = true; break;
-				case 0: rotMat = mat; break;
-				case 1: scaleMat = mat; break;
-				case 2: transMat = mat; break;
-				}
-				break;
-			}
+		if (it.posIndies.x >= 0) {
+			transMat = XMMatrixTranslation(mot[it.posIndies.x], mot[it.posIndies.y], mot[it.posIndies.z]);
+		} else {
+			transMat = XMMatrixTranslation(it.offset.x, it.offset.y, it.offset.z);
 		}
-		if (!stored) {
-			XMStoreFloat4x4(&f.frameTransformMatrix, scaleMat * rotMat * transMat);
+		if (it.rotIndies.x >= 0) {
+			rotMat = XMMatrixRotationY(mot[it.rotIndies.y] * XM_PI / 180) * XMMatrixRotationX(mot[it.rotIndies.x] * XM_PI / 180) * XMMatrixRotationX(mot[it.rotIndies.z] * XM_PI / 180);
 		}
+		XMStoreFloat4x4(&it.frameTransformMatrix, scaleMat * rotMat * transMat);
 	}
-*/
 }
 
 
@@ -535,12 +528,9 @@ void Bvh::Draw(int animId, double time)
 	XMMATRIX BoneMatrices[50];
 	assert(m_frames.size() <= dimof(BoneMatrices));
 
-	for (auto& it : BoneMatrices) {
-		it = XMMatrixIdentity();
-	}
 
-	/*
-	CalcAnimation(animId, time * m_animTicksPerSecond);
+	CalcAnimation(time);
+
 	CalcFrameMatrices(0, XMMatrixIdentity());
 
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
@@ -550,6 +540,9 @@ void Bvh::Draw(int animId, double time)
 		BoneMatrices[i] = boneOffset * frameTransform;
 	}
 
-*/
+	for (auto& it : BoneMatrices) {
+//		it = XMMatrixIdentity();
+	}
+
 	m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
 }

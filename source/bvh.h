@@ -6,6 +6,11 @@ struct BvhFrame
 	BONE_ID parentId;
 	BONE_ID childId;
 	BONE_ID siblingId;
+	XMINT3 rotIndies;
+	XMINT3 posIndies;
+	XMFLOAT4X4 frameTransformMatrix;
+	XMFLOAT4X4 boneOffsetMatrix;
+	XMFLOAT4X4 result;
 };
 
 class Bvh : public Mesh
@@ -21,11 +26,13 @@ private:
 	void CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent);
 	void DumpFrames(BONE_ID frameId, int depth) const;
 	void ParseMotion(const char *p);
+	void CalcAnimation(double time);
 
 	std::vector<BvhFrame> m_frames;
 	std::vector<float> motion;
 	int motionFrames;
 	float frameTime;
+	int channels;
 
 	MeshRenderer m_meshRenderer;
 	Block m_block;
