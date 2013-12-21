@@ -236,11 +236,11 @@ Bvh::Bvh(const char *fileName)
 	unsigned idx = 0;
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		BvhFrame& f2 = m_frames[i];
-		int p = f2.parentId;
-		if (p < 0) {
+		BONE_ID pId = f2.parentId;
+		if (pId < 0) {
 			continue;
 		}
-		BvhFrame& f1 = m_frames[p];
+		BvhFrame& f1 = m_frames[pId];
 		XMVECTOR v1 = XMLoadFloat3(&f1.offsetCombined);
 		XMVECTOR v2 = XMLoadFloat3(&f2.offsetCombined);
 		XMVECTOR sub = XMVectorSubtract(v2, v1);
@@ -249,7 +249,7 @@ Bvh::Bvh(const char *fileName)
 		XMVECTOR v1R = XMVector3Cross(eyeDir, sub);
 		MeshVertex vert[3];
 		for (auto& it : vert) {
-			InitVertex(it, i);
+			InitVertex(it, pId);
 		}
 		XMStoreFloat3(&vert[0].xyz, XMVectorAdd(v1, v1L));
 		XMStoreFloat3(&vert[1].xyz, XMVectorAdd(v1, v1R));
