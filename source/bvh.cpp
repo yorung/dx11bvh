@@ -116,7 +116,7 @@ static int _getIndices(char*& p, std::vector<unsigned>& indices, int nOrgFaces, 
 static std::string _getToken(char*& p)
 {
 	while(*p && !isalpha(*p)) {
-		if (*p == '{') {
+		if (*p == '{' || *p == '}') {
 			return "";
 		}
 		p++;
@@ -393,22 +393,23 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 			XMVECTOR dummy;
 			XMStoreFloat4x4(&frame.boneOffsetMatrix, XMMatrixInverse(&dummy, (XMMatrixTranslation(frame.offsetCombined.x, frame.offsetCombined.y, frame.offsetCombined.z))));
 
-			_getToken(child);	// "CHANNELS"
-			int nChannels = _getI(child);
-			for (int i = 0; i < nChannels; i++) {
-				std::string t = _getToken(child);
-				if (t == "Xposition") {
-					frame.posIndies.x = channels++;
-				} else if (t == "Yposition") {
-					frame.posIndies.y = channels++;
-				} else if (t == "Zposition") {
-					frame.posIndies.z = channels++;
-				} else if (t == "Xrotation") {
-					frame.rotIndies.x = channels++;
-				} else if (t == "Yrotation") {
-					frame.rotIndies.y = channels++;
-				} else if (t == "Zrotation") {
-					frame.rotIndies.z = channels++;
+			if ("CHANNELS" == _getToken(child)) {
+				int nChannels = _getI(child);
+				for (int i = 0; i < nChannels; i++) {
+					std::string t = _getToken(child);
+					if (t == "Xposition") {
+						frame.posIndies.x = channels++;
+					} else if (t == "Yposition") {
+						frame.posIndies.y = channels++;
+					} else if (t == "Zposition") {
+						frame.posIndies.z = channels++;
+					} else if (t == "Xrotation") {
+						frame.rotIndies.x = channels++;
+					} else if (t == "Yrotation") {
+						frame.rotIndies.y = channels++;
+					} else if (t == "Zrotation") {
+						frame.rotIndies.z = channels++;
+					}
 				}
 			}
 
@@ -516,7 +517,7 @@ void Bvh::CalcAnimation(double time)
 			transMat = XMMatrixTranslation(it.offset.x, it.offset.y, it.offset.z);
 		}
 		if (it.rotIndies.x >= 0) {
-			rotMat = XMMatrixRotationY(mot[it.rotIndies.y] * XM_PI / 180) * XMMatrixRotationX(mot[it.rotIndies.x] * XM_PI / 180) * XMMatrixRotationX(mot[it.rotIndies.z] * XM_PI / 180);
+			rotMat = XMMatrixRotationY(mot[it.rotIndies.y] * XM_PI / 180) * XMMatrixRotationX(mot[it.rotIndies.x] * XM_PI / 180) * XMMatrixRotationZ(mot[it.rotIndies.z] * XM_PI / 180);
 		}
 		XMStoreFloat4x4(&it.frameTransformMatrix, scaleMat * rotMat * transMat);
 	}
