@@ -371,6 +371,9 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 		std::string name;
 		char* child = _searchChildTag(p, frameStr, &name);
 		if (child) {
+			if (name == "Site") {
+				name = std::string("End of ") + m_frames[parentFrameId].name;
+			}
 			BONE_ID frameId = _getFrameIdByName(name.c_str());
 			BvhFrame& frame = m_frames[frameId];
 
@@ -410,6 +413,7 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 			}
 
 			ParseFrame("JOINT", child, frameId);
+			ParseFrame("End", child, frameId);
 		}
 		p = _leaveBrace(child);
 	}
