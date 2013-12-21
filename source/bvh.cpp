@@ -517,7 +517,10 @@ void Bvh::CalcAnimation(double time)
 			transMat = XMMatrixTranslation(it.offset.x, it.offset.y, it.offset.z);
 		}
 		if (it.rotIndies.x >= 0) {
-			rotMat = XMMatrixRotationY(mot[it.rotIndies.y] * XM_PI / 180) * XMMatrixRotationX(mot[it.rotIndies.x] * XM_PI / 180) * XMMatrixRotationZ(mot[it.rotIndies.z] * XM_PI / 180);
+//			rotMat = XMMatrixRotationY(mot[it.rotIndies.y] * XM_PI / 180) * XMMatrixRotationX(mot[it.rotIndies.x] * XM_PI / 180) * XMMatrixRotationZ(mot[it.rotIndies.z] * XM_PI / 180);
+//			rotMat = XMMatrixRotationX(mot[it.rotIndies.x] * XM_PI / 180) * XMMatrixRotationY(mot[it.rotIndies.y] * XM_PI / 180) * XMMatrixRotationZ(mot[it.rotIndies.z] * XM_PI / 180);
+//			rotMat = XMMatrixRotationZ(mot[it.rotIndies.z] * XM_PI / 180) * XMMatrixRotationY(mot[it.rotIndies.y] * XM_PI / 180) * XMMatrixRotationX(mot[it.rotIndies.x] * XM_PI / 180);
+			rotMat = XMMatrixRotationZ(mot[it.rotIndies.z] * XM_PI / 180) * XMMatrixRotationX(mot[it.rotIndies.x] * XM_PI / 180) * XMMatrixRotationY(mot[it.rotIndies.y] * XM_PI / 180);
 		}
 		XMStoreFloat4x4(&it.frameTransformMatrix, scaleMat * rotMat * transMat);
 	}
