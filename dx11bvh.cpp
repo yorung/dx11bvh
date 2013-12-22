@@ -10,24 +10,63 @@
 HINSTANCE hInst;								// current instance
 TCHAR szTitle[MAX_LOADSTRING];					// The title bar text
 TCHAR szWindowClass[MAX_LOADSTRING];			// the main window class name
+HWND hWnd;
+static App app;
 
 // Forward declarations of functions included in this code module:
 ATOM				MyRegisterClass(HINSTANCE hInstance);
-BOOL				InitInstance(HINSTANCE, int);
+BOOL				InitInstance(HINSTANCE);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 
-int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPTSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
-{
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
-
- 	// TODO: Place code here.
+// WindowMessage
+static BOOL ProcessWindowMessage(){
 	MSG msg;
-	HACCEL hAccelTable;
+	for (;;){
+		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)){
+			if (msg.message == WM_QUIT){
+				return FALSE;
+			}
+
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+
+		BOOL active = !IsIconic(hWnd) && GetForegroundWindow() == hWnd;
+
+		if (!active){
+			WaitMessage();
+			continue;
+		}
+
+		return TRUE;
+	}
+}
+
+static void GoMyDir()
+{
+	char dir[MAX_PATH];
+	GetModuleFileNameA(GetModuleHandleA(nullptr), dir, MAX_PATH);
+	char* p = strrchr(dir, '\\');
+	assert(p);
+	*p = '\0';
+	p = strrchr(dir, '\\');
+	assert(p);
+	*p = '\0';
+	SetCurrentDirectoryA(dir);
+}
+
+#ifdef _DEBUG
+int main(int, char**)
+#else
+int APIENTRY _tWinMain(_In_ HINSTANCE,
+	_In_opt_ HINSTANCE hPrevInstance,
+	_In_ LPTSTR    lpCmdLine,
+	_In_ int       nCmdShow)
+#endif
+{
+	HINSTANCE hInstance = GetModuleHandle(nullptr);
+	GoMyDir();
 
 	// Initialize global strings
 	LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -35,24 +74,34 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	MyRegisterClass(hInstance);
 
 	// Perform application initialization:
-	if (!InitInstance (hInstance, nCmdShow))
+	if (!InitInstance (hInstance))
 	{
 		return FALSE;
 	}
 
-	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_DX11BVH));
+	deviceMan11.Create(hWnd);
+
+	app.Init("D:\\github\\aachan.bvh");
+//	app.Init("D:\\github\\example-openFrameworks\\example-bvh\\bin\\data\\A_test.bvh");
+//	app.Init("C:\\Users\\YOSUKE\\Desktop\\bvh\\7.bvh");
+	
 
 	// Main message loop:
-	while (GetMessage(&msg, NULL, 0, 0))
-	{
-		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+	for (;;) {
+		if (!ProcessWindowMessage()) {
+			break;
 		}
+		deviceMan11.BeginScene();
+		app.Draw();
+		deviceMan11.EndScene();
+		Sleep(1);
 	}
 
-	return (int) msg.wParam;
+	app.Destroy();
+	texMan.Destroy();
+	shaderMan.Destroy();
+	deviceMan11.Destroy();
+	return 0;
 }
 
 
@@ -93,22 +142,25 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //        In this function, we save the instance handle in a global variable and
 //        create and display the main program window.
 //
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
+BOOL InitInstance(HINSTANCE hInstance)
 {
-   HWND hWnd;
-
    hInst = hInstance; // Store instance handle in our global variable
 
-   hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
+   RECT r;
+   SetRect(&r, 0, 0, SCR_W, SCR_H);
+   AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, FALSE);
+   hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
+	   CW_USEDEFAULT, CW_USEDEFAULT, r.right - r.left, r.bottom - r.top, NULL, NULL, hInstance, NULL);
 
    if (!hWnd)
    {
       return FALSE;
    }
 
-   ShowWindow(hWnd, nCmdShow);
+   ShowWindow(hWnd, SW_SHOWNORMAL);
    UpdateWindow(hWnd);
+
+   DragAcceptFiles(hWnd, TRUE);
 
    return TRUE;
 }
@@ -151,6 +203,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		hdc = BeginPaint(hWnd, &ps);
 		// TODO: Add any drawing code here...
 		EndPaint(hWnd, &ps);
+		break;
+	case WM_DROPFILES:
+		{
+			HDROP hDrop = (HDROP)wParam;
+			char fileName[MAX_PATH];
+			DragQueryFileA(hDrop, 0, fileName, MAX_PATH);
+			DragFinish(hDrop);
+			app.Init(fileName);
+			break;
+		}
+	case WM_LBUTTONDOWN:
+		app.LButtonDown(LOWORD(lParam) / (float)SCR_W, HIWORD(lParam) / (float)SCR_H);
+		break;
+	case WM_LBUTTONUP:
+		app.LButtonUp(LOWORD(lParam) / (float)SCR_W, HIWORD(lParam) / (float)SCR_H);
+		break;
+	case WM_MOUSEMOVE:
+		app.MouseMove(LOWORD(lParam) / (float)SCR_W, HIWORD(lParam) / (float)SCR_H);
+		break;
+	case WM_MOUSEWHEEL:
+		app.MouseWheel((short)HIWORD(wParam) / (float)WHEEL_DELTA);
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
