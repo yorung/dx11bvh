@@ -81,10 +81,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE,
 
 	deviceMan11.Create(hWnd);
 
-	app.Init("D:\\github\\aachan.bvh");
-//	app.Init("D:\\github\\example-openFrameworks\\example-bvh\\bin\\data\\A_test.bvh");
-//	app.Init("C:\\Users\\YOSUKE\\Desktop\\bvh\\7.bvh");
-	
+	app.Init(nullptr);
 
 	// Main message loop:
 	for (;;) {

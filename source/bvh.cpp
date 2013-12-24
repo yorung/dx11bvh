@@ -271,7 +271,9 @@ Bvh::Bvh(const char *fileName)
 
 	int sizeVertices = m_block.vertices.size() * sizeof(m_block.vertices[0]);
 	int sizeIndices = m_block.indices.size() * sizeof(m_block.indices[0]);
-	m_meshRenderer.Init(sizeVertices, sizeIndices, &m_block.vertices[0], &m_block.indices[0]);
+	if (sizeVertices && sizeIndices) {
+		m_meshRenderer.Init(sizeVertices, sizeIndices, &m_block.vertices[0], &m_block.indices[0]);
+	}
 
 	Material mat;
 	mat.faceColor.x = 0.6f;
