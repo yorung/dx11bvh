@@ -243,20 +243,29 @@ Bvh::Bvh(const char *fileName)
 		BvhFrame& f1 = m_frames[pId];
 		XMVECTOR v1 = XMLoadFloat3(&f1.offsetCombined);
 		XMVECTOR v2 = XMLoadFloat3(&f2.offsetCombined);
-		XMVECTOR sub = XMVectorSubtract(v2, v1);
-		XMVECTOR eyeDir = XMVectorSet(0, 0, 0.1f, 0);
-		XMVECTOR v1L = XMVector3Cross(sub, eyeDir);
-		XMVECTOR v1R = XMVector3Cross(eyeDir, sub);
-		MeshVertex vert[3];
-		for (auto& it : vert) {
-			InitVertex(it, pId);
-		}
-		XMStoreFloat3(&vert[0].xyz, XMVectorAdd(v1, v1L));
-		XMStoreFloat3(&vert[1].xyz, XMVectorAdd(v1, v1R));
-		XMStoreFloat3(&vert[2].xyz, v2);
-		for (auto& it : vert) {
-			m_block.vertices.push_back(it);
-			m_block.indices.push_back(idx++);
+		XMVECTOR boneDir = XMVectorSubtract(v2, v1);
+		XMVECTOR eyeDir = XMVectorSet(0, 0, 0.15f, 0);
+		XMVECTOR vRot0 = XMVector3Cross(boneDir, eyeDir);
+		XMVECTOR vRot90 = XMVector3Cross(vRot0, XMVector3Normalize(boneDir));
+		XMVECTOR vRotLast = XMVectorAdd(v1, vRot0);
+		static const int div = 10;
+		for (int j = 0; j < div; j++) {
+			MeshVertex vert[3];
+			for (auto& it : vert) {
+				InitVertex(it, pId);
+			}
+			float rad = XM_2PI / div * (j + 1);
+			XMVECTOR vRot = XMVectorAdd(v1, XMVectorScale(vRot0, cosf(rad)) + XMVectorScale(vRot90, sinf(rad)));
+			XMStoreFloat3(&vert[0].xyz, vRotLast);
+			XMStoreFloat3(&vert[1].xyz, vRot);
+			XMStoreFloat3(&vert[2].xyz, v2);
+			XMVECTOR normal = XMVector3Cross(XMVectorSubtract(vRot, vRotLast), XMVectorSubtract(v2, vRot));
+			for (auto& it : vert) {
+				XMStoreFloat3(&it.normal, normal);
+				m_block.vertices.push_back(it);
+				m_block.indices.push_back(idx++);
+			}
+			vRotLast = vRot;
 		}
 	}
 
@@ -265,18 +274,18 @@ Bvh::Bvh(const char *fileName)
 	m_meshRenderer.Init(sizeVertices, sizeIndices, &m_block.vertices[0], &m_block.indices[0]);
 
 	Material mat;
-	mat.faceColor.x = 1.0f;
-	mat.faceColor.y = 1.0f;
-	mat.faceColor.z = 1.0f;
+	mat.faceColor.x = 0.6f;
+	mat.faceColor.y = 0.6f;
+	mat.faceColor.z = 0.6f;
 	mat.faceColor.w = 1.0f;
 	mat.power = 1.0f;
 	mat.specular.x = 1.0f;
 	mat.specular.y = 1.0f;
 	mat.specular.z = 1.0f;
 	mat.specular.w = 1.0f;
-	mat.emissive.x = 1.0f;
-	mat.emissive.y = 1.0f;
-	mat.emissive.z = 1.0f;
+	mat.emissive.x = 0.4f;
+	mat.emissive.y = 0.4f;
+	mat.emissive.z = 0.4f;
 	mat.emissive.w = 1.0f;
 	mat.tmid = texMan.Create("white.bmp", true);
 

@@ -18,7 +18,6 @@ MeshRenderer11::MeshRenderer11()
 	pConstantBuffer = nullptr;
 	pSamplerState = nullptr;
 	pDSState = nullptr;
-	pRasterState = nullptr;
 }
 
 MeshRenderer11::~MeshRenderer11()
@@ -33,7 +32,6 @@ void MeshRenderer11::Destroy()
 	SAFE_RELEASE(pConstantBuffer);
 	SAFE_RELEASE(pSamplerState);
 	SAFE_RELEASE(pDSState);
-	SAFE_RELEASE(pRasterState);
 }
 
 void MeshRenderer11::Init(int sizeVertices, int sizeIndices, void* vertices, void* indices)
@@ -58,18 +56,12 @@ void MeshRenderer11::Init(int sizeVertices, int sizeIndices, void* vertices, voi
 	descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	deviceMan11.GetDevice()->CreateSamplerState(&descSamp, &pSamplerState);
 	deviceMan11.GetDevice()->CreateDepthStencilState(&CD3D11_DEPTH_STENCIL_DESC(D3D11_DEFAULT), &pDSState);
-
-	CD3D11_RASTERIZER_DESC rasterDesc(D3D11_DEFAULT);
-	rasterDesc.CullMode = D3D11_CULL_NONE;
-	deviceMan11.GetDevice()->CreateRasterizerState(&rasterDesc, &pRasterState);
 }
 
 void MeshRenderer11::Draw(XMMATRIX BoneMatrices[], int nBones, const Block& block)
 {
 	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	shaderMan.Apply(shaderId);
-
-	deviceMan11.GetContext()->RSSetState(pRasterState);
 
 	XMMATRIX matWorld, matView, matProj;
 	matrixMan.Get(MatrixMan::WORLD, matWorld);
