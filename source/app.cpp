@@ -11,9 +11,10 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), mesh(nullptr), lastX(-1), lastY(-1)
+App::App() : scale(1), lastX(-1), lastY(-1)
 {
 	quat = XMQuaternionIdentity();
+	ZeroMemory(mesh, sizeof(mesh));
 }
 
 App::~App()
@@ -24,13 +25,20 @@ void App::Init(const char* fileName)
 {
 	Destroy();
 
-	const char* ext = strrchr(fileName, '.');
-	if (ext && !_stricmp(ext, ".bvh")) {
-		mesh = new Bvh(fileName);
+	if (fileName) {
+		const char* ext = strrchr(fileName, '.');
+		if (ext && !_stricmp(ext, ".bvh")) {
+			mesh[0] = new Bvh(fileName);
+		} else {
+			mesh[0] = new MeshX(fileName);
+		}
 	} else {
-		mesh = new MeshX(fileName);
+		mesh[0] = new Bvh("D:\\github\\aachan.bvh");
+		mesh[1] = new Bvh("D:\\github\\kashiyuka.bvh");
+		mesh[2] = new Bvh("D:\\github\\nocchi.bvh");
 	}
-	float radius = CalcRadius(mesh);
+
+	float radius = CalcRadius(mesh[0]);
 	scale = 1 / std::max(0.00001f, radius);
 
 	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, 0.1f, 1000.0f));
@@ -97,12 +105,16 @@ void App::Draw()
 	float rot = XM_PI;
 	matrixMan.Set(MatrixMan::VIEW, XMMatrixLookAtLH(XMVectorSet(sin(rot) * dist, 0, cos(rot) * dist, 1), XMVectorSet(0, 0, 0, 0), XMVectorSet(0, 1, 0, 0)));
 
-	if (mesh) {
-		mesh->Draw(0, time);
+	for (auto& it : mesh) {
+		if (it) {
+			it->Draw(0, time);
+		}
 	}
 }
 
 void App::Destroy()
 {
-	SAFE_DELETE(mesh);
+	SAFE_DELETE(mesh[0]);
+	SAFE_DELETE(mesh[1]);
+	SAFE_DELETE(mesh[2]);
 }
