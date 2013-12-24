@@ -1,4 +1,8 @@
-dx11bvh
+DirectX 11 BVH Viewer
 =======
 
-Minimum code to visualize Biovision BVH on DirectX 11
+Very simple Biovision BVH viewer.
+
+![Perfume](perfume.png)
+
+It also works as a simple example to show "Perfume" motions which distributed at http://www.perfume-global.com/ with DirectX.
