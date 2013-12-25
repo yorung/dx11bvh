@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+static float bvhScale = 100.0f;
 void *LoadFile(const char *fileName);
 
 static void _enterBrace(char*& p)
@@ -389,9 +390,9 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 			BvhFrame& frame = m_frames[frameId];
 
 			_getToken(child);	// "OFFSET"
-			frame.offset.x = _getF(child);
-			frame.offset.y = _getF(child);
-			frame.offset.z = -_getF(child);
+			frame.offset.x = _getF(child) * bvhScale;
+			frame.offset.y = _getF(child) * bvhScale;
+			frame.offset.z = -_getF(child) * bvhScale;
 
 			frame.offsetCombined.x = 0;
 			frame.offsetCombined.y = 0; 
@@ -523,7 +524,7 @@ void Bvh::CalcAnimation(double time)
 	for (auto& it : m_frames) {
 		XMMATRIX rotMat = XMMatrixIdentity(), scaleMat = XMMatrixIdentity(), transMat = XMMatrixIdentity();
 		if (it.posIndies.x >= 0) {
-			transMat = XMMatrixTranslation(mot[it.posIndies.x], mot[it.posIndies.y], -mot[it.posIndies.z]);
+			transMat = XMMatrixTranslation(mot[it.posIndies.x] * bvhScale, mot[it.posIndies.y] * bvhScale, -mot[it.posIndies.z] * bvhScale);
 		} else {
 			transMat = XMMatrixTranslation(it.offset.x, it.offset.y, it.offset.z);
 		}
