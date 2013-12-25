@@ -11,7 +11,7 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), lastX(-1), lastY(-1)
+App::App() : scale(1), lastX(-1), lastY(-1), meshTiny(nullptr)
 {
 	quat = XMQuaternionIdentity();
 	ZeroMemory(mesh, sizeof(mesh));
@@ -25,13 +25,11 @@ void App::Init(const char* fileName)
 {
 	Destroy();
 
+	meshTiny = new MeshX("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\Media\\Tiny\\tiny.x");
+
 	if (fileName) {
 		const char* ext = strrchr(fileName, '.');
-		if (ext && !_stricmp(ext, ".bvh")) {
-			mesh[0] = new Bvh(fileName);
-		} else {
-			mesh[0] = new MeshX(fileName);
-		}
+		mesh[0] = new Bvh(fileName);
 	} else {
 		mesh[0] = new Bvh("D:\\github\\aachan.bvh");
 		mesh[1] = new Bvh("D:\\github\\kashiyuka.bvh");
@@ -106,8 +104,9 @@ void App::Draw()
 	matrixMan.Set(MatrixMan::VIEW, XMMatrixLookAtLH(XMVectorSet(sin(rot) * dist, 0, cos(rot) * dist, 1), XMVectorSet(0, 0, 0, 0), XMVectorSet(0, 1, 0, 0)));
 
 	for (auto& it : mesh) {
-		if (it) {
-			it->Draw(0, time);
+		if (it && meshTiny) {
+//			it->Draw(0, time);
+			meshTiny->DrawBvh(it, time);
 		}
 	}
 }
@@ -117,4 +116,5 @@ void App::Destroy()
 	SAFE_DELETE(mesh[0]);
 	SAFE_DELETE(mesh[1]);
 	SAFE_DELETE(mesh[2]);
+	SAFE_DELETE(meshTiny);
 }

@@ -135,5 +135,6 @@ public:
 	MeshX(const char *fileName);
 	~MeshX();
 	void Draw(int animId, double time);
+	void DrawBvh(class Bvh* bvh, double time);
 };
 

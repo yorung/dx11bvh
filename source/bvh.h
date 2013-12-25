@@ -41,5 +41,7 @@ public:
 	Bvh(const char *fileName);
 	~Bvh();
 	void Draw(int animId, double time);
+	void CalcBones(XMMATRIX BoneMatrices[50], double time);
+	BONE_ID BoneNameToId(const char* name);
 };
 

@@ -914,3 +914,94 @@ void MeshX::Draw(int animId, double time)
 
 	m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
 }
+
+
+void MeshX::DrawBvh(Bvh* bvh, double time)
+{
+	struct BoneConvTbl {
+		char* bvh;
+		char* x;
+	};
+	const BoneConvTbl tbl[] =
+	{
+		{ "@myroot", "Hips" },
+		{ "Scene_Root", "Hips" },
+		{ "body", "Hips" },
+		{ "Box01", "Hips" },
+		{ "Bip01", "Hips" },
+		{ "Bip01_Footsteps", "Hips" },
+		{ "Bip01_Pelvis", "Hips" },
+		{ "Bip01_Spine", "Chest2" },
+		{ "Bip01_Spine1", "Chest2" },
+		{ "Bip01_L_Thigh", "LeftKnee" },
+		{ "Bip01_R_Thigh", "RightKnee" },
+		{ "Bip01_R_Calf", "RightAnkle" },
+		{ "Bip01_R_Foot", "RightAnkle" },
+		{ "Bip01_R_Toe0", "RightToe" },
+		{ "Dummy11", "End of RightToe" },
+		{ "Bip01_L_Calf", "LeftAnkle" },
+		{ "Bip01_L_Foot", "LeftAnkle" },
+		{ "Bip01_L_Toe0", "LeftToe" },
+		{ "Dummy16", "End of LeftToe" },
+		{ "Bip01_Spine2", "Chest3" },
+		{ "Bip01_Spine3", "Chest4" },
+		{ "Bip01_Neck", "Neck" },
+		{ "Bip01_Head", "Head" },
+		{ "Bip01_L_Clavicle", "LeftCollar" },
+		{ "Bip01_R_Clavicle", "RightCollar" },
+		{ "Bip01_R_UpperArm", "RightShoulder" },
+		{ "Bip01_R_Forearm", "RightElbow" },
+		{ "Bip01_R_Hand", "RightWrist" },
+		{ "Bip01_R_Finger0", "End of RightWrist" },
+		{ "Bip01_R_Finger1", "End of RightWrist" },
+		{ "Bip01_R_Finger11", "End of RightWrist" },
+		{ "Bip01_R_Finger12", "End of RightWrist" },
+		{ "Dummy02", "End of RightWrist" },
+		{ "Bip01_R_Finger01", "End of RightWrist" },
+		{ "Bip01_R_Finger02", "End of RightWrist" },
+		{ "Dummy01", "End of RightWrist" },
+		{ "Bip01_L_UpperArm", "LeftShoulder" },
+		{ "Bip01_L_Forearm", "LeftElbow" },
+		{ "Bip01_L_Hand", "LeftWrist" },
+		{ "Bip01_L_Finger0", "End of LeftWrist" },
+		{ "Bip01_L_Finger1", "End of LeftWrist" },
+		{ "Bip01_L_Finger11", "End of LeftWrist" },
+		{ "Bip01_L_Finger12", "End of LeftWrist" },
+		{ "Dummy03", "End of LeftWrist" },
+		{ "Bip01_L_Finger01", "End of LeftWrist" },
+		{ "Bip01_L_Finger02", "End of LeftWrist" },
+		{ "Dummy06", "End of LeftWrist" },
+		{ "Dummy21", "End of LeftWrist" },
+	};
+
+	XMMATRIX BoneTransForBvh[50];
+	bvh->CalcBones(BoneTransForBvh, time);
+
+	XMMATRIX BonesForX[50];
+	for (auto& it : BonesForX) {
+		it = XMMatrixIdentity();
+	}
+
+	assert(m_frames.size() <= dimof(BonesForX));
+	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+		Frame& f = m_frames[i];
+		const char* bvhBoneName = nullptr;
+		for (auto& t : tbl) {
+			if (!strcmp(t.bvh, f.name)) {
+				bvhBoneName = t.x;
+				break;
+			}
+		}
+		if (!bvhBoneName) {
+			continue;
+		}
+		BONE_ID bvhBoneId = bvh->BoneNameToId(bvhBoneName);
+		if (bvhBoneId >= 0) {
+	//		BonesForX[i] = XMLoadFloat4x4(&f.boneOffsetMatrix) * BoneTransForBvh[bvhBoneId];
+			BonesForX[i] = /*XMLoadFloat4x4(&f.boneOffsetMatrix) **/ BoneTransForBvh[bvhBoneId];
+		}
+	}
+
+	m_meshRenderer.Draw(BonesForX, dimof(BonesForX), m_block);
+}
+

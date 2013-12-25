@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-static float bvhScale = 100.0f;
+static float bvhScale = 5.0f;
 void *LoadFile(const char *fileName);
 
 static void _enterBrace(char*& p)
@@ -545,7 +545,6 @@ void Bvh::Draw(int animId, double time)
 	XMMATRIX BoneMatrices[50];
 	assert(m_frames.size() <= dimof(BoneMatrices));
 
-
 	CalcAnimation(time);
 
 	CalcFrameMatrices(0, XMMatrixIdentity());
@@ -557,9 +556,32 @@ void Bvh::Draw(int animId, double time)
 		BoneMatrices[i] = boneOffset * frameTransform;
 	}
 
-	for (auto& it : BoneMatrices) {
-//		it = XMMatrixIdentity();
-	}
-
 	m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
 }
+
+void Bvh::CalcBones(XMMATRIX BoneMatrices[50], double time)
+{
+	CalcAnimation(time);
+
+	CalcFrameMatrices(0, XMMatrixIdentity());
+
+	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+		BvhFrame& f = m_frames[i];
+		XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
+		XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
+		BoneMatrices[i] = boneOffset * frameTransform;
+//		BoneMatrices[i] = frameTransform;
+	}
+}
+
+BONE_ID Bvh::BoneNameToId(const char* name)
+{
+	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+		BvhFrame& f = m_frames[i];
+		if (!strcmp(f.name, name)) {
+			return i;
+		}
+	}
+	return -1;
+}
+
