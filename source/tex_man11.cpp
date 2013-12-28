@@ -15,16 +15,11 @@ TexMan11::TMID TexMan11::Create(const char *name, bool for3D)
 	WCHAR wname[MAX_PATH];
 	MultiByteToWideChar(CP_ACP, 0, name, -1, wname, dimof(wname));
 
-	TexMetadata imageMetadata;
-	ScratchImage* pScratchImage = new ScratchImage();
 	if (!_stricmp(".dds", name + strlen(name) - 4)) {
-		LoadFromDDSFile(wname, DDS_FLAGS_NONE, &imageMetadata, *pScratchImage);
+		CreateDDSTextureFromFileEx(deviceMan11.GetDevice(), wname, 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false, nullptr, &tex);
 	} else {
-		LoadFromWICFile(wname, DDS_FLAGS_NONE, &imageMetadata, *pScratchImage);
+		CreateWICTextureFromFileEx(deviceMan11.GetDevice(), deviceMan11.GetContext(), wname, 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false, nullptr, &tex);
 	}
-	CreateShaderResourceView(deviceMan11.GetDevice(), pScratchImage->GetImages(), pScratchImage->GetImageCount(), imageMetadata, &tex);
-	delete pScratchImage;
-
 	if (!tex) {
 		return -1;
 	}
