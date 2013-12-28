@@ -30,7 +30,8 @@
 #include <d3d11.h>
 #include <D3Dcompiler.h>
 #include <directxmath.h>
-#include <DirectXTex.h>
+#include <DDSTextureLoader.h>
+#include <WICTextureLoader.h>
 using namespace DirectX;
 
 // TODO: reference additional headers your program requires here
