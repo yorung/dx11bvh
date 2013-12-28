@@ -4,6 +4,8 @@ class App {
 	float lastX;
 	float lastY;
 	XMVECTOR quat;
+	SpriteBatch* sprite;
+	SpriteFont* font;
 public:
 	App();
 	~App();

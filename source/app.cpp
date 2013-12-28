@@ -11,7 +11,7 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), lastX(-1), lastY(-1)
+App::App() : scale(1), lastX(-1), lastY(-1), sprite(nullptr), font(nullptr)
 {
 	quat = XMQuaternionIdentity();
 	ZeroMemory(mesh, sizeof(mesh));
@@ -24,6 +24,9 @@ App::~App()
 void App::Init(const char* fileName)
 {
 	Destroy();
+
+	sprite = new SpriteBatch(deviceMan11.GetContext());
+	font = new SpriteFont(deviceMan11.GetDevice(), L"resource\\font.spritefont");
 
 	if (fileName) {
 		const char* ext = strrchr(fileName, '.');
@@ -110,6 +113,13 @@ void App::Draw()
 			it->Draw(0, time);
 		}
 	}
+
+    sprite->Begin();
+    XMFLOAT2 pos;
+    pos.x = SCR_W / 2;
+    pos.y = SCR_H / 2;
+    font->DrawString(sprite, L"Font Test", pos);
+    sprite->End();
 }
 
 void App::Destroy()
@@ -117,4 +127,6 @@ void App::Destroy()
 	SAFE_DELETE(mesh[0]);
 	SAFE_DELETE(mesh[1]);
 	SAFE_DELETE(mesh[2]);
+	SAFE_DELETE(font);
+	SAFE_DELETE(sprite);
 }
