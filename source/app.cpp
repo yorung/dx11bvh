@@ -105,7 +105,7 @@ void App::Draw()
 
 	for (auto& it : mesh) {
 		if (it && meshTiny) {
-//			it->Draw(0, time);
+			it->Draw(0, time);
 			meshTiny->DrawBvh(it, time);
 		}
 	}
