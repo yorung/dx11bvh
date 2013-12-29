@@ -383,6 +383,7 @@ BONE_ID MeshX::_getFrameIdByName(const char* name)
 	f.childId = -1;
 	f.siblingId = -1;
 	XMStoreFloat4x4(&f.frameTransformMatrix, XMMatrixIdentity());
+	XMStoreFloat4x4(&f.frameTransformMatrixOrg, XMMatrixIdentity());
 	XMStoreFloat4x4(&f.boneOffsetMatrix, XMMatrixIdentity());
 	m_frames.push_back(f);
 	return m_frames.size() - 1;
@@ -641,6 +642,7 @@ void MeshX::ParseFrame(char* p, BONE_ID parentFrameId)
 			BONE_ID frameId = _getFrameIdByName(name.c_str());
 			Frame& frame = m_frames[frameId];
 			_getMatrix(frameMat, frame.frameTransformMatrix);
+			frame.frameTransformMatrixOrg = frame.frameTransformMatrix;
 			_linkFrame(parentFrameId, frameId);
 
 			Block b;
@@ -998,8 +1000,34 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 		BONE_ID bvhBoneId = bvh->BoneNameToId(bvhBoneName);
 		if (bvhBoneId >= 0) {
 	//		BonesForX[i] = XMLoadFloat4x4(&f.boneOffsetMatrix) * BoneTransForBvh[bvhBoneId];
-			BonesForX[i] = /*XMLoadFloat4x4(&f.boneOffsetMatrix) **/ BoneTransForBvh[bvhBoneId];
+	//		BonesForX[i] = /*XMLoadFloat4x4(&f.boneOffsetMatrix) **/ BoneTransForBvh[bvhBoneId];
+	//		BonesForX[i] = XMMatrixIdentity();
+	//		XMMATRIX rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 50.0f * XM_PI / 180) * XMMatrixRotationX(cos(time * XM_PI / 10) * 50.0f * XM_PI / 180) * XMMatrixRotationY(sin(time * XM_PI / 8) * 50.0f * XM_PI / 180);
+//			XMStoreFloat4x4(&f.frameTransformMatrix, rot);
+
+//			XMVECTOR dummy;
+//			XMStoreFloat4x4(&f.frameTransformMatrix, XMMatrixInverse(&dummy, XMLoadFloat4x4(&f.boneOffsetMatrix)));
+
+//			BonesForX[i] = XMLoadFloat4x4(&f.boneOffsetMatrix) * rot * XMMatrixInverse(&dummy, XMLoadFloat4x4(&f.boneOffsetMatrix));
 		}
+		f.frameTransformMatrix = f.frameTransformMatrixOrg;
+
+		f.frameTransformMatrix._11 = f.frameTransformMatrix._22 = f.frameTransformMatrix._33 = 1.0f;
+		f.frameTransformMatrix._12 = f.frameTransformMatrix._13 = f.frameTransformMatrix._21 = 0.0f;
+		f.frameTransformMatrix._23 = f.frameTransformMatrix._31 = f.frameTransformMatrix._32 = 0.0f;
+
+	//	XMVECTOR dummy;
+
+	//	XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.boneOffsetMatrix));
+	}
+
+	CalcFrameMatrices(0, XMMatrixIdentity());
+
+	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+		Frame& f = m_frames[i];
+		XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
+		XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
+		BonesForX[i] = boneOffset * frameTransform;
 	}
 
 	m_meshRenderer.Draw(BonesForX, dimof(BonesForX), m_block);

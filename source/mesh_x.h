@@ -91,6 +91,7 @@ struct MaterialMap
 struct Frame
 {
 	char name[32];
+	XMFLOAT4X4 frameTransformMatrixOrg;
 	XMFLOAT4X4 frameTransformMatrix;
 	XMFLOAT4X4 boneOffsetMatrix;
 	XMFLOAT4X4 result;
