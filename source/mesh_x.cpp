@@ -385,6 +385,7 @@ BONE_ID MeshX::_getFrameIdByName(const char* name)
 	XMStoreFloat4x4(&f.frameTransformMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&f.frameTransformMatrixOrg, XMMatrixIdentity());
 	XMStoreFloat4x4(&f.boneOffsetMatrix, XMMatrixIdentity());
+	XMStoreFloat4x4(&f.initialMatrix, XMMatrixIdentity());
 	m_frames.push_back(f);
 	return m_frames.size() - 1;
 }
@@ -792,6 +793,13 @@ void MeshX::LoadSub(const char *fileName)
 
 	ParseFrame(body, frameId);
 
+	for (auto& f : m_frames) {
+		if (f.parentId >= 0) {
+			XMVECTOR dummy;
+			XMStoreFloat4x4(&f.initialMatrix, XMMatrixInverse(&dummy, XMLoadFloat4x4(&f.boneOffsetMatrix)) * XMLoadFloat4x4(&m_frames[f.parentId].boneOffsetMatrix));
+		}
+	}
+
 	ParseAnimationSets(body);
 
 	char* animTick = _searchChildTag(body, "AnimTicksPerSecond");
@@ -1013,12 +1021,16 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 		f.frameTransformMatrix = f.frameTransformMatrixOrg;
 
 		f.frameTransformMatrix._11 = f.frameTransformMatrix._22 = f.frameTransformMatrix._33 = 1.0f;
-		f.frameTransformMatrix._12 = f.frameTransformMatrix._13 = f.frameTransformMatrix._21 = 0.0f;
-		f.frameTransformMatrix._23 = f.frameTransformMatrix._31 = f.frameTransformMatrix._32 = 0.0f;
+		f.frameTransformMatrix._12 = f.frameTransformMatrix._13 = f.frameTransformMatrix._21 = f.frameTransformMatrix._23 = f.frameTransformMatrix._31 = f.frameTransformMatrix._32 = 0.0f;
 
 	//	XMVECTOR dummy;
 
 	//	XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.boneOffsetMatrix));
+
+		XMMATRIX rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationX(cos(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationY(sin(time * XM_PI / 8) * 10.0f * XM_PI / 180);
+//		XMMATRIX rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180);
+//		XMMATRIX rot = XMMatrixRotationY(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180);
+		XMStoreFloat4x4(&f.frameTransformMatrix, rot * XMLoadFloat4x4(&f.initialMatrix));
 	}
 
 	CalcFrameMatrices(0, XMMatrixIdentity());
