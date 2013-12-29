@@ -201,16 +201,37 @@ static char* _searchChildTag(char* from, const char *tag, std::string* name = nu
 	return nullptr;
 }
 
-static void InitVertex(MeshVertex& v, BONE_ID boneId)
+static void InitVertex(MeshVertex& v, BONE_ID boneId, int depth)
 {
+	DWORD depthToColor[] = {
+		0xffffffff,
+		0xffffff00,
+		0xffff00ff,
+		0xffff0000,
+		0xff00ffff,
+		0xff00ff00,
+		0xff0000ff,
+		0xff000000,
+	};
+
 	v.blendIndices.x = v.blendIndices.y = v.blendIndices.z = v.blendIndices.w = boneId;
-	v.color = 0xffffffff;
+	v.color = depthToColor[depth % dimof(depthToColor)];
 	v.blendWeights.x = v.blendWeights.y = v.blendWeights.z = 0;
 	v.normal.x = 1;
 	v.normal.y = 0;
 	v.normal.z = 0;
 	v.uv.x = v.uv.y = 0;
 	v.xyz.x = v.xyz.y = v.xyz.z = 0;
+}
+
+int Bvh::GetDepth(BONE_ID id)
+{
+	int depth = 0;
+	BvhFrame* f = &m_frames[id];
+	for (; f->parentId >= 0; depth++) {
+		f = &m_frames[f->parentId];
+	}
+	return depth;
 }
 
 Bvh::Bvh(const char *fileName)
@@ -241,6 +262,7 @@ Bvh::Bvh(const char *fileName)
 		if (pId < 0) {
 			continue;
 		}
+		int depth = GetDepth(pId);
 		BvhFrame& f1 = m_frames[pId];
 		XMVECTOR v1 = XMLoadFloat3(&f1.offsetCombined);
 		XMVECTOR v2 = XMLoadFloat3(&f2.offsetCombined);
@@ -253,7 +275,7 @@ Bvh::Bvh(const char *fileName)
 		for (int j = 0; j < div; j++) {
 			MeshVertex vert[3];
 			for (auto& it : vert) {
-				InitVertex(it, pId);
+				InitVertex(it, pId, GetDepth(pId));
 			}
 			float rad = XM_2PI / div * (j + 1);
 			XMVECTOR vRot = XMVectorAdd(v1, XMVectorScale(vRot0, cosf(rad)) + XMVectorScale(vRot90, sinf(rad)));

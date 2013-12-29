@@ -11,7 +11,7 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), lastX(-1), lastY(-1), meshTiny(nullptr)
+App::App() : scale(1), lastX(-1), lastY(-1), sprite(nullptr), font(nullptr), meshTiny(nullptr)
 {
 	quat = XMQuaternionIdentity();
 	ZeroMemory(mesh, sizeof(mesh));
@@ -24,6 +24,9 @@ App::~App()
 void App::Init(const char* fileName)
 {
 	Destroy();
+
+	sprite = new SpriteBatch(deviceMan11.GetContext());
+	font = new SpriteFont(deviceMan11.GetDevice(), L"resource\\font.spritefont");
 
 	meshTiny = new MeshX("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\Media\\Tiny\\tiny.x");
 
@@ -85,6 +88,50 @@ void App::MouseMove(float x, float y)
 	quat = XMQuaternionMultiply(quat, q);
 }
 
+inline XMFLOAT2 GetScreenPos(const XMMATRIX& mLocal)
+{
+	XMFLOAT4X4 mViewport;
+	XMMATRIX mW, mV, mP;
+	matrixMan.Get(MatrixMan::WORLD, mW);
+	matrixMan.Get(MatrixMan::VIEW, mV);
+	matrixMan.Get(MatrixMan::PROJ, mP);
+	XMStoreFloat4x4(&mViewport, XMMatrixIdentity());
+	mViewport._11 = SCR_W / 2;
+	mViewport._22 = -SCR_H / 2;
+	mViewport._41 = SCR_W / 2;
+	mViewport._42 = SCR_H / 2;
+
+	XMMATRIX m = mLocal * mW * mV * mP * XMLoadFloat4x4(&mViewport);
+
+	XMFLOAT2 p;
+	p.x = XMVectorGetX(m.r[3]) / XMVectorGetW(m.r[3]);
+	p.y = XMVectorGetY(m.r[3]) / XMVectorGetW(m.r[3]);
+	return p;
+}
+
+void App::DrawBoneNames(Bvh* bvh)
+{
+	const std::vector<BvhFrame>& frames = bvh->GetFrames();
+	for (auto& it : frames) {
+		if (it.childId < 0) {
+			continue;
+		}
+		XMFLOAT2 pos = GetScreenPos(XMLoadFloat4x4(&it.result));
+
+		WCHAR wname[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, 0, it.name, -1, wname, dimof(wname));
+
+		XMVECTOR size = font->MeasureString(wname);
+		pos.x -= XMVectorGetX(size) / 2;
+		pos.y -= XMVectorGetY(size) / 2;
+		XMFLOAT2 origin = {0, 0};
+		font->DrawString(sprite, wname, pos, Colors::Black, 0, origin, 0.7f);
+		pos.x += 1.0f;
+		pos.y += 1.0f;
+		font->DrawString(sprite, wname, pos, Colors::White, 0, origin, 0.7f);
+	}
+}
+
 void App::Draw()
 {
 	LARGE_INTEGER t, f;
@@ -103,12 +150,22 @@ void App::Draw()
 	float rot = XM_PI;
 	matrixMan.Set(MatrixMan::VIEW, XMMatrixLookAtLH(XMVectorSet(sin(rot) * dist, 0, cos(rot) * dist, 1), XMVectorSet(0, 0, 0, 0), XMVectorSet(0, 1, 0, 0)));
 
+    sprite->Begin();
+
 	for (auto& it : mesh) {
 		if (it && meshTiny) {
 			it->Draw(0, time);
+
 			meshTiny->DrawBvh(it, time);
+
+			Bvh* bvh = dynamic_cast<Bvh*>(it);
+			if (bvh) {
+				DrawBoneNames(bvh);
+			}
 		}
 	}
+
+	sprite->End();
 }
 
 void App::Destroy()
@@ -117,4 +174,6 @@ void App::Destroy()
 	SAFE_DELETE(mesh[1]);
 	SAFE_DELETE(mesh[2]);
 	SAFE_DELETE(meshTiny);
+	SAFE_DELETE(font);
+	SAFE_DELETE(sprite);
 }

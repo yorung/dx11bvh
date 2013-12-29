@@ -32,6 +32,8 @@
 #include <directxmath.h>
 #include <DDSTextureLoader.h>
 #include <WICTextureLoader.h>
+#include <SpriteFont.h>
+
 using namespace DirectX;
 
 // TODO: reference additional headers your program requires here
