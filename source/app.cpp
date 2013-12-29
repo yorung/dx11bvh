@@ -115,10 +115,17 @@ void App::DrawBoneNames(Bvh* bvh)
 {
 	const std::vector<BvhFrame>& frames = bvh->GetFrames();
 	for (auto& it : frames) {
+		if (it.childId < 0) {
+			continue;
+		}
 		XMFLOAT2 pos = GetScreenPos(XMLoadFloat4x4(&it.result));
 
 		WCHAR wname[MAX_PATH];
 		MultiByteToWideChar(CP_ACP, 0, it.name, -1, wname, dimof(wname));
+
+		XMVECTOR size = font->MeasureString(wname);
+		pos.x -= XMVectorGetX(size) / 2;
+		pos.y -= XMVectorGetY(size) / 2;
 		font->DrawString(sprite, wname, pos);
 	}
 }
