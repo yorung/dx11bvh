@@ -27,6 +27,7 @@ private:
 	void DumpFrames(BONE_ID frameId, int depth) const;
 	void ParseMotion(const char *p);
 	void CalcAnimation(double time);
+	int GetDepth(BONE_ID id);
 
 	std::vector<BvhFrame> m_frames;
 	std::vector<float> motion;

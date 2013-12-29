@@ -38,8 +38,7 @@ VS_OUTPUT mainVS( VS_INPUT _In ) {
 		bones[_In.indices[3]] * (1 - _In.weights[0] - _In.weights[1] - _In.weights[2]);
 	Out.Pos = mul(float4( _In.Pos, 1 ), mul(comb, mul(g_matW,g_matVP)));
 	_In.Normal = normalize(mul(_In.Normal, mul(comb, g_matW)));
-	Out.Col = CalcColor( _In.Normal );
-	Out.Col.w = 1;
+	Out.Col = float4(CalcColor(_In.Normal).xyz, 1) * _In.Col;
 	Out.Tex0 = _In.Tex0;
 	return Out;
 }
