@@ -39,8 +39,8 @@ void App::Init(const char* fileName)
 		}
 	} else {
 		mesh[0] = new Bvh("D:\\github\\aachan.bvh");
-		mesh[1] = new Bvh("D:\\github\\kashiyuka.bvh");
-		mesh[2] = new Bvh("D:\\github\\nocchi.bvh");
+	//	mesh[1] = new Bvh("D:\\github\\kashiyuka.bvh");
+	//	mesh[2] = new Bvh("D:\\github\\nocchi.bvh");
 	}
 
 	float radius = CalcRadius(mesh[0]);
