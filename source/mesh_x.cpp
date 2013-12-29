@@ -934,54 +934,56 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 	};
 	const BoneConvTbl tbl[] =
 	{
-		{ "@myroot", "Hips" },
-		{ "Scene_Root", "Hips" },
-		{ "body", "Hips" },
-		{ "Box01", "Hips" },
-		{ "Bip01", "Hips" },
-		{ "Bip01_Footsteps", "Hips" },
-		{ "Bip01_Pelvis", "Hips" },
-		{ "Bip01_Spine", "Chest2" },
-		{ "Bip01_Spine1", "Chest2" },
-		{ "Bip01_L_Thigh", "LeftKnee" },
-		{ "Bip01_R_Thigh", "RightKnee" },
-		{ "Bip01_R_Calf", "RightAnkle" },
-		{ "Bip01_R_Foot", "RightAnkle" },
-		{ "Bip01_R_Toe0", "RightToe" },
-		{ "Dummy11", "End of RightToe" },
-		{ "Bip01_L_Calf", "LeftAnkle" },
-		{ "Bip01_L_Foot", "LeftAnkle" },
-		{ "Bip01_L_Toe0", "LeftToe" },
-		{ "Dummy16", "End of LeftToe" },
-		{ "Bip01_Spine2", "Chest3" },
-		{ "Bip01_Spine3", "Chest4" },
-		{ "Bip01_Neck", "Neck" },
-		{ "Bip01_Head", "Head" },
-		{ "Bip01_L_Clavicle", "LeftCollar" },
-		{ "Bip01_R_Clavicle", "RightCollar" },
-		{ "Bip01_R_UpperArm", "RightShoulder" },
-		{ "Bip01_R_Forearm", "RightElbow" },
-		{ "Bip01_R_Hand", "RightWrist" },
-		{ "Bip01_R_Finger0", "End of RightWrist" },
-		{ "Bip01_R_Finger1", "End of RightWrist" },
-		{ "Bip01_R_Finger11", "End of RightWrist" },
-		{ "Bip01_R_Finger12", "End of RightWrist" },
-		{ "Dummy02", "End of RightWrist" },
-		{ "Bip01_R_Finger01", "End of RightWrist" },
-		{ "Bip01_R_Finger02", "End of RightWrist" },
-		{ "Dummy01", "End of RightWrist" },
-		{ "Bip01_L_UpperArm", "LeftShoulder" },
-		{ "Bip01_L_Forearm", "LeftElbow" },
-		{ "Bip01_L_Hand", "LeftWrist" },
-		{ "Bip01_L_Finger0", "End of LeftWrist" },
-		{ "Bip01_L_Finger1", "End of LeftWrist" },
-		{ "Bip01_L_Finger11", "End of LeftWrist" },
-		{ "Bip01_L_Finger12", "End of LeftWrist" },
-		{ "Dummy03", "End of LeftWrist" },
-		{ "Bip01_L_Finger01", "End of LeftWrist" },
-		{ "Bip01_L_Finger02", "End of LeftWrist" },
-		{ "Dummy06", "End of LeftWrist" },
-		{ "Dummy21", "End of LeftWrist" },
+	//	{ "@myroot", "Hips" },
+	//	{ "Scene_Root", "Hips" },
+	//	{ "body", "Hips" },
+	//	{ "Box01", "Hips" },
+	//	{ "Bip01", "Hips" },
+	//	{ "Bip01_Footsteps", "Hips" },
+	//	{ "Bip01_Pelvis", "Hips" },
+	//	{ "Bip01_Spine", "Chest2" },
+	//	{ "Bip01_Spine1", "Chest2" },
+	//	{ "Bip01_L_Thigh", "LeftKnee" },
+	//	{ "Bip01_R_Thigh", "RightKnee" },
+	//	{ "Bip01_R_Calf", "RightAnkle" },
+	//	{ "Bip01_R_Foot", "RightAnkle" },
+	//	{ "Bip01_R_Toe0", "RightToe" },
+	//	{ "Dummy11", "End of RightToe" },
+	//	{ "Bip01_L_Calf", "LeftAnkle" },
+	//	{ "Bip01_L_Foot", "LeftAnkle" },
+	//	{ "Bip01_L_Toe0", "LeftToe" },
+	//	{ "Dummy16", "End of LeftToe" },
+	//	{ "Bip01_Spine2", "Chest3" },
+	//	{ "Bip01_Spine3", "Chest4" },
+	//	{ "Bip01_Neck", "Neck" },
+	//	{ "Bip01_Head", "Head" },
+	//	{ "Bip01_L_Clavicle", "LeftCollar" },
+	//	{ "Bip01_R_Clavicle", "RightCollar" },
+	//	{ "Bip01_R_UpperArm", "RightShoulder" },
+	//	{ "Bip01_R_Hand", "RightWrist" },
+	//	{ "Bip01_R_Finger0", "End of RightWrist" },
+	//	{ "Bip01_R_Finger1", "End of RightWrist" },
+	//	{ "Bip01_R_Finger11", "End of RightWrist" },
+	//	{ "Bip01_R_Finger12", "End of RightWrist" },
+	//	{ "Dummy02", "End of RightWrist" },
+	//	{ "Bip01_R_Finger01", "End of RightWrist" },
+	//	{ "Bip01_R_Finger02", "End of RightWrist" },
+	//	{ "Dummy01", "End of RightWrist" },
+	//	{ "Bip01_L_UpperArm", "LeftShoulder" },
+	//	{ "Bip01_L_Hand", "LeftWrist" },
+	//	{ "Bip01_L_Finger0", "End of LeftWrist" },
+	//	{ "Bip01_L_Finger1", "End of LeftWrist" },
+	//	{ "Bip01_L_Finger11", "End of LeftWrist" },
+	//	{ "Bip01_L_Finger12", "End of LeftWrist" },
+	//	{ "Dummy03", "End of LeftWrist" },
+	//	{ "Bip01_L_Finger01", "End of LeftWrist" },
+	//	{ "Bip01_L_Finger02", "End of LeftWrist" },
+	//	{ "Dummy06", "End of LeftWrist" },
+	//	{ "Dummy21", "End of LeftWrist" },
+
+
+		{ "Bip01_R_Forearm", "LeftElbow" },
+		{ "Bip01_L_Forearm", "RightElbow" },
 	};
 
 	XMMATRIX BoneTransForBvh[50];
@@ -995,6 +997,9 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 	assert(m_frames.size() <= dimof(BonesForX));
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		Frame& f = m_frames[i];
+
+		XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.initialMatrix));
+
 		const char* bvhBoneName = nullptr;
 		for (auto& t : tbl) {
 			if (!strcmp(t.bvh, f.name)) {
@@ -1006,6 +1011,9 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 			continue;
 		}
 		BONE_ID bvhBoneId = bvh->BoneNameToId(bvhBoneName);
+
+		XMMATRIX rot = XMMatrixIdentity();
+
 		if (bvhBoneId >= 0) {
 	//		BonesForX[i] = XMLoadFloat4x4(&f.boneOffsetMatrix) * BoneTransForBvh[bvhBoneId];
 	//		BonesForX[i] = /*XMLoadFloat4x4(&f.boneOffsetMatrix) **/ BoneTransForBvh[bvhBoneId];
@@ -1017,17 +1025,26 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 //			XMStoreFloat4x4(&f.frameTransformMatrix, XMMatrixInverse(&dummy, XMLoadFloat4x4(&f.boneOffsetMatrix)));
 
 //			BonesForX[i] = XMLoadFloat4x4(&f.boneOffsetMatrix) * rot * XMMatrixInverse(&dummy, XMLoadFloat4x4(&f.boneOffsetMatrix));
-		}
-		f.frameTransformMatrix = f.frameTransformMatrixOrg;
 
-		f.frameTransformMatrix._11 = f.frameTransformMatrix._22 = f.frameTransformMatrix._33 = 1.0f;
-		f.frameTransformMatrix._12 = f.frameTransformMatrix._13 = f.frameTransformMatrix._21 = f.frameTransformMatrix._23 = f.frameTransformMatrix._31 = f.frameTransformMatrix._32 = 0.0f;
+
+			const std::vector<BvhFrame>& bvhFrames = bvh->GetFrames();
+			XMFLOAT4X4 bvhFrameTransMat = bvhFrames[bvhBoneId].frameTransformMatrix;
+			bvhFrameTransMat._41 = 0;
+			bvhFrameTransMat._42 = 0;
+			bvhFrameTransMat._43 = 0;
+			rot = XMLoadFloat4x4(&bvhFrameTransMat);
+
+			//rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationX(cos(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationY(sin(time * XM_PI / 8) * 10.0f * XM_PI / 180);
+		}
+	//	f.frameTransformMatrix = f.frameTransformMatrixOrg;
+	//	f.frameTransformMatrix._11 = f.frameTransformMatrix._22 = f.frameTransformMatrix._33 = 1.0f;
+	//	f.frameTransformMatrix._12 = f.frameTransformMatrix._13 = f.frameTransformMatrix._21 = f.frameTransformMatrix._23 = f.frameTransformMatrix._31 = f.frameTransformMatrix._32 = 0.0f;
 
 	//	XMVECTOR dummy;
 
 	//	XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.boneOffsetMatrix));
 
-		XMMATRIX rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationX(cos(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationY(sin(time * XM_PI / 8) * 10.0f * XM_PI / 180);
+//		XMMATRIX rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationX(cos(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationY(sin(time * XM_PI / 8) * 10.0f * XM_PI / 180);
 //		XMMATRIX rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180);
 //		XMMATRIX rot = XMMatrixRotationY(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180);
 		XMStoreFloat4x4(&f.frameTransformMatrix, rot * XMLoadFloat4x4(&f.initialMatrix));

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-static float bvhScale = 5.0f;
+static float bvhScale = 3.0f;
 void *LoadFile(const char *fileName);
 
 static void _enterBrace(char*& p)
@@ -551,7 +551,8 @@ void Bvh::CalcAnimation(double time)
 			transMat = XMMatrixTranslation(it.offset.x, it.offset.y, it.offset.z);
 	//	}
 		if (it.rotIndies.x >= 0) {
-			rotMat = XMMatrixRotationZ(mot[it.rotIndies.z] * XM_PI / 180) * XMMatrixRotationX(-mot[it.rotIndies.x] * XM_PI / 180) * XMMatrixRotationY(-mot[it.rotIndies.y] * XM_PI / 180);
+//			rotMat = XMMatrixRotationZ(mot[it.rotIndies.z] * XM_PI / 180) * XMMatrixRotationX(-mot[it.rotIndies.x] * XM_PI / 180) * XMMatrixRotationY(-mot[it.rotIndies.y] * XM_PI / 180);
+			rotMat = XMMatrixIdentity();
 		}
 		XMStoreFloat4x4(&it.frameTransformMatrix, scaleMat * rotMat * transMat);
 	}
