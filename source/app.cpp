@@ -126,7 +126,11 @@ void App::DrawBoneNames(Bvh* bvh)
 		XMVECTOR size = font->MeasureString(wname);
 		pos.x -= XMVectorGetX(size) / 2;
 		pos.y -= XMVectorGetY(size) / 2;
-		font->DrawString(sprite, wname, pos);
+		XMFLOAT2 origin = {0, 0};
+		font->DrawString(sprite, wname, pos, Colors::Black, 0, origin, 0.7f);
+		pos.x += 1.0f;
+		pos.y += 1.0f;
+		font->DrawString(sprite, wname, pos, Colors::White, 0, origin, 0.7f);
 	}
 }
 
