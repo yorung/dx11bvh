@@ -32,7 +32,11 @@ void App::Init(const char* fileName)
 
 	if (fileName) {
 		const char* ext = strrchr(fileName, '.');
-		mesh[0] = new Bvh(fileName);
+		if (ext && !_stricmp(ext, ".bvh")) {
+			mesh[0] = new Bvh(fileName);
+		} else {
+			mesh[0] = new MeshX(fileName);
+		}
 	} else {
 		mesh[0] = new Bvh("D:\\github\\aachan.bvh");
 		mesh[1] = new Bvh("D:\\github\\kashiyuka.bvh");
@@ -156,10 +160,10 @@ void App::Draw()
 		if (it && meshTiny) {
 			it->Draw(0, time);
 
-			meshTiny->DrawBvh(it, time);
-
 			Bvh* bvh = dynamic_cast<Bvh*>(it);
+
 			if (bvh) {
+				meshTiny->DrawBvh(bvh, time);
 				DrawBoneNames(bvh);
 			}
 		}
