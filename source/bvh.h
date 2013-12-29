@@ -38,6 +38,7 @@ private:
 	Block m_block;
 public:
 	const Block& GetRawDatas() const { return m_block; }
+	const std::vector<BvhFrame>& GetFrames() const { return m_frames; }
 	Bvh(const char *fileName);
 	~Bvh();
 	void Draw(int animId, double time);

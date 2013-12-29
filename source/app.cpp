@@ -90,6 +90,39 @@ void App::MouseMove(float x, float y)
 	quat = XMQuaternionMultiply(quat, q);
 }
 
+inline XMFLOAT2 GetScreenPos(const XMMATRIX& mLocal)
+{
+	XMFLOAT4X4 mViewport;
+	XMMATRIX mW, mV, mP;
+	matrixMan.Get(MatrixMan::WORLD, mW);
+	matrixMan.Get(MatrixMan::VIEW, mV);
+	matrixMan.Get(MatrixMan::PROJ, mP);
+	XMStoreFloat4x4(&mViewport, XMMatrixIdentity());
+	mViewport._11 = SCR_W / 2;
+	mViewport._22 = -SCR_H / 2;
+	mViewport._41 = SCR_W / 2;
+	mViewport._42 = SCR_H / 2;
+
+	XMMATRIX m = mLocal * mW * mV * mP * XMLoadFloat4x4(&mViewport);
+
+	XMFLOAT2 p;
+	p.x = XMVectorGetX(m.r[3]) / XMVectorGetW(m.r[3]);
+	p.y = XMVectorGetY(m.r[3]) / XMVectorGetW(m.r[3]);
+	return p;
+}
+
+void App::DrawBoneNames(Bvh* bvh)
+{
+	const std::vector<BvhFrame>& frames = bvh->GetFrames();
+	for (auto& it : frames) {
+		XMFLOAT2 pos = GetScreenPos(XMLoadFloat4x4(&it.result));
+
+		WCHAR wname[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, 0, it.name, -1, wname, dimof(wname));
+		font->DrawString(sprite, wname, pos);
+	}
+}
+
 void App::Draw()
 {
 	LARGE_INTEGER t, f;
@@ -108,18 +141,20 @@ void App::Draw()
 	float rot = XM_PI;
 	matrixMan.Set(MatrixMan::VIEW, XMMatrixLookAtLH(XMVectorSet(sin(rot) * dist, 0, cos(rot) * dist, 1), XMVectorSet(0, 0, 0, 0), XMVectorSet(0, 1, 0, 0)));
 
+    sprite->Begin();
+
 	for (auto& it : mesh) {
 		if (it) {
 			it->Draw(0, time);
+
+			Bvh* bvh = dynamic_cast<Bvh*>(it);
+			if (bvh) {
+				DrawBoneNames(bvh);
+			}
 		}
 	}
 
-    sprite->Begin();
-    XMFLOAT2 pos;
-    pos.x = SCR_W / 2;
-    pos.y = SCR_H / 2;
-    font->DrawString(sprite, L"Font Test", pos);
-    sprite->End();
+	sprite->End();
 }
 
 void App::Destroy()
