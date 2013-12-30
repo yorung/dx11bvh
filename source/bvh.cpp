@@ -200,21 +200,10 @@ static char* _searchChildTag(char* from, const char *tag, std::string* name = nu
 	return nullptr;
 }
 
-static void InitVertex(MeshVertex& v, BONE_ID boneId, int depth)
+static void InitVertex(MeshVertex& v, BONE_ID boneId, DWORD color)
 {
-	DWORD depthToColor[] = {
-		0xffffffff,
-		0xffffff00,
-		0xffff00ff,
-		0xffff0000,
-		0xff00ffff,
-		0xff00ff00,
-		0xff0000ff,
-		0xff000000,
-	};
-
 	v.blendIndices.x = v.blendIndices.y = v.blendIndices.z = v.blendIndices.w = boneId;
-	v.color = depthToColor[depth % dimof(depthToColor)];
+	v.color = color;
 	v.blendWeights.x = v.blendWeights.y = v.blendWeights.z = 0;
 	v.normal.x = 1;
 	v.normal.y = 0;
@@ -231,6 +220,34 @@ int Bvh::GetDepth(BONE_ID id)
 		f = &m_frames[f->parentId];
 	}
 	return depth;
+}
+
+static inline void CreateCone(Block& b, XMVECTOR v1, XMVECTOR v2, BONE_ID boneId, DWORD color)
+{
+	XMVECTOR boneDir = XMVectorSubtract(v2, v1);
+	XMVECTOR eyeDir = XMVectorSet(0, 0, 0.15f, 0);
+	XMVECTOR vRot0 = XMVector3Cross(boneDir, eyeDir);
+	XMVECTOR vRot90 = XMVector3Cross(vRot0, XMVector3Normalize(boneDir));
+	XMVECTOR vRotLast = XMVectorAdd(v1, vRot0);
+	static const int div = 10;
+	for (int j = 0; j < div; j++) {
+		MeshVertex vert[3];
+		for (auto& it : vert) {
+			InitVertex(it, boneId, color);
+		}
+		float rad = XM_2PI / div * (j + 1);
+		XMVECTOR vRot = XMVectorAdd(v1, XMVectorScale(vRot0, cosf(rad)) + XMVectorScale(vRot90, sinf(rad)));
+		XMStoreFloat3(&vert[0].xyz, vRotLast);
+		XMStoreFloat3(&vert[1].xyz, vRot);
+		XMStoreFloat3(&vert[2].xyz, v2);
+		XMVECTOR normal = XMVector3Cross(XMVectorSubtract(vRot, vRotLast), XMVectorSubtract(v2, vRot));
+		for (auto& it : vert) {
+			XMStoreFloat3(&it.normal, normal);
+			b.vertices.push_back(it);
+			b.indices.push_back(b.indices.size());
+		}
+		vRotLast = vRot;
+	}
 }
 
 Bvh::Bvh(const char *fileName)
@@ -254,7 +271,6 @@ Bvh::Bvh(const char *fileName)
 	
     SetCurrentDirectoryA(strCWD);
 
-	unsigned idx = 0;
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		BvhFrame& f2 = m_frames[i];
 		BONE_ID pId = f2.parentId;
@@ -265,30 +281,18 @@ Bvh::Bvh(const char *fileName)
 		BvhFrame& f1 = m_frames[pId];
 		XMVECTOR v1 = XMLoadFloat3(&f1.offsetCombined);
 		XMVECTOR v2 = XMLoadFloat3(&f2.offsetCombined);
-		XMVECTOR boneDir = XMVectorSubtract(v2, v1);
-		XMVECTOR eyeDir = XMVectorSet(0, 0, 0.15f, 0);
-		XMVECTOR vRot0 = XMVector3Cross(boneDir, eyeDir);
-		XMVECTOR vRot90 = XMVector3Cross(vRot0, XMVector3Normalize(boneDir));
-		XMVECTOR vRotLast = XMVectorAdd(v1, vRot0);
-		static const int div = 10;
-		for (int j = 0; j < div; j++) {
-			MeshVertex vert[3];
-			for (auto& it : vert) {
-				InitVertex(it, pId, GetDepth(pId));
-			}
-			float rad = XM_2PI / div * (j + 1);
-			XMVECTOR vRot = XMVectorAdd(v1, XMVectorScale(vRot0, cosf(rad)) + XMVectorScale(vRot90, sinf(rad)));
-			XMStoreFloat3(&vert[0].xyz, vRotLast);
-			XMStoreFloat3(&vert[1].xyz, vRot);
-			XMStoreFloat3(&vert[2].xyz, v2);
-			XMVECTOR normal = XMVector3Cross(XMVectorSubtract(vRot, vRotLast), XMVectorSubtract(v2, vRot));
-			for (auto& it : vert) {
-				XMStoreFloat3(&it.normal, normal);
-				m_block.vertices.push_back(it);
-				m_block.indices.push_back(idx++);
-			}
-			vRotLast = vRot;
-		}
+
+		static const DWORD depthToColor[] = {
+			0xffffffff,
+			0xffffff00,
+			0xffff00ff,
+			0xffff0000,
+			0xff00ffff,
+			0xff00ff00,
+			0xff0000ff,
+			0xff000000,
+		};
+		CreateCone(m_block, v1, v2, pId, depthToColor[depth % dimof(depthToColor)]);
 	}
 
 	int sizeVertices = m_block.vertices.size() * sizeof(m_block.vertices[0]);
