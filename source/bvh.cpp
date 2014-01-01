@@ -225,9 +225,12 @@ int Bvh::GetDepth(BONE_ID id)
 
 static inline void CreateCone(Block& b, XMVECTOR v1, XMVECTOR v2, BONE_ID boneId, DWORD color)
 {
+	float radius = 0.15f;
 	XMVECTOR boneDir = XMVectorSubtract(v2, v1);
-	XMVECTOR eyeDir = XMVectorSet(0, 0, 0.15f, 0);
-	XMVECTOR vRot0 = XMVector3Cross(boneDir, eyeDir);
+	XMVECTOR vRot0 = XMVector3Cross(boneDir, XMVectorSet(0, 0, radius, 0));
+	if (XMVector3Equal(XMVectorZero(), vRot0)) {
+		vRot0 = XMVector3Cross(boneDir, XMVectorSet(0, radius, 0, 0));
+	}
 	XMVECTOR vRot90 = XMVector3Cross(vRot0, XMVector3Normalize(boneDir));
 	XMVECTOR vRotLast = XMVectorAdd(v1, vRot0);
 	static const int div = 10;
