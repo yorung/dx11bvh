@@ -329,6 +329,76 @@ static MatMan::MMID _getMaterial(char*& p)
 
 void CreateCone(Block& b, XMVECTOR v1, XMVECTOR v2, BONE_ID boneId, DWORD color);
 
+int MeshX::GetDepth(BONE_ID id)
+{
+	int depth = 0;
+	Frame* f = &m_frames[id];
+	for (; f->parentId >= 0; depth++) {
+		f = &m_frames[f->parentId];
+	}
+	return depth;
+}
+
+void MeshX::CreateBoneMesh()
+{
+	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+		Frame& f2 = m_frames[i];
+		BONE_ID pId = f2.parentId;
+		if (pId < 0) {
+			continue;
+		}
+		int depth = GetDepth(pId);
+		Frame& f1 = m_frames[pId];
+		XMVECTOR dummy;
+		XMVECTOR v1 = XMMatrixInverse(&dummy, XMLoadFloat4x4(&f1.boneOffsetMatrix)).r[3];
+		XMVECTOR v2 = XMMatrixInverse(&dummy, XMLoadFloat4x4(&f2.boneOffsetMatrix)).r[3];
+
+		if (XMVectorGetX(XMVector3LengthSq(v2)) == 0) {	// dummy bone?
+			continue;
+		}
+
+		static const DWORD depthToColor[] = {
+			0xffffffff,
+			0xffffff00,
+			0xffff00ff,
+			0xffff0000,
+			0xff00ffff,
+			0xff00ff00,
+			0xff0000ff,
+			0xff000000,
+		};
+		CreateCone(bones, v1, v2, pId, depthToColor[depth % dimof(depthToColor)]);
+	}
+
+	int sizeVertices = bones.vertices.size() * sizeof(bones.vertices[0]);
+	int sizeIndices = bones.indices.size() * sizeof(bones.indices[0]);
+	if (sizeVertices && sizeIndices) {
+		bonesRenderer.Init(sizeVertices, sizeIndices, &bones.vertices[0], &bones.indices[0]);
+	}
+
+	Material mat;
+	mat.faceColor.x = 0.6f;
+	mat.faceColor.y = 0.6f;
+	mat.faceColor.z = 0.6f;
+	mat.faceColor.w = 1.0f;
+	mat.power = 1.0f;
+	mat.specular.x = 1.0f;
+	mat.specular.y = 1.0f;
+	mat.specular.z = 1.0f;
+	mat.specular.w = 1.0f;
+	mat.emissive.x = 0.4f;
+	mat.emissive.y = 0.4f;
+	mat.emissive.z = 0.4f;
+	mat.emissive.w = 1.0f;
+	mat.tmid = texMan.Create("white.bmp", true);
+
+	MaterialMap map;
+	map.materialId = matMan.Create(mat);
+	map.faceStartIndex = 0;
+	map.faces = bones.indices.size() / 3;
+	bones.materialMaps.push_back(map);
+}
+
 void MeshX::CreatePivotMesh()
 {
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
@@ -399,6 +469,7 @@ MeshX::MeshX(const char *fileName)
 	m_meshRenderer.Init(sizeVertices, sizeIndices, &m_block.vertices[0], &m_block.indices[0]);
 
 	CreatePivotMesh();
+	CreateBoneMesh();
 }
 
 static DWORD _conv1To255(float f, int bit)
@@ -868,6 +939,7 @@ MeshX::~MeshX()
 {
 	m_meshRenderer.Destroy();
 	pivotsRenderer.Destroy();
+	bonesRenderer.Destroy();
 }
 
 void MeshX::CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent)
@@ -972,7 +1044,8 @@ void MeshX::Draw(int animId, double time)
 	}
 
 //	m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
-	pivotsRenderer.Draw(BoneMatrices, dimof(BoneMatrices), pivots);
+//	pivotsRenderer.Draw(BoneMatrices, dimof(BoneMatrices), pivots);
+	bonesRenderer.Draw(BoneMatrices, dimof(BoneMatrices), bones);
 }
 
 
@@ -1110,6 +1183,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 	}
 
 //	m_meshRenderer.Draw(BonesForX, dimof(BonesForX), m_block);
-	pivotsRenderer.Draw(BonesForX, dimof(BonesForX), pivots);
+//	pivotsRenderer.Draw(BonesForX, dimof(BonesForX), pivots);
+	bonesRenderer.Draw(BonesForX, dimof(BonesForX), bones);
 }
 

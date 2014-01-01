@@ -186,8 +186,8 @@ void App::Draw()
 			Bvh* bvh = dynamic_cast<Bvh*>(it);
 
 			if (bvh) {
-				meshTiny->DrawBvh(bvh, time);
-			//	meshTiny->Draw(0, time);
+			//	meshTiny->DrawBvh(bvh, time);
+				meshTiny->Draw(0, time);
 				DrawBoneNames(bvh);
 			}
 		}

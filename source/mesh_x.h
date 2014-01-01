@@ -127,7 +127,9 @@ private:
 	void CalcAnimation(int animId, double time);
 	void CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent);
 	void DumpFrames(BONE_ID frameId, int depth) const;
+	void CreateBoneMesh();
 	void CreatePivotMesh();
+	int GetDepth(BONE_ID id);
 
 	std::vector<Frame> m_frames;
 	std::vector<AnimationSet> m_animationSets;
@@ -136,6 +138,9 @@ private:
 
 	MeshRenderer pivotsRenderer;
 	Block pivots;
+
+	MeshRenderer bonesRenderer;
+	Block bones;
 public:
 	const Block& GetRawDatas() const { return m_block; }
 	const std::vector<Frame>& GetFrames() const { return m_frames; }
