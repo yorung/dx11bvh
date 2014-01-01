@@ -1109,6 +1109,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 		BonesForX[i] = boneOffset * frameTransform;
 	}
 
-	m_meshRenderer.Draw(BonesForX, dimof(BonesForX), m_block);
+//	m_meshRenderer.Draw(BonesForX, dimof(BonesForX), m_block);
+	pivotsRenderer.Draw(BonesForX, dimof(BonesForX), pivots);
 }
 
