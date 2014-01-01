@@ -238,9 +238,9 @@ static inline void CreateCone(Block& b, XMVECTOR v1, XMVECTOR v2, BONE_ID boneId
 		float rad = XM_2PI / div * (j + 1);
 		XMVECTOR vRot = XMVectorAdd(v1, XMVectorScale(vRot0, cosf(rad)) + XMVectorScale(vRot90, sinf(rad)));
 		XMStoreFloat3(&vert[0].xyz, vRotLast);
-		XMStoreFloat3(&vert[1].xyz, vRot);
-		XMStoreFloat3(&vert[2].xyz, v2);
-		XMVECTOR normal = XMVector3Cross(XMVectorSubtract(vRot, vRotLast), XMVectorSubtract(v2, vRot));
+		XMStoreFloat3(&vert[1].xyz, v2);
+		XMStoreFloat3(&vert[2].xyz, vRot);
+		XMVECTOR normal = XMVector3Cross(XMVectorSubtract(vRotLast, v2), XMVectorSubtract(v2, vRot));
 		for (auto& it : vert) {
 			XMStoreFloat3(&it.normal, normal);
 			b.vertices.push_back(it);
