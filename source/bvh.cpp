@@ -340,9 +340,9 @@ void Bvh::CreatePivotMesh()
 		BvhFrame& f = m_frames[i];
 		XMVECTOR v = XMLoadFloat3(&f.offsetCombined);
 		float len = 50.0f;
-		CreateCone(pivots, v, v + XMVectorSet(len, 0, 0, 0), i, 0xffff0000);
+		CreateCone(pivots, v, v + XMVectorSet(len, 0, 0, 0), i, 0xff0000ff);
 		CreateCone(pivots, v, v + XMVectorSet(0, len, 0, 0), i, 0xff00ff00);
-		CreateCone(pivots, v, v + XMVectorSet(0, 0, len, 0), i, 0xff0000ff);
+		CreateCone(pivots, v, v + XMVectorSet(0, 0, len, 0), i, 0xffff0000);
 	}
 
 	int sizeVertices = pivots.vertices.size() * sizeof(pivots.vertices[0]);

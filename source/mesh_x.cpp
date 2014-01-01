@@ -339,9 +339,9 @@ void MeshX::CreatePivotMesh()
 
 		XMVECTOR v = matLocal.r[3];
 		float len = 50.0f;
-		CreateCone(pivots, v, XMVector3TransformCoord(XMVectorSet(len, 0, 0, 0), matLocal), i, 0xffff0000);
+		CreateCone(pivots, v, XMVector3TransformCoord(XMVectorSet(len, 0, 0, 0), matLocal), i, 0xff0000ff);
 		CreateCone(pivots, v, XMVector3TransformCoord(XMVectorSet(0, len, 0, 0), matLocal), i, 0xff00ff00);
-		CreateCone(pivots, v, XMVector3TransformCoord(XMVectorSet(0, 0, len, 0), matLocal), i, 0xff0000ff);
+		CreateCone(pivots, v, XMVector3TransformCoord(XMVectorSet(0, 0, len, 0), matLocal), i, 0xffff0000);
 	}
 
 	int sizeVertices = pivots.vertices.size() * sizeof(pivots.vertices[0]);
