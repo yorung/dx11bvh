@@ -127,13 +127,18 @@ private:
 	void CalcAnimation(int animId, double time);
 	void CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent);
 	void DumpFrames(BONE_ID frameId, int depth) const;
+	void CreatePivotMesh();
 
 	std::vector<Frame> m_frames;
 	std::vector<AnimationSet> m_animationSets;
 	Block m_block;
 	int m_animTicksPerSecond;
+
+	MeshRenderer pivotsRenderer;
+	Block pivots;
 public:
 	const Block& GetRawDatas() const { return m_block; }
+	const std::vector<Frame>& GetFrames() const { return m_frames; }
 	MeshX(const char *fileName);
 	~MeshX();
 	void Draw(int animId, double time);

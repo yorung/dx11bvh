@@ -327,6 +327,52 @@ static MatMan::MMID _getMaterial(char*& p)
 	return matMan.Create(mat);
 }
 
+void CreateCone(Block& b, XMVECTOR v1, XMVECTOR v2, BONE_ID boneId, DWORD color);
+
+void MeshX::CreatePivotMesh()
+{
+	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+		Frame& f = m_frames[i];
+
+		XMVECTOR dummy;
+		XMMATRIX matLocal = XMMatrixInverse(&dummy, XMLoadFloat4x4(&f.boneOffsetMatrix));
+
+		XMVECTOR v = matLocal.r[3];
+		float len = 50.0f;
+		CreateCone(pivots, v, v + XMVectorSet(len, 0, 0, 0), i, 0xffff0000);
+		CreateCone(pivots, v, v + XMVectorSet(0, len, 0, 0), i, 0xff00ff00);
+		CreateCone(pivots, v, v + XMVectorSet(0, 0, len, 0), i, 0xff0000ff);
+	}
+
+	int sizeVertices = pivots.vertices.size() * sizeof(pivots.vertices[0]);
+	int sizeIndices = pivots.indices.size() * sizeof(pivots.indices[0]);
+	if (sizeVertices && sizeIndices) {
+		pivotsRenderer.Init(sizeVertices, sizeIndices, &pivots.vertices[0], &pivots.indices[0]);
+	}
+
+	Material mat;
+	mat.faceColor.x = 0.6f;
+	mat.faceColor.y = 0.6f;
+	mat.faceColor.z = 0.6f;
+	mat.faceColor.w = 1.0f;
+	mat.power = 1.0f;
+	mat.specular.x = 1.0f;
+	mat.specular.y = 1.0f;
+	mat.specular.z = 1.0f;
+	mat.specular.w = 1.0f;
+	mat.emissive.x = 0.4f;
+	mat.emissive.y = 0.4f;
+	mat.emissive.z = 0.4f;
+	mat.emissive.w = 1.0f;
+	mat.tmid = texMan.Create("white.bmp", true);
+
+	MaterialMap map;
+	map.materialId = matMan.Create(mat);
+	map.faceStartIndex = 0;
+	map.faces = pivots.indices.size() / 3;
+	pivots.materialMaps.push_back(map);
+}
+
 MeshX::MeshX(const char *fileName)
 {
     char strPath[MAX_PATH];
@@ -351,6 +397,8 @@ MeshX::MeshX(const char *fileName)
 	int sizeVertices = m_block.vertices.size() * sizeof(m_block.vertices[0]);
 	int sizeIndices = m_block.indices.size() * sizeof(m_block.indices[0]);
 	m_meshRenderer.Init(sizeVertices, sizeIndices, &m_block.vertices[0], &m_block.indices[0]);
+
+	CreatePivotMesh();
 }
 
 static DWORD _conv1To255(float f, int bit)
@@ -819,6 +867,7 @@ void MeshX::LoadSub(const char *fileName)
 MeshX::~MeshX()
 {
 	m_meshRenderer.Destroy();
+	pivotsRenderer.Destroy();
 }
 
 void MeshX::CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent)
@@ -922,7 +971,8 @@ void MeshX::Draw(int animId, double time)
 		BoneMatrices[i] = boneOffset * frameTransform;
 	}
 
-	m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
+//	m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
+	pivotsRenderer.Draw(BoneMatrices, dimof(BoneMatrices), pivots);
 }
 
 

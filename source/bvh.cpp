@@ -223,7 +223,7 @@ int Bvh::GetDepth(BONE_ID id)
 	return depth;
 }
 
-static inline void CreateCone(Block& b, XMVECTOR v1, XMVECTOR v2, BONE_ID boneId, DWORD color)
+void CreateCone(Block& b, XMVECTOR v1, XMVECTOR v2, BONE_ID boneId, DWORD color)
 {
 	float radius = 0.15f;
 	XMVECTOR boneDir = XMVectorSubtract(v2, v1);

@@ -13,6 +13,7 @@ public:
 	void Init(const char* fileName);
 	void Draw();
 	void DrawBoneNames(Bvh* bvh);
+	void DrawBoneNames(MeshX* meshX);
 	void MouseWheel(float delta);
 	void LButtonDown(float x, float y);
 	void LButtonUp(float x, float y);
