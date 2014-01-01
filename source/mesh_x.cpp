@@ -1114,7 +1114,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 		{ "Bip01_Spine2", "Chest3" },
 		{ "Bip01_Spine1", "Chest2" },
 		{ "Bip01_Spine", "Chest" },
-		{ "Bip01_Pelvis", "Hips" },			// ?
+	//	{ "Bip01_Pelvis", "Hips" },			// ?
 		{ "Bip01_L_Thigh", "RightHip" },
 		{ "Bip01_R_Thigh", "LeftHip" },
 		{ "Bip01_L_Calf", "RightKnee" },
@@ -1186,7 +1186,17 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 //		XMMATRIX rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationX(cos(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationY(sin(time * XM_PI / 8) * 10.0f * XM_PI / 180);
 //		XMMATRIX rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180);
 //		XMMATRIX rot = XMMatrixRotationY(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180);
-		XMStoreFloat4x4(&f.frameTransformMatrix, rot * XMLoadFloat4x4(&f.initialMatrix));
+//		XMStoreFloat4x4(&f.frameTransformMatrix, rot * XMLoadFloat4x4(&f.initialMatrix));
+
+		XMFLOAT4X4 initialMatRot = f.initialMatrix;
+		initialMatRot._41 = 0;
+		initialMatRot._42 = 0;
+		initialMatRot._43 = 0;
+		XMFLOAT4X4 initialMatTrans = f.initialMatrix;
+		initialMatTrans._11 = initialMatTrans._22 = initialMatTrans._33 = 1.0f;
+		initialMatTrans._12 = initialMatTrans._23 = initialMatTrans._21 = 0.0f;
+		initialMatTrans._23 = initialMatTrans._31 = initialMatTrans._32 = 0.0f;
+		XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&initialMatRot) * rot * XMLoadFloat4x4(&initialMatTrans));
 	}
 
 	CalcFrameMatrices(0, XMMatrixIdentity());
