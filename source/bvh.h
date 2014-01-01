@@ -28,6 +28,7 @@ private:
 	void ParseMotion(const char *p);
 	void CalcAnimation(double time);
 	int GetDepth(BONE_ID id);
+	void CreateBoneMesh();
 
 	std::vector<BvhFrame> m_frames;
 	std::vector<float> motion;
