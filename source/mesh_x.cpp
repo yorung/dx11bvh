@@ -1048,10 +1048,9 @@ void MeshX::Draw(int animId, double time)
 	bonesRenderer.Draw(BoneMatrices, dimof(BoneMatrices), bones);
 }
 
-
-void MeshX::DrawBvh(Bvh* bvh, double time)
+static BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, Bvh* bvh)
 {
-	struct BoneConvTbl {
+		struct BoneConvTbl {
 		char* bvh;
 		char* x;
 	};
@@ -1125,6 +1124,22 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 		{ "Bip01_R_Toe0", "LeftToe" },
 	};
 
+	const char* bvhBoneName = nullptr;
+	for (auto& t : tbl) {
+		if (!strcmp(t.bvh, tinyBoneName)) {
+			bvhBoneName = t.x;
+			break;
+		}
+	}
+	if (!bvhBoneName) {
+		return -1;
+	}
+	BONE_ID bvhBoneId = bvh->BoneNameToId(bvhBoneName);
+	return bvhBoneId;
+}
+
+void MeshX::DrawBvh(Bvh* bvh, double time)
+{
 	XMMATRIX BoneTransForBvh[50];
 	bvh->CalcBones(BoneTransForBvh, time);
 
@@ -1139,17 +1154,8 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 
 		XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.initialMatrix));
 
-		const char* bvhBoneName = nullptr;
-		for (auto& t : tbl) {
-			if (!strcmp(t.bvh, f.name)) {
-				bvhBoneName = t.x;
-				break;
-			}
-		}
-		if (!bvhBoneName) {
-			continue;
-		}
-		BONE_ID bvhBoneId = bvh->BoneNameToId(bvhBoneName);
+
+		BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
 
 		XMMATRIX rot = XMMatrixIdentity();
 
@@ -1203,9 +1209,19 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		Frame& f = m_frames[i];
-		XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
-		XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
-		BonesForX[i] = boneOffset * frameTransform;
+
+		BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
+		if (bvhBoneId >= 0)
+		{
+			const BvhFrame& bh = bvh->GetFrames()[bvhBoneId];
+			XMMATRIX boneOffset = XMLoadFloat4x4(&bh.boneOffsetMatrix);
+			XMMATRIX frameTransform = XMLoadFloat4x4(&bh.result);
+			BonesForX[i] = boneOffset * frameTransform;
+		} else {
+			XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
+			XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
+			BonesForX[i] = boneOffset * frameTransform;
+		}
 	}
 
 //	m_meshRenderer.Draw(BonesForX, dimof(BonesForX), m_block);
