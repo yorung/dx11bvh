@@ -775,6 +775,124 @@ void MeshX::ParseFrame(char* p, BONE_ID parentFrameId)
 	}
 }
 
+
+void MeshX::GetVertStatistics(std::vector<int>& cnts) const
+{
+	cnts.resize(m_frames.size());
+	for (auto& it : cnts) {
+		it = 0;
+	}
+	for (auto& it : m_block.vertices)
+	{
+		assert(it.blendIndices.x >= 0 && it.blendIndices.x < m_frames.size());
+		assert(it.blendIndices.y >= 0 && it.blendIndices.y < m_frames.size());
+		assert(it.blendIndices.z >= 0 && it.blendIndices.z < m_frames.size());
+		assert(it.blendIndices.w >= 0 && it.blendIndices.w < m_frames.size());
+		if (it.blendWeights.x > 0) {
+			cnts[it.blendIndices.x]++;
+		}
+		if (it.blendWeights.y > 0) {
+			cnts[it.blendIndices.y]++;
+		}
+		if (it.blendWeights.z > 0) {
+			cnts[it.blendIndices.z]++;
+		}
+		if (it.blendWeights.x + it.blendWeights.y + it.blendWeights.z < 1.0f) {
+			cnts[it.blendIndices.w]++;
+		}
+	}
+}
+
+void MeshX::GetAnimStatistics(std::vector<int>& animCnts) const
+{
+	animCnts.resize(m_frames.size());
+	for (auto& it : animCnts) {
+		it = 0;
+	}
+	for (auto& i : m_animationSets) {
+		for (auto& j : i.animations) {
+			assert(j.first >= 0 && j.first < (BONE_ID)m_frames.size());
+			animCnts[j.first]++;
+		}
+	}
+}
+
+void MeshX::PrintStatistics() const
+{
+	std::vector<int> vCnts;
+	GetVertStatistics(vCnts);
+	std::vector<int> aCnts;
+	GetAnimStatistics(aCnts);
+	for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++)
+	{
+		const Frame& f = m_frames[i];
+		printf("v=%d a=%d, parentId=%d, childId=%d, %s(%d)\n", vCnts[i], aCnts[i], f.parentId, f.childId, f.name, i);
+	}
+}
+
+bool MeshX::UnlinkFrame(BONE_ID id)
+{
+	Frame& f = m_frames[id];
+	if (f.childId >= 0) {
+		return false;
+	}
+	if (f.parentId < 0) {
+		return false;
+	}
+	Frame& p = m_frames[f.parentId];
+	if (p.childId == id) {
+		p.childId = f.siblingId;
+	}
+	else {
+		Frame* mySibling = &m_frames[p.childId];
+		do {
+			if (mySibling->siblingId == id)
+			{
+				mySibling->siblingId = f.siblingId;
+			}
+			mySibling = &m_frames[mySibling->siblingId];
+		} while (mySibling);
+	}
+	f.parentId = -1;
+
+	for (auto& i : m_animationSets) {
+		auto& j = i.animations.find(id);
+		if (j != i.animations.end()) {
+			i.animations.erase(j);
+		}
+	}
+
+	return true;
+}
+
+void MeshX::DeleteDummyFrames()
+{
+	std::vector<int> cnts;
+
+	bool deleted = false;
+	do {
+		deleted = false;
+		GetVertStatistics(cnts);
+		for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++)
+		{
+			const Frame& f = m_frames[i];
+			int cnt = cnts[i];
+			if (cnt) {
+				continue;
+			}
+			if (f.childId >= 0)
+			{
+				continue;
+			}
+			deleted = UnlinkFrame(i);
+		}
+	} while (deleted);
+
+	while (!m_frames.empty() && m_frames.rbegin()->parentId < 0 && m_frames.rbegin()->childId < 0) {
+		m_frames.erase(m_frames.end() - 1);
+	}
+}
+
 void MeshX::DumpFrames(BONE_ID frameId, int depth) const
 {
 	const Frame& f = m_frames[frameId];
@@ -929,10 +1047,15 @@ void MeshX::LoadSub(const char *fileName)
 
 	free(img);
 
+	DeleteDummyFrames();
+
 	printf("===============DumpFrames begin\n");
 	DumpFrames(0, 0);
 	printf("===============DumpFrames end\n");
 
+	printf("===============DumpStatistics begin\n");
+	PrintStatistics();
+	printf("===============DumpStatistics end\n");
 }
 
 MeshX::~MeshX()
@@ -1044,8 +1167,8 @@ void MeshX::Draw(int animId, double time)
 	}
 
 //	m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
-//	pivotsRenderer.Draw(BoneMatrices, dimof(BoneMatrices), pivots);
-	bonesRenderer.Draw(BoneMatrices, dimof(BoneMatrices), bones);
+	pivotsRenderer.Draw(BoneMatrices, dimof(BoneMatrices), pivots);
+//	bonesRenderer.Draw(BoneMatrices, dimof(BoneMatrices), bones);
 }
 
 static BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, Bvh* bvh)
@@ -1224,6 +1347,9 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 		}
 	}
 
+	if (g_type == mesh) {
+
+	}
 //	m_meshRenderer.Draw(BonesForX, dimof(BonesForX), m_block);
 //	pivotsRenderer.Draw(BonesForX, dimof(BonesForX), pivots);
 	bonesRenderer.Draw(BonesForX, dimof(BonesForX), bones);

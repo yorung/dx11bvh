@@ -130,6 +130,11 @@ private:
 	void CreateBoneMesh();
 	void CreatePivotMesh();
 	int GetDepth(BONE_ID id);
+	void PrintStatistics() const;
+	void GetVertStatistics(std::vector<int>& cnts) const;
+	void GetAnimStatistics(std::vector<int>& animCnts) const;
+	void DeleteDummyFrames();
+	bool UnlinkFrame(BONE_ID id);
 
 	std::vector<Frame> m_frames;
 	std::vector<AnimationSet> m_animationSets;
