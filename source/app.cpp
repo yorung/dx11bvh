@@ -142,13 +142,13 @@ void App::DrawBoneNames(MeshX* meshX)
 {
 	const std::vector<Frame>& frames = meshX->GetFrames();
 	for (auto& it : frames) {
-		if (it.childId < 0) {
-			continue;
-		}
 		XMFLOAT2 pos = GetScreenPos(XMLoadFloat4x4(&it.result));
 
 		WCHAR wname[MAX_PATH];
 		MultiByteToWideChar(CP_ACP, 0, it.name, -1, wname, dimof(wname));
+		if (wname[0] == '\0') {
+			wcscpy(wname, L"[NO NAME]");
+		}
 
 		XMVECTOR size = font->MeasureString(wname);
 		pos.x -= XMVectorGetX(size) / 2;
