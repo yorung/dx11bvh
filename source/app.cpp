@@ -11,7 +11,7 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), lastX(-1), lastY(-1), sprite(nullptr), font(nullptr), meshTiny(nullptr)
+App::App() : scale(1), lastX(-1), lastY(-1), sprite(nullptr), font(nullptr), meshTiny(nullptr), animationNumber(0)
 {
 	quat = XMQuaternionIdentity();
 	ZeroMemory(mesh, sizeof(mesh));
@@ -172,6 +172,11 @@ void App::Update()
 	if (GetKeyState('B') & 0x80) {
 		g_type = "bone";
 	}
+	for (auto& i : {'0', '1', '2', '3', '4'}) {
+		if (GetKeyState(i) & 0x80) {
+			animationNumber = i - '0';
+		}
+	}
 }
 
 void App::Draw()
@@ -202,7 +207,7 @@ void App::Draw()
 
 			if (bvh) {
 			//	meshTiny->DrawBvh(bvh, time);
-				meshTiny->Draw(0, time);
+				meshTiny->Draw(animationNumber, time);
 				DrawBoneNames(bvh);
 			}
 		}

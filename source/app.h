@@ -7,6 +7,7 @@ class App {
 	XMVECTOR quat;
 	SpriteBatch* sprite;
 	SpriteFont* font;
+	int animationNumber;
 public:
 	App();
 	~App();

@@ -353,10 +353,6 @@ void MeshX::CreateBoneMesh()
 		XMVECTOR v1 = XMMatrixInverse(&dummy, XMLoadFloat4x4(&f1.boneOffsetMatrix)).r[3];
 		XMVECTOR v2 = XMMatrixInverse(&dummy, XMLoadFloat4x4(&f2.boneOffsetMatrix)).r[3];
 
-		if (XMVectorGetX(XMVector3LengthSq(v2)) == 0) {	// dummy bone?
-			continue;
-		}
-
 		static const DWORD depthToColor[] = {
 			0xffffffff,
 			0xffffff00,
@@ -1096,6 +1092,9 @@ static XMMATRIX Interpolate(const XMMATRIX& m1, const XMMATRIX& m2, float ratio)
 void MeshX::CalcAnimation(int animId, double time)
 {
 	if (animId < 0 || animId >= (int)m_animationSets.size()) {
+		for (auto& f : m_frames) {
+			XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.frameTransformMatrixOrg));
+		}
 		return;
 	}
 	int revAnimId = m_animationSets.size() - animId - 1;
