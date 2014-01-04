@@ -88,6 +88,8 @@ int APIENTRY _tWinMain(_In_ HINSTANCE,
 		if (!ProcessWindowMessage()) {
 			break;
 		}
+		app.Update();
+
 		deviceMan11.BeginScene();
 		app.Draw();
 		deviceMan11.EndScene();

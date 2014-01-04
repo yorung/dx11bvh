@@ -11,6 +11,7 @@ public:
 	App();
 	~App();
 	void Init(const char* fileName);
+	void Update();
 	void Draw();
 	void DrawBoneNames(Bvh* bvh);
 	void DrawBoneNames(MeshX* meshX);
@@ -21,4 +22,4 @@ public:
 	void Destroy();
 };
 
-std::string g_type;
+extern std::string g_type;

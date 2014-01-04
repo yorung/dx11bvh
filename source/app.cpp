@@ -25,6 +25,8 @@ void App::Init(const char* fileName)
 {
 	Destroy();
 
+	g_type = "mesh";
+
 	sprite = new SpriteBatch(deviceMan11.GetContext());
 	font = new SpriteFont(deviceMan11.GetDevice(), L"resource\\font.spritefont");
 
@@ -159,6 +161,19 @@ void App::DrawBoneNames(MeshX* meshX)
 	}
 }
 
+void App::Update()
+{
+	if (GetKeyState('P') & 0x80) {
+		g_type = "pivot";
+	}
+	if (GetKeyState('M') & 0x80) {
+		g_type = "mesh";
+	}
+	if (GetKeyState('B') & 0x80) {
+		g_type = "bone";
+	}
+}
+
 void App::Draw()
 {
 	LARGE_INTEGER t, f;
@@ -212,7 +227,4 @@ void App::Destroy()
 }
 
 
-extern std::string g_type;
-g_type = "mesh";
-g_type = "bone";
-g_type = "pivot";
+std::string g_type;

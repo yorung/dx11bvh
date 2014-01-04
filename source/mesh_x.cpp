@@ -1166,9 +1166,15 @@ void MeshX::Draw(int animId, double time)
 		BoneMatrices[i] = boneOffset * frameTransform;
 	}
 
-//	m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
-	pivotsRenderer.Draw(BoneMatrices, dimof(BoneMatrices), pivots);
-//	bonesRenderer.Draw(BoneMatrices, dimof(BoneMatrices), bones);
+	if (g_type == "pivot") {
+		pivotsRenderer.Draw(BoneMatrices, dimof(BoneMatrices), pivots);
+	}
+	if (g_type == "mesh") {
+		m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
+	}
+	if (g_type == "bone") {
+		bonesRenderer.Draw(BoneMatrices, dimof(BoneMatrices), bones);
+	}
 }
 
 static BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, Bvh* bvh)
@@ -1347,11 +1353,14 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 		}
 	}
 
-	if (g_type == mesh) {
-
+	if (g_type == "pivot") {
+		pivotsRenderer.Draw(BonesForX, dimof(BonesForX), pivots);
 	}
-//	m_meshRenderer.Draw(BonesForX, dimof(BonesForX), m_block);
-//	pivotsRenderer.Draw(BonesForX, dimof(BonesForX), pivots);
-	bonesRenderer.Draw(BonesForX, dimof(BonesForX), bones);
+	if (g_type == "bone") {
+		m_meshRenderer.Draw(BonesForX, dimof(BonesForX), m_block);
+	}
+	if (g_type == "mesh") {
+		bonesRenderer.Draw(BonesForX, dimof(BonesForX), bones);
+	}
 }
 
