@@ -20,3 +20,5 @@ public:
 	void MouseMove(float x, float y);
 	void Destroy();
 };
+
+std::string g_type;

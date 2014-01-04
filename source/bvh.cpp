@@ -633,8 +633,8 @@ void Bvh::Draw(int animId, double time)
 		BoneMatrices[i] = boneOffset * frameTransform;
 	}
 
-	m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
-//	pivotsRenderer.Draw(BoneMatrices, dimof(BoneMatrices), pivots);
+//	m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
+	pivotsRenderer.Draw(BoneMatrices, dimof(BoneMatrices), pivots);
 }
 
 void Bvh::CalcBones(XMMATRIX BoneMatrices[50], double time)

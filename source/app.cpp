@@ -186,8 +186,8 @@ void App::Draw()
 			Bvh* bvh = dynamic_cast<Bvh*>(it);
 
 			if (bvh) {
-				meshTiny->DrawBvh(bvh, time);
-			//	meshTiny->Draw(0, time);
+			//	meshTiny->DrawBvh(bvh, time);
+				meshTiny->Draw(0, time);
 				DrawBoneNames(bvh);
 			}
 		}
@@ -210,3 +210,9 @@ void App::Destroy()
 	SAFE_DELETE(font);
 	SAFE_DELETE(sprite);
 }
+
+
+extern std::string g_type;
+g_type = "mesh";
+g_type = "bone";
+g_type = "pivot";
