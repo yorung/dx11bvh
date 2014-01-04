@@ -353,6 +353,16 @@ void MeshX::CreateBoneMesh()
 		XMVECTOR v1 = XMMatrixInverse(&dummy, XMLoadFloat4x4(&f1.boneOffsetMatrix)).r[3];
 		XMVECTOR v2 = XMMatrixInverse(&dummy, XMLoadFloat4x4(&f2.boneOffsetMatrix)).r[3];
 
+		if (XMMatrixIsIdentity(XMLoadFloat4x4(&f1.boneOffsetMatrix))) {
+		//	v1 = XMLoadFloat4x4(&f1.frameTransformMatrixOrg).r[3];
+			continue;
+		}
+
+		if (XMMatrixIsIdentity(XMLoadFloat4x4(&f2.boneOffsetMatrix))) {
+		//	v2 = XMLoadFloat4x4(&f2.frameTransformMatrixOrg).r[3];
+			continue;
+		}
+
 		static const DWORD depthToColor[] = {
 			0xffffffff,
 			0xffffff00,
