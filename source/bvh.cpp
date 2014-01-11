@@ -401,6 +401,10 @@ BONE_ID Bvh::_getFrameIdByName(const char* name)
 	f.posIndies.x = -1;
 	f.posIndies.y = -1;
 	f.posIndies.z = -1;
+//	XMStoreFloat4x4(&f.axisAlignMatrix, XMMatrixIdentity());
+//	XMStoreFloat4x4(&f.axisAlignMatrix, XMMatrixRotationZ(XM_PI / 2));
+//	XMStoreFloat4x4(&f.axisAlignMatrix, XMMatrixRotationZ(XM_2PI * (rand() / float(RAND_MAX))));
+	XMStoreFloat4x4(&f.axisAlignMatrix, XMMatrixRotationZ(XM_2PI * (rand() / float(RAND_MAX))) * XMMatrixRotationX(XM_2PI * (rand() / float(RAND_MAX))));
 	m_frames.push_back(f);
 	return m_frames.size() - 1;
 }
@@ -477,7 +481,7 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 			}
 
 			XMVECTOR dummy;
-			XMStoreFloat4x4(&frame.boneOffsetMatrix, XMMatrixInverse(&dummy, (XMMatrixTranslation(frame.offsetCombined.x, frame.offsetCombined.y, frame.offsetCombined.z))));
+			XMStoreFloat4x4(&frame.boneOffsetMatrix, XMMatrixInverse(&dummy, (XMLoadFloat4x4(&frame.axisAlignMatrix) * XMMatrixTranslation(frame.offsetCombined.x, frame.offsetCombined.y, frame.offsetCombined.z))));
 
 			if ("CHANNELS" == _getToken(child)) {
 				int nChannels = _getI(child);
@@ -607,7 +611,10 @@ void Bvh::CalcAnimation(double time)
 			rotMat = XMMatrixRotationZ(mot[it.rotIndies.z] * XM_PI / 180) * XMMatrixRotationX(-mot[it.rotIndies.x] * XM_PI / 180) * XMMatrixRotationY(-mot[it.rotIndies.y] * XM_PI / 180);
 //			rotMat = XMMatrixIdentity();
 		}
-		XMStoreFloat4x4(&it.frameTransformMatrix, scaleMat * rotMat * transMat);
+
+		XMVECTOR dummy;
+		XMMATRIX matParentAxisAlignInv = it.parentId >= 0 ? XMMatrixInverse(&dummy, XMLoadFloat4x4(&m_frames[it.parentId].axisAlignMatrix)) : XMMatrixIdentity();
+		XMStoreFloat4x4(&it.frameTransformMatrix, XMLoadFloat4x4(&it.axisAlignMatrix) * scaleMat * rotMat * transMat * matParentAxisAlignInv);
 	}
 }
 
