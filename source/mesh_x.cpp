@@ -1393,10 +1393,10 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 	if (g_type == "pivot") {
 		pivotsRenderer.Draw(BonesForX, dimof(BonesForX), pivots);
 	}
-	if (g_type == "bone") {
+	if (g_type == "mesh") {
 		m_meshRenderer.Draw(BonesForX, dimof(BonesForX), m_block);
 	}
-	if (g_type == "mesh") {
+	if (g_type == "bone") {
 		bonesRenderer.Draw(BonesForX, dimof(BonesForX), bones);
 	}
 }
