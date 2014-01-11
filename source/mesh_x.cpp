@@ -1297,6 +1297,13 @@ void MeshX::ApplyXLocalAxisToBvh(Bvh* bvh)
 {
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		Frame& f = m_frames[i];
+		XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.initialMatrix));
+	}
+
+	CalcFrameMatrices(0, XMMatrixIdentity());
+
+	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+		Frame& f = m_frames[i];
 
 		BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
 		if (bvhBoneId >= 0) {
@@ -1325,7 +1332,6 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 		XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.initialMatrix));
 
 
-		continue;
 		BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
 
 		XMMATRIX rot = XMMatrixIdentity();
@@ -1374,6 +1380,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 	//	initialMatTrans._12 = initialMatTrans._23 = initialMatTrans._21 = 0.0f;
 	//	initialMatTrans._23 = initialMatTrans._31 = initialMatTrans._32 = 0.0f;
 	//	XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&initialMatRot) * rot * XMLoadFloat4x4(&initialMatTrans));
+		XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.initialMatrix) * rot);
 	}
 
 	CalcFrameMatrices(0, XMMatrixIdentity());
