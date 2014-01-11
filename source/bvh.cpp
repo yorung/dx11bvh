@@ -337,8 +337,7 @@ void Bvh::CreateBoneMesh()
 void Bvh::CreatePivotMesh()
 {
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-		BvhFrame& f = m_frames[i];
-		XMVECTOR v = XMLoadFloat3(&f.offsetCombined);
+		XMVECTOR v = XMVectorZero();
 		float len = 50.0f;
 		CreateCone(pivots, v, v + XMVectorSet(len, 0, 0, 0), i, 0xff0000ff);
 		CreateCone(pivots, v, v + XMVectorSet(0, len, 0, 0), i, 0xff00ff00);
@@ -626,16 +625,20 @@ void Bvh::Draw(int animId, double time)
 
 	CalcFrameMatrices(0, XMMatrixIdentity());
 
-	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-		BvhFrame& f = m_frames[i];
-		XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
-		XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
-		BoneMatrices[i] = boneOffset * frameTransform;
-	}
-
 	if (g_type == "pivot") {
+		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+			BvhFrame& f = m_frames[i];
+			XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
+			BoneMatrices[i] = frameTransform;
+		}
 		pivotsRenderer.Draw(BoneMatrices, dimof(BoneMatrices), pivots);
 	} else {
+		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+			BvhFrame& f = m_frames[i];
+			XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
+			XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
+			BoneMatrices[i] = boneOffset * frameTransform;
+		}
 		m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
 	}
 }
