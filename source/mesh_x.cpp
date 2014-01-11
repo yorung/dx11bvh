@@ -1062,6 +1062,13 @@ void MeshX::LoadSub(const char *fileName)
 	printf("===============DumpStatistics begin\n");
 	PrintStatistics();
 	printf("===============DumpStatistics end\n");
+
+	MakeInitialMatrixPerfectTStance();
+}
+
+void MeshX::MakeInitialMatrixPerfectTStance()
+{
+	XMStoreFloat4x4(&m_frames[0].initialMatrix, XMLoadFloat4x4(&m_frames[0].initialMatrix) * XMMatrixRotationY(XM_PI));
 }
 
 MeshX::~MeshX()
@@ -1276,8 +1283,22 @@ static BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, Bvh* bvh)
 	return bvhBoneId;
 }
 
+XMMATRIX MeshX::GetWorldRotation(const char* frameName)
+{
+	BONE_ID id = _getFrameIdByName(frameName);
+	XMFLOAT4X4 r = m_frames[id].result;
+	r._41 = 0;
+	r._42 = 0;
+	r._43 = 0;
+	return XMLoadFloat4x4(&r);
+}
+
+
 void MeshX::DrawBvh(Bvh* bvh, double time)
 {
+	bvh->SetLocalAxis("LeftShoulder", GetWorldRotation("Bip01_R_UpperArm"));
+	bvh->SetLocalAxis("RightShoulder", GetWorldRotation("Bip01_L_UpperArm"));
+
 	XMMATRIX BoneTransForBvh[50];
 	bvh->CalcBones(BoneTransForBvh, time);
 
@@ -1292,6 +1313,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 
 //		XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.initialMatrix));
 		XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.initialMatrix));
+
 
 		continue;
 		BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
@@ -1345,7 +1367,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 	}
 
 	CalcFrameMatrices(0, XMMatrixIdentity());
-
+	/*
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		Frame& f = m_frames[i];
 
@@ -1361,6 +1383,12 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 			XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
 			BonesForX[i] = boneOffset * frameTransform;
 		}
+	}*/
+	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+		Frame& f = m_frames[i];
+		XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
+		XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
+		BonesForX[i] = boneOffset * frameTransform;
 	}
 
 	if (g_type == "pivot") {

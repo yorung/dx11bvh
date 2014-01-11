@@ -18,6 +18,7 @@ class Bvh : public Mesh
 {
 private:
 	bool ParseMesh(char* imgFrame, Block& block, BONE_ID frameId);
+	void CalcBoneOffsetMatrix(BONE_ID frameId);
 	void ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId);
 	void LoadSub(const char* fileName);
 	BONE_ID _getFrameIdByName(const char* name);
@@ -51,5 +52,6 @@ public:
 	void Draw(int animId, double time);
 	void CalcBones(XMMATRIX BoneMatrices[50], double time);
 	BONE_ID BoneNameToId(const char* name);
+	void SetLocalAxis(const char* frameName, const XMMATRIX& m);
 };
 

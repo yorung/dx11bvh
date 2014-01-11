@@ -135,6 +135,8 @@ private:
 	void GetAnimStatistics(std::vector<int>& animCnts) const;
 	void DeleteDummyFrames();
 	bool UnlinkFrame(BONE_ID id);
+	void MakeInitialMatrixPerfectTStance();
+	XMMATRIX GetWorldRotation(const char* frameName);
 
 	std::vector<Frame> m_frames;
 	std::vector<AnimationSet> m_animationSets;

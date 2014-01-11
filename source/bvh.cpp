@@ -455,6 +455,13 @@ void Bvh::_linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId)
 	}
 }
 
+void Bvh::CalcBoneOffsetMatrix(BONE_ID frameId)
+{
+	BvhFrame& frame = m_frames[frameId];
+	XMVECTOR dummy;
+	XMStoreFloat4x4(&frame.boneOffsetMatrix, XMMatrixInverse(&dummy, (XMLoadFloat4x4(&frame.axisAlignMatrix) * XMMatrixTranslation(frame.offsetCombined.x, frame.offsetCombined.y, frame.offsetCombined.z))));
+}
+
 void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 {
 	while(p) {
@@ -480,8 +487,7 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 				_linkFrame(parentFrameId, frameId);
 			}
 
-			XMVECTOR dummy;
-			XMStoreFloat4x4(&frame.boneOffsetMatrix, XMMatrixInverse(&dummy, (XMLoadFloat4x4(&frame.axisAlignMatrix) * XMMatrixTranslation(frame.offsetCombined.x, frame.offsetCombined.y, frame.offsetCombined.z))));
+			CalcBoneOffsetMatrix(frameId);
 
 			if ("CHANNELS" == _getToken(child)) {
 				int nChannels = _getI(child);
@@ -674,5 +680,13 @@ BONE_ID Bvh::BoneNameToId(const char* name)
 		}
 	}
 	return -1;
+}
+
+void Bvh::SetLocalAxis(const char* frameName, const XMMATRIX& m)
+{
+	BONE_ID frameId = _getFrameIdByName(frameName);
+	BvhFrame* f = &m_frames[frameId];
+	XMStoreFloat4x4(&f->axisAlignMatrix, m);
+	CalcBoneOffsetMatrix(frameId);
 }
 
