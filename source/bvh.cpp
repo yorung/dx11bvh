@@ -43,7 +43,7 @@ static double _getD(char*& p)
 	}
 
 	while (true) {
-		if (strchr("0123456789-", *p))
+		if (strchr("0123456789-.", *p))
 		{
 			break;
 		}
