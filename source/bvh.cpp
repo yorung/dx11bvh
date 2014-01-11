@@ -468,9 +468,10 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 			BvhFrame& frame = m_frames[frameId];
 
 			_getToken(child);	// "OFFSET"
-			frame.offset.x = _getF(child) * bvhScale;
-			frame.offset.y = _getF(child) * bvhScale;
-			frame.offset.z = -_getF(child) * bvhScale;
+			float mul = (rand() / (float)RAND_MAX) + 0.5f;
+			frame.offset.x = _getF(child) * bvhScale * mul;
+			frame.offset.y = _getF(child) * bvhScale * mul;
+			frame.offset.z = -_getF(child) * bvhScale * mul;
 
 			frame.offsetCombined.x = 0;
 			frame.offsetCombined.y = 0; 
