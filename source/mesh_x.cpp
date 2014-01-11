@@ -1336,7 +1336,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 
 		XMMATRIX rot = XMMatrixIdentity();
 
-		if (bvhBoneId >= 0) {
+		if (bvhBoneId >= 0 && !strcmp(f.name, "Bip01_R_UpperArm")) {
 	//		BonesForX[i] = XMLoadFloat4x4(&f.boneOffsetMatrix) * BoneTransForBvh[bvhBoneId];
 	//		BonesForX[i] = /*XMLoadFloat4x4(&f.boneOffsetMatrix) **/ BoneTransForBvh[bvhBoneId];
 	//		BonesForX[i] = XMMatrixIdentity();
@@ -1358,29 +1358,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 
 			//rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationX(cos(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationY(sin(time * XM_PI / 8) * 10.0f * XM_PI / 180);
 		}
-	//	f.frameTransformMatrix = f.frameTransformMatrixOrg;
-	//	f.frameTransformMatrix._11 = f.frameTransformMatrix._22 = f.frameTransformMatrix._33 = 1.0f;
-	//	f.frameTransformMatrix._12 = f.frameTransformMatrix._13 = f.frameTransformMatrix._21 = f.frameTransformMatrix._23 = f.frameTransformMatrix._31 = f.frameTransformMatrix._32 = 0.0f;
-
-	//	XMVECTOR dummy;
-
-	//	XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.boneOffsetMatrix));
-
-//		XMMATRIX rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationX(cos(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationY(sin(time * XM_PI / 8) * 10.0f * XM_PI / 180);
-//		XMMATRIX rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180);
-//		XMMATRIX rot = XMMatrixRotationY(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180);
-//		XMStoreFloat4x4(&f.frameTransformMatrix, rot * XMLoadFloat4x4(&f.initialMatrix));
-
-	//	XMFLOAT4X4 initialMatRot = f.initialMatrix;
-	//	initialMatRot._41 = 0;
-	//	initialMatRot._42 = 0;
-	//	initialMatRot._43 = 0;
-	//	XMFLOAT4X4 initialMatTrans = f.initialMatrix;
-	//	initialMatTrans._11 = initialMatTrans._22 = initialMatTrans._33 = 1.0f;
-	//	initialMatTrans._12 = initialMatTrans._23 = initialMatTrans._21 = 0.0f;
-	//	initialMatTrans._23 = initialMatTrans._31 = initialMatTrans._32 = 0.0f;
-	//	XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&initialMatRot) * rot * XMLoadFloat4x4(&initialMatTrans));
-		XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.initialMatrix) * rot);
+		XMStoreFloat4x4(&f.frameTransformMatrix, rot * XMLoadFloat4x4(&f.initialMatrix));
 	}
 
 	CalcFrameMatrices(0, XMMatrixIdentity());
