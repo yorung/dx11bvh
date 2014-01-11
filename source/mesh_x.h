@@ -1,3 +1,5 @@
+class Bvh;
+
 class Mesh
 {
 public:
@@ -137,6 +139,8 @@ private:
 	bool UnlinkFrame(BONE_ID id);
 	void MakeInitialMatrixPerfectTStance();
 	XMMATRIX GetWorldRotation(const char* frameName);
+	void ApplyXLocalAxisToBvh(Bvh* bvh);
+
 
 	std::vector<Frame> m_frames;
 	std::vector<AnimationSet> m_animationSets;

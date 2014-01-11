@@ -52,6 +52,6 @@ public:
 	void Draw(int animId, double time);
 	void CalcBones(XMMATRIX BoneMatrices[50], double time);
 	BONE_ID BoneNameToId(const char* name);
-	void SetLocalAxis(const char* frameName, const XMMATRIX& m);
+	void SetLocalAxis(BONE_ID boneId, const XMMATRIX& m);
 };
 

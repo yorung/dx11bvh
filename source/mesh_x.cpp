@@ -1293,11 +1293,21 @@ XMMATRIX MeshX::GetWorldRotation(const char* frameName)
 	return XMLoadFloat4x4(&r);
 }
 
+void MeshX::ApplyXLocalAxisToBvh(Bvh* bvh)
+{
+	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+		Frame& f = m_frames[i];
+
+		BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
+		if (bvhBoneId >= 0) {
+			bvh->SetLocalAxis(bvhBoneId, GetWorldRotation(f.name));
+		}
+	}
+}
 
 void MeshX::DrawBvh(Bvh* bvh, double time)
 {
-	bvh->SetLocalAxis("LeftShoulder", GetWorldRotation("Bip01_R_UpperArm"));
-	bvh->SetLocalAxis("RightShoulder", GetWorldRotation("Bip01_L_UpperArm"));
+	ApplyXLocalAxisToBvh(bvh);
 
 	XMMATRIX BoneTransForBvh[50];
 	bvh->CalcBones(BoneTransForBvh, time);

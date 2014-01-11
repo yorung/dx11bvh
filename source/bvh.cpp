@@ -401,10 +401,10 @@ BONE_ID Bvh::_getFrameIdByName(const char* name)
 	f.posIndies.x = -1;
 	f.posIndies.y = -1;
 	f.posIndies.z = -1;
-//	XMStoreFloat4x4(&f.axisAlignMatrix, XMMatrixIdentity());
+	XMStoreFloat4x4(&f.axisAlignMatrix, XMMatrixIdentity());
 //	XMStoreFloat4x4(&f.axisAlignMatrix, XMMatrixRotationZ(XM_PI / 2));
 //	XMStoreFloat4x4(&f.axisAlignMatrix, XMMatrixRotationZ(XM_2PI * (rand() / float(RAND_MAX))));
-	XMStoreFloat4x4(&f.axisAlignMatrix, XMMatrixRotationZ(XM_2PI * (rand() / float(RAND_MAX))) * XMMatrixRotationX(XM_2PI * (rand() / float(RAND_MAX))));
+//	XMStoreFloat4x4(&f.axisAlignMatrix, XMMatrixRotationZ(XM_2PI * (rand() / float(RAND_MAX))) * XMMatrixRotationX(XM_2PI * (rand() / float(RAND_MAX))));
 	m_frames.push_back(f);
 	return m_frames.size() - 1;
 }
@@ -682,9 +682,8 @@ BONE_ID Bvh::BoneNameToId(const char* name)
 	return -1;
 }
 
-void Bvh::SetLocalAxis(const char* frameName, const XMMATRIX& m)
+void Bvh::SetLocalAxis(BONE_ID frameId, const XMMATRIX& m)
 {
-	BONE_ID frameId = _getFrameIdByName(frameName);
 	BvhFrame* f = &m_frames[frameId];
 	XMStoreFloat4x4(&f->axisAlignMatrix, m);
 	CalcBoneOffsetMatrix(frameId);
