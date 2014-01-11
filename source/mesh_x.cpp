@@ -1356,7 +1356,9 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 			bvhFrameTransMat._43 = 0;
 			rot = XMLoadFloat4x4(&bvhFrameTransMat);
 
-			//rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationX(cos(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationY(sin(time * XM_PI / 8) * 10.0f * XM_PI / 180);
+			float time = GetTickCount() / 1000.0f;
+		//	rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationX(cos(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationY(sin(time * XM_PI / 8) * 10.0f * XM_PI / 180);
+			rot = XMMatrixRotationZ(cos(time * XM_PI / 10) * 50.0f * XM_PI / 180);
 		}
 		XMStoreFloat4x4(&f.frameTransformMatrix, rot * XMLoadFloat4x4(&f.initialMatrix));
 	}

@@ -621,6 +621,13 @@ void Bvh::CalcAnimation(double time)
 		XMVECTOR dummy;
 		XMMATRIX matParentAxisAlignInv = it.parentId >= 0 ? XMMatrixInverse(&dummy, XMLoadFloat4x4(&m_frames[it.parentId].axisAlignMatrix)) : XMMatrixIdentity();
 		XMStoreFloat4x4(&it.frameTransformMatrix, XMLoadFloat4x4(&it.axisAlignMatrix) * scaleMat * rotMat * transMat * matParentAxisAlignInv);
+
+		if (!strcmp(it.name, "LeftShoulder")) {
+			float time = GetTickCount() / 1000.0f;
+
+			XMMATRIX rot = XMMatrixRotationZ(cos(time * XM_PI / 10) * 50.0f * XM_PI / 180);
+			XMStoreFloat4x4(&it.frameTransformMatrix, rot * XMLoadFloat4x4(&it.axisAlignMatrix) * transMat * matParentAxisAlignInv);
+		}
 	}
 }
 
