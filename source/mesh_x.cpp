@@ -871,6 +871,57 @@ bool MeshX::UnlinkFrame(BONE_ID id)
 	return true;
 }
 
+void MeshX::MergeBonesForLod()
+{
+	std::vector<int> cnts;
+	GetVertStatistics(cnts);
+	int least = INT_MAX;
+	BONE_ID target = -1;
+	for (BONE_ID i = cnts.size() - 1; i >= 0; i--) {
+		if (cnts[i] == 0 || cnts[i] >= least) {
+			continue;
+		}
+		least = cnts[i];
+		target = i;
+	}
+	if (target < 0) {
+		return;
+	}
+
+	Frame* f = &m_frames[target];
+	printf("removing weight of bone %s from vertices.\n", f->name);
+
+	std::vector<BONE_ID> relatives;
+	if (f->parentId >= 0) {
+		relatives.push_back(f->parentId);
+	}
+	if (f->childId >= 0) {
+		relatives.push_back(f->childId);
+		f = &m_frames[f->childId];
+		while (f->siblingId >= 0) {
+			relatives.push_back(f->childId);
+			f = &m_frames[f->siblingId];
+		}
+	}
+
+	assert(relatives.size());
+
+	for (auto& i : m_block.vertices) {
+		if (i.blendIndices.x == target) {
+			i.blendIndices.x = relatives[0];
+		}
+		if (i.blendIndices.y == target) {
+			i.blendIndices.y = relatives[0];
+		}
+		if (i.blendIndices.z == target) {
+			i.blendIndices.z = relatives[0];
+		}
+		if (i.blendIndices.w == target) {
+			i.blendIndices.w = relatives[0];
+		}
+	}
+}
+
 void MeshX::DeleteDummyFrames()
 {
 	std::vector<int> cnts;
@@ -1053,6 +1104,9 @@ void MeshX::LoadSub(const char *fileName)
 
 	free(img);
 
+	for (int i = 0; i < 15; i++) {
+		MergeBonesForLod();
+	}
 	DeleteDummyFrames();
 
 	printf("===============DumpFrames begin\n");

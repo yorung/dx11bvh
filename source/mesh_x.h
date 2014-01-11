@@ -134,6 +134,7 @@ private:
 	void GetVertStatistics(std::vector<int>& cnts) const;
 	void GetAnimStatistics(std::vector<int>& animCnts) const;
 	void DeleteDummyFrames();
+	void MergeBonesForLod();
 	bool UnlinkFrame(BONE_ID id);
 
 	std::vector<Frame> m_frames;
