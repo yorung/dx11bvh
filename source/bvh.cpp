@@ -555,16 +555,26 @@ void Bvh::CalcAnimation(double time)
 	const float* mot = &motion[frame * channels];
 
 	for (auto& it : m_frames) {
-		XMMATRIX rotMat = XMMatrixIdentity(), scaleMat = XMMatrixIdentity(), transMat = XMMatrixIdentity();
+		XMMATRIX transMat = XMMatrixIdentity();
 		if (it.posIndices.x >= 0) {
 			transMat = XMMatrixTranslation(mot[it.posIndices.x], mot[it.posIndices.y], -mot[it.posIndices.z]);
 		} else {
 			transMat = XMMatrixTranslation(it.offset.x, it.offset.y, it.offset.z);
 		}
+
+		XMMATRIX rotMat[3] = { XMMatrixIdentity(), XMMatrixIdentity(), XMMatrixIdentity() };
+		int idxMin = std::min((uint32_t)it.rotIndices.x, std::min((uint32_t)it.rotIndices.y, (uint32_t)it.rotIndices.z));
 		if (it.rotIndices.x >= 0) {
-			rotMat = XMMatrixRotationZ(mot[it.rotIndices.z] * XM_PI / 180) * XMMatrixRotationX(-mot[it.rotIndices.x] * XM_PI / 180) * XMMatrixRotationY(-mot[it.rotIndices.y] * XM_PI / 180);
+			rotMat[it.rotIndices.x - idxMin] = XMMatrixRotationX(-mot[it.rotIndices.x] * XM_PI / 180);
 		}
-		XMStoreFloat4x4(&it.frameTransformMatrix, scaleMat * rotMat * transMat);
+		if (it.rotIndices.y >= 0) {
+			rotMat[it.rotIndices.y - idxMin] = XMMatrixRotationY(-mot[it.rotIndices.y] * XM_PI / 180);
+		}
+		if (it.rotIndices.z >= 0) {
+			rotMat[it.rotIndices.z - idxMin] = XMMatrixRotationZ(mot[it.rotIndices.z] * XM_PI / 180);
+		}
+
+		XMStoreFloat4x4(&it.frameTransformMatrix, rotMat[2] * rotMat[1] * rotMat[0] * transMat);
 	}
 }
 
