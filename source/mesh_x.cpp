@@ -1336,7 +1336,8 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 
 		XMMATRIX rot = XMMatrixIdentity();
 
-		if (bvhBoneId >= 0 && !strcmp(f.name, "Bip01_R_UpperArm")) {
+		if (bvhBoneId >= 0 && (!!strstr(f.name, "_UpperArm") || !!strstr(f.name, "_Thigh") || !!strstr(f.name, "_Calf") || !!strstr(f.name, "_Forearm"))) {
+//		if (bvhBoneId >= 0 && !strcmp(f.name, "Bip01_R_UpperArm")) {
 	//		BonesForX[i] = XMLoadFloat4x4(&f.boneOffsetMatrix) * BoneTransForBvh[bvhBoneId];
 	//		BonesForX[i] = /*XMLoadFloat4x4(&f.boneOffsetMatrix) **/ BoneTransForBvh[bvhBoneId];
 	//		BonesForX[i] = XMMatrixIdentity();
@@ -1357,8 +1358,9 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 			rot = XMLoadFloat4x4(&bvhFrameTransMat);
 
 			float time = GetTickCount() / 1000.0f;
+			rot = XMMatrixRotationZ(cos(time * XM_PI / 3) * 50.0f * XM_PI / 180);
+
 		//	rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationX(cos(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationY(sin(time * XM_PI / 8) * 10.0f * XM_PI / 180);
-			rot = XMMatrixRotationZ(cos(time * XM_PI / 10) * 50.0f * XM_PI / 180);
 		}
 		XMStoreFloat4x4(&f.frameTransformMatrix, rot * XMLoadFloat4x4(&f.initialMatrix));
 	}
