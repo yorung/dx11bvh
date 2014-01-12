@@ -50,7 +50,7 @@ public:
 	Bvh(const char *fileName);
 	~Bvh();
 	void Draw(int animId, double time);
-	void CalcBones(XMMATRIX BoneMatrices[50], double time);
+	void CalcRotAnimForAlignedAxis(XMMATRIX RotAnimMatrices[50], double time) const;
 	BONE_ID BoneNameToId(const char* name);
 	void SetLocalAxis(BONE_ID boneId, const XMMATRIX& m);
 };

@@ -607,7 +607,7 @@ void Bvh::CalcAnimation(double time)
 	const float* mot = &motion[frame * channels];
 
 	for (auto& it : m_frames) {
-		XMMATRIX rotMat = XMMatrixIdentity(), scaleMat = XMMatrixIdentity(), transMat = XMMatrixIdentity();
+		XMMATRIX rotMat = XMMatrixIdentity(), transMat = XMMatrixIdentity();
 		if (it.posIndies.x >= 0) {
 			transMat = XMMatrixTranslation(mot[it.posIndies.x] * bvhScale, mot[it.posIndies.y] * bvhScale, -mot[it.posIndies.z] * bvhScale);
 		} else {
@@ -620,14 +620,14 @@ void Bvh::CalcAnimation(double time)
 
 		XMVECTOR dummy;
 		XMMATRIX matParentAxisAlignInv = it.parentId >= 0 ? XMMatrixInverse(&dummy, XMLoadFloat4x4(&m_frames[it.parentId].axisAlignMatrix)) : XMMatrixIdentity();
-		XMStoreFloat4x4(&it.frameTransformMatrix, XMLoadFloat4x4(&it.axisAlignMatrix) * scaleMat * rotMat * transMat * matParentAxisAlignInv);
-
+		XMStoreFloat4x4(&it.frameTransformMatrix, XMLoadFloat4x4(&it.axisAlignMatrix) * rotMat * transMat * matParentAxisAlignInv);
+		/*
 		if (!!strstr(it.name, "tShoulder") || !!strstr(it.name, "tHip") || !!strstr(it.name, "tKnee") || !!strstr(it.name, "tElbow")) {
 			float time = GetTickCount() / 1000.0f;
 
 			XMMATRIX rot = XMMatrixRotationZ(cos(time * XM_PI / 3) * 50.0f * XM_PI / 180);
 			XMStoreFloat4x4(&it.frameTransformMatrix, rot * XMLoadFloat4x4(&it.axisAlignMatrix) * transMat * matParentAxisAlignInv);
-		}
+		}*/
 	}
 }
 
@@ -663,18 +663,26 @@ void Bvh::Draw(int animId, double time)
 	}
 }
 
-void Bvh::CalcBones(XMMATRIX BoneMatrices[50], double time)
+void Bvh::CalcRotAnimForAlignedAxis(XMMATRIX RotAnimMatrices[50], double time) const
 {
-	CalcAnimation(time);
+	int frame = (int)(time / frameTime);
+	frame %= motionFrames;
 
-	CalcFrameMatrices(0, XMMatrixIdentity());
+	const float* mot = &motion[frame * channels];
 
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-		BvhFrame& f = m_frames[i];
-		XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
-		XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
-		BoneMatrices[i] = boneOffset * frameTransform;
-//		BoneMatrices[i] = frameTransform;
+		const BvhFrame& f = m_frames[i];
+
+		XMMATRIX rotMat = XMMatrixIdentity(), transMat = XMMatrixIdentity();
+		if (f.rotIndies.x >= 0) {
+			rotMat = XMMatrixRotationZ(mot[f.rotIndies.z] * XM_PI / 180) * XMMatrixRotationX(-mot[f.rotIndies.x] * XM_PI / 180) * XMMatrixRotationY(-mot[f.rotIndies.y] * XM_PI / 180);
+		}
+
+		XMMATRIX AA = XMLoadFloat4x4(&f.axisAlignMatrix);
+		XMVECTOR dummy;
+		XMMATRIX invAA = XMMatrixInverse(&dummy, AA);
+
+		RotAnimMatrices[i] = AA * rotMat * invAA;
 	}
 }
 

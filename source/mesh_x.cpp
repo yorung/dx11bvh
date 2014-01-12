@@ -1316,8 +1316,8 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 {
 	ApplyXLocalAxisToBvh(bvh);
 
-	XMMATRIX BoneTransForBvh[50];
-	bvh->CalcBones(BoneTransForBvh, time);
+	XMMATRIX RotAnim[50];
+	bvh->CalcRotAnimForAlignedAxis(RotAnim, time);
 
 	XMMATRIX BonesForX[50];
 	for (auto& it : BonesForX) {
@@ -1338,28 +1338,8 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 
 		if (bvhBoneId >= 0 && (!!strstr(f.name, "_UpperArm") || !!strstr(f.name, "_Thigh") || !!strstr(f.name, "_Calf") || !!strstr(f.name, "_Forearm"))) {
 //		if (bvhBoneId >= 0 && !strcmp(f.name, "Bip01_R_UpperArm")) {
-	//		BonesForX[i] = XMLoadFloat4x4(&f.boneOffsetMatrix) * BoneTransForBvh[bvhBoneId];
-	//		BonesForX[i] = /*XMLoadFloat4x4(&f.boneOffsetMatrix) **/ BoneTransForBvh[bvhBoneId];
-	//		BonesForX[i] = XMMatrixIdentity();
-	//		XMMATRIX rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 50.0f * XM_PI / 180) * XMMatrixRotationX(cos(time * XM_PI / 10) * 50.0f * XM_PI / 180) * XMMatrixRotationY(sin(time * XM_PI / 8) * 50.0f * XM_PI / 180);
-//			XMStoreFloat4x4(&f.frameTransformMatrix, rot);
 
-//			XMVECTOR dummy;
-//			XMStoreFloat4x4(&f.frameTransformMatrix, XMMatrixInverse(&dummy, XMLoadFloat4x4(&f.boneOffsetMatrix)));
-
-//			BonesForX[i] = XMLoadFloat4x4(&f.boneOffsetMatrix) * rot * XMMatrixInverse(&dummy, XMLoadFloat4x4(&f.boneOffsetMatrix));
-
-
-			const std::vector<BvhFrame>& bvhFrames = bvh->GetFrames();
-			XMFLOAT4X4 bvhFrameTransMat = bvhFrames[bvhBoneId].frameTransformMatrix;
-			bvhFrameTransMat._41 = 0;
-			bvhFrameTransMat._42 = 0;
-			bvhFrameTransMat._43 = 0;
-			rot = XMLoadFloat4x4(&bvhFrameTransMat);
-
-			float time = GetTickCount() / 1000.0f;
-			rot = XMMatrixRotationZ(cos(time * XM_PI / 3) * 50.0f * XM_PI / 180);
-
+			rot = RotAnim[bvhBoneId];
 		//	rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationX(cos(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationY(sin(time * XM_PI / 8) * 10.0f * XM_PI / 180);
 		}
 		XMStoreFloat4x4(&f.frameTransformMatrix, rot * XMLoadFloat4x4(&f.initialMatrix));

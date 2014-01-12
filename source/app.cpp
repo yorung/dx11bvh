@@ -184,8 +184,8 @@ void App::Draw()
 	LARGE_INTEGER t, f;
 	QueryPerformanceCounter(&t);
 	QueryPerformanceFrequency(&f);
-//	float time = (float)((double)t.QuadPart / f.QuadPart);
-	float time = 0;
+	float time = (float)((double)t.QuadPart / f.QuadPart);
+//	float time = 0;
 
 //	XMMATRIX mRot = XMMatrixRotationQuaternion(XMQuaternionRotationAxis(XMVectorSet(1, 0, 0, 0), time / 2 * XM_PI));
 	XMMATRIX mRot = XMMatrixRotationQuaternion(quat);
