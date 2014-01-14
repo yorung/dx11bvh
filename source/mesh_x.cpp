@@ -1069,6 +1069,29 @@ void MeshX::LoadSub(const char *fileName)
 void MeshX::MakeInitialMatrixPerfectTStance()
 {
 	XMStoreFloat4x4(&m_frames[0].initialMatrix, XMLoadFloat4x4(&m_frames[0].initialMatrix) * XMMatrixRotationY(XM_PI));
+
+	for (auto& f : m_frames) {
+		f.frameTransformMatrix = f.initialMatrix;
+		f.frameTransformMatrix._41 = 0;
+		f.frameTransformMatrix._42 = 0;
+		f.frameTransformMatrix._43 = 0;
+	}
+	CalcFrameMatrices(0, XMMatrixIdentity());
+
+//	XMVECTOR local100 = XMVectorSet(1, 0, 0, 0);
+	Frame* f = &m_frames[_getFrameIdByName("Bip01_R_UpperArm")];
+//	XMVECTOR world100 = XMLoadFloat4x4(&f->result).r[0];
+	XMVECTOR world100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
+//	XMVECTOR world100 = XMVector3Normalize(XMVector3Transform(local100, XMLoadFloat4x4(&f->result)));
+	XMVECTOR worldBone = XMVectorSet(1, 0, 0, 0);
+	XMVECTOR rotAxis = XMVector3Cross(worldBone, world100);
+	float rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
+/*
+	f->initialMatrix._11 = f->initialMatrix._22 = f->initialMatrix._33 = 1.0f;
+	f->initialMatrix._12 = f->initialMatrix._13 = f->initialMatrix._21 = 0.0f;
+	f->initialMatrix._23 = f->initialMatrix._31 = f->initialMatrix._32 = 0.0f;
+	*/
+	XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxis, rotRad) * XMLoadFloat4x4(&f->initialMatrix));
 }
 
 MeshX::~MeshX()

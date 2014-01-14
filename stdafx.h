@@ -29,7 +29,7 @@
 // DirectX
 #include <d3d11.h>
 #include <D3Dcompiler.h>
-#include <directxmath.h>
+#include <SimpleMath.h>
 #include <DDSTextureLoader.h>
 #include <WICTextureLoader.h>
 #include <SpriteFont.h>
