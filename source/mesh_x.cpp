@@ -1078,20 +1078,22 @@ void MeshX::MakeInitialMatrixPerfectTStance()
 	}
 	CalcFrameMatrices(0, XMMatrixIdentity());
 
-//	XMVECTOR local100 = XMVectorSet(1, 0, 0, 0);
 	Frame* f = &m_frames[_getFrameIdByName("Bip01_R_UpperArm")];
-//	XMVECTOR world100 = XMLoadFloat4x4(&f->result).r[0];
 	XMVECTOR world100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
-//	XMVECTOR world100 = XMVector3Normalize(XMVector3Transform(local100, XMLoadFloat4x4(&f->result)));
 	XMVECTOR worldBone = XMVectorSet(1, 0, 0, 0);
 	XMVECTOR rotAxis = XMVector3Cross(worldBone, world100);
+	XMVECTOR dummy;
+	XMVECTOR rotAxisLocal = XMVector3Transform(rotAxis, XMMatrixInverse(&dummy, XMLoadFloat4x4(&m_frames[0].result)));
 	float rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
-/*
-	f->initialMatrix._11 = f->initialMatrix._22 = f->initialMatrix._33 = 1.0f;
-	f->initialMatrix._12 = f->initialMatrix._13 = f->initialMatrix._21 = 0.0f;
-	f->initialMatrix._23 = f->initialMatrix._31 = f->initialMatrix._32 = 0.0f;
-	*/
-	XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxis, rotRad) * XMLoadFloat4x4(&f->initialMatrix));
+	XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, rotRad) * XMLoadFloat4x4(&f->initialMatrix));
+
+	f = &m_frames[_getFrameIdByName("Bip01_L_UpperArm")];
+	world100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
+	worldBone = XMVectorSet(-1, 0, 0, 0);
+	rotAxis = XMVector3Cross(worldBone, world100);
+	rotAxisLocal = XMVector3Transform(rotAxis, XMMatrixInverse(&dummy, XMLoadFloat4x4(&m_frames[0].result)));
+	rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
+	XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, rotRad) * XMLoadFloat4x4(&f->initialMatrix));
 }
 
 MeshX::~MeshX()
