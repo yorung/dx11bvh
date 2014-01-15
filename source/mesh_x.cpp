@@ -405,49 +405,6 @@ void MeshX::CreateBoneMesh()
 	bones.materialMaps.push_back(map);
 }
 
-void MeshX::CreatePivotMesh()
-{
-	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-		Frame& f = m_frames[i];
-
-		XMVECTOR dummy;
-		XMMATRIX matLocal = XMMatrixInverse(&dummy, XMLoadFloat4x4(&f.boneOffsetMatrix));
-
-		XMVECTOR v = matLocal.r[3];
-		float len = 50.0f;
-		CreateCone(pivots, v, XMVector3TransformCoord(XMVectorSet(len, 0, 0, 0), matLocal), i, 0xff0000ff);
-		CreateCone(pivots, v, XMVector3TransformCoord(XMVectorSet(0, len, 0, 0), matLocal), i, 0xff00ff00);
-		CreateCone(pivots, v, XMVector3TransformCoord(XMVectorSet(0, 0, len, 0), matLocal), i, 0xffff0000);
-	}
-
-	int sizeVertices = pivots.vertices.size() * sizeof(pivots.vertices[0]);
-	int sizeIndices = pivots.indices.size() * sizeof(pivots.indices[0]);
-	if (sizeVertices && sizeIndices) {
-		pivotsRenderer.Init(sizeVertices, sizeIndices, &pivots.vertices[0], &pivots.indices[0]);
-	}
-
-	Material mat;
-	mat.faceColor.x = 0.6f;
-	mat.faceColor.y = 0.6f;
-	mat.faceColor.z = 0.6f;
-	mat.faceColor.w = 1.0f;
-	mat.power = 1.0f;
-	mat.specular.x = 1.0f;
-	mat.specular.y = 1.0f;
-	mat.specular.z = 1.0f;
-	mat.specular.w = 1.0f;
-	mat.emissive.x = 0.4f;
-	mat.emissive.y = 0.4f;
-	mat.emissive.z = 0.4f;
-	mat.emissive.w = 1.0f;
-	mat.tmid = texMan.Create("white.bmp", true);
-
-	MaterialMap map;
-	map.materialId = matMan.Create(mat);
-	map.faceStartIndex = 0;
-	map.faces = pivots.indices.size() / 3;
-	pivots.materialMaps.push_back(map);
-}
 
 MeshX::MeshX(const char *fileName)
 {
@@ -474,7 +431,6 @@ MeshX::MeshX(const char *fileName)
 	int sizeIndices = m_block.indices.size() * sizeof(m_block.indices[0]);
 	m_meshRenderer.Init(sizeVertices, sizeIndices, &m_block.vertices[0], &m_block.indices[0]);
 
-	CreatePivotMesh();
 	CreateBoneMesh();
 }
 
@@ -1114,7 +1070,6 @@ void MeshX::MakeInitialMatrixPerfectTStance()
 MeshX::~MeshX()
 {
 	m_meshRenderer.Destroy();
-	pivotsRenderer.Destroy();
 	bonesRenderer.Destroy();
 }
 
@@ -1215,21 +1170,28 @@ void MeshX::Draw(int animId, double time)
 	CalcAnimation(animId, time * m_animTicksPerSecond);
 	CalcFrameMatrices(0, XMMatrixIdentity());
 
-	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-		Frame& f = m_frames[i];
-		XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
-		XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
-		BoneMatrices[i] = boneOffset * frameTransform;
-	}
 
 	if (g_type == "pivot") {
-		pivotsRenderer.Draw(BoneMatrices, dimof(BoneMatrices), pivots);
-	}
-	if (g_type == "mesh") {
-		m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
-	}
-	if (g_type == "bone") {
-		bonesRenderer.Draw(BoneMatrices, dimof(BoneMatrices), bones);
+		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+			Frame& f = m_frames[i];
+			BoneMatrices[i] = XMLoadFloat4x4(&f.result);
+		}
+
+		debugRenderer.DrawPivots(BoneMatrices, m_frames.size());
+	} else {
+		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+			Frame& f = m_frames[i];
+			XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
+			XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
+			BoneMatrices[i] = boneOffset * frameTransform;
+		}
+
+		if (g_type == "mesh") {
+			m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
+		}
+		if (g_type == "bone") {
+			bonesRenderer.Draw(BoneMatrices, dimof(BoneMatrices), bones);
+		}
 	}
 }
 
@@ -1403,21 +1365,26 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 			BonesForX[i] = boneOffset * frameTransform;
 		}
 	}*/
-	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-		Frame& f = m_frames[i];
-		XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
-		XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
-		BonesForX[i] = boneOffset * frameTransform;
-	}
 
 	if (g_type == "pivot") {
-		pivotsRenderer.Draw(BonesForX, dimof(BonesForX), pivots);
-	}
-	if (g_type == "mesh") {
-		m_meshRenderer.Draw(BonesForX, dimof(BonesForX), m_block);
-	}
-	if (g_type == "bone") {
-		bonesRenderer.Draw(BonesForX, dimof(BonesForX), bones);
+		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+			Frame& f = m_frames[i];
+			BonesForX[i] = XMLoadFloat4x4(&f.result);
+		}
+		debugRenderer.DrawPivots(BonesForX, dimof(BonesForX));
+	} else {
+		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+			Frame& f = m_frames[i];
+			XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
+			XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
+			BonesForX[i] = boneOffset * frameTransform;
+		}
+		if (g_type == "mesh") {
+			m_meshRenderer.Draw(BonesForX, dimof(BonesForX), m_block);
+		}
+		if (g_type == "bone") {
+			bonesRenderer.Draw(BonesForX, dimof(BonesForX), bones);
+		}
 	}
 }
 

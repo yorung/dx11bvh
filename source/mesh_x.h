@@ -130,7 +130,6 @@ private:
 	void CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent);
 	void DumpFrames(BONE_ID frameId, int depth) const;
 	void CreateBoneMesh();
-	void CreatePivotMesh();
 	int GetDepth(BONE_ID id);
 	void PrintStatistics() const;
 	void GetVertStatistics(std::vector<int>& cnts) const;
@@ -146,9 +145,6 @@ private:
 	std::vector<AnimationSet> m_animationSets;
 	Block m_block;
 	int m_animTicksPerSecond;
-
-	MeshRenderer pivotsRenderer;
-	Block pivots;
 
 	MeshRenderer bonesRenderer;
 	Block bones;
