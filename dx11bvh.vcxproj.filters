@@ -57,6 +57,9 @@
     <ClInclude Include="source\tex_man11.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="source\debug_renderer.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -90,6 +93,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\tex_man11.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\debug_renderer.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

@@ -25,6 +25,8 @@ void App::Init(const char* fileName)
 {
 	Destroy();
 
+	debugRenderer.Init();
+
 	g_type = "mesh";
 
 	sprite = new SpriteBatch(deviceMan11.GetContext());
@@ -230,6 +232,8 @@ void App::Destroy()
 	SAFE_DELETE(meshTiny);
 	SAFE_DELETE(font);
 	SAFE_DELETE(sprite);
+
+	debugRenderer.Destroy();
 }
 
 
