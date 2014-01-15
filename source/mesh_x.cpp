@@ -1086,12 +1086,17 @@ void MeshX::MakeInitialMatrixPerfectTStance()
 	XMVECTOR world100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
 	XMVECTOR worldBone = XMVectorSet(1, 0, 0, 0);
 	XMVECTOR rotAxis = XMVector3Cross(world100, worldBone);
+	float len1 = XMVectorGetX(XMVector3Length(world100));
+	float len2 = XMVectorGetX(XMVector3Length(worldBone));
+	float rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
+
+	XMVECTOR testResult = XMVector3Transform(world100, XMMatrixRotationAxis(rotAxis, rotRad));
+	printf("testResult %f, %f, %f", XMVectorGetX(testResult), XMVectorGetY(testResult), XMVectorGetZ(testResult));
+
 	XMVECTOR dummy;
 	XMVECTOR rotAxisLocal = XMVector3Transform(rotAxis, XMMatrixInverse(&dummy, XMLoadFloat4x4(&f->result)));
-	float rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
 	XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, rotRad) * XMLoadFloat4x4(&f->initialMatrix));
 
-	
 
 
 	f = &m_frames[_getFrameIdByName("Bip01_L_UpperArm")];
@@ -1101,6 +1106,9 @@ void MeshX::MakeInitialMatrixPerfectTStance()
 	rotAxisLocal = XMVector3Transform(rotAxis, XMMatrixInverse(&dummy, XMLoadFloat4x4(&f->result)));
 	rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
 	XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, rotRad) * XMLoadFloat4x4(&f->initialMatrix));
+
+	CalcFrameMatrices(0, XMMatrixIdentity());
+	printf("f.result %f, %f, %f", f->result._11, f->result._12, f->result._13);
 }
 
 MeshX::~MeshX()
