@@ -865,8 +865,8 @@ void MeshX::CalcAnimation(int animId, double time)
 			if (maxTime <= 0) {
 				continue;
 			}
-			int iTime = (int)time % (int)maxTime;
 			double timeMod = fmod(time, maxTime);
+			int iTime = (int)timeMod % (int)maxTime;
 	
 			for (int i = 0; i < (int)itKey.timedFloatKeys.size() - 1; i++) {
 				TimedFloatKeys& t1 = itKey.timedFloatKeys[i];
