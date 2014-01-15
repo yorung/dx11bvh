@@ -1024,6 +1024,12 @@ void MeshX::LoadSub(const char *fileName)
 	MakeInitialMatrixPerfectTStance();
 }
 
+inline XMMATRIX inv(const XMMATRIX& m)
+{
+	XMVECTOR dummy;
+	return XMMatrixInverse(&dummy, m);
+}
+
 void MeshX::MakeInitialMatrixPerfectTStance()
 {
 	XMStoreFloat4x4(&m_frames[0].initialMatrix, XMLoadFloat4x4(&m_frames[0].initialMatrix) * XMMatrixRotationY(XM_PI));
@@ -1038,28 +1044,42 @@ void MeshX::MakeInitialMatrixPerfectTStance()
 
 	Frame* f = &m_frames[_getFrameIdByName("Bip01_R_UpperArm")];
 //	assert(f->childId >= 0);
+	assert(f->parentId >= 0);
 //	Frame* child =  &m_frames[f->childId];
+	Frame* parent =  &m_frames[f->parentId];
 	XMVECTOR world100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
 	XMVECTOR worldBone = XMVectorSet(1, 0, 0, 0);
 	XMVECTOR rotAxis = XMVector3Cross(world100, worldBone);
-	float len1 = XMVectorGetX(XMVector3Length(world100));
-	float len2 = XMVectorGetX(XMVector3Length(worldBone));
 	float rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
 
 	XMVECTOR testResult = XMVector3Transform(world100, XMMatrixRotationAxis(rotAxis, rotRad));
 	printf("testResult %f, %f, %f", XMVectorGetX(testResult), XMVectorGetY(testResult), XMVectorGetZ(testResult));
 
-	XMVECTOR dummy;
-	XMVECTOR rotAxisLocal = XMVector3Transform(rotAxis, XMMatrixInverse(&dummy, XMLoadFloat4x4(&f->result)));
+	XMFLOAT4X4 rotMat = parent->result;
+	rotMat._41 = rotMat._42 = rotMat._43 = 0;
+	XMVECTOR rotAxisLocal = XMVector3Transform(rotAxis, inv(XMLoadFloat4x4(&rotMat)));
+//	XMVECTOR rotAxisLocal2 = XMVector3Transform(rotAxis, XMMatrixInverse(&dummy, XMLoadFloat4x4(&f->result)));
+
+
+//	XMVECTOR local100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
+//	XMVECTOR localBone = XMVectorSet(1, 0, 0, 0);
+
+
 	XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, rotRad) * XMLoadFloat4x4(&f->initialMatrix));
 
 
 
 	f = &m_frames[_getFrameIdByName("Bip01_L_UpperArm")];
+	assert(f->parentId >= 0);
+	parent =  &m_frames[f->parentId];
 	world100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
 	worldBone = XMVectorSet(-1, 0, 0, 0);
 	rotAxis = XMVector3Cross(world100, worldBone);
-	rotAxisLocal = XMVector3Transform(rotAxis, XMMatrixInverse(&dummy, XMLoadFloat4x4(&f->result)));
+
+	rotMat = parent->result;
+	rotMat._41 = rotMat._42 = rotMat._43 = 0;
+	rotAxisLocal = XMVector3Transform(rotAxis, inv(XMLoadFloat4x4(&rotMat)));
+
 	rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
 	XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, rotRad) * XMLoadFloat4x4(&f->initialMatrix));
 
