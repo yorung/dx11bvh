@@ -1107,7 +1107,7 @@ void MeshX::CalcAnimation(int animId, double time)
 		for (auto& f : m_frames) {
 			XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.frameTransformMatrixOrg));
 		}
-		return;
+//		return;
 	}
 	int revAnimId = m_animationSets.size() - animId - 1;
 
