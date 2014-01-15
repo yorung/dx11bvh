@@ -201,18 +201,6 @@ static char* _searchChildTag(char* from, const char *tag, std::string* name = nu
 	return nullptr;
 }
 
-static void InitVertex(MeshVertex& v, BONE_ID boneId, DWORD color)
-{
-	v.blendIndices.x = v.blendIndices.y = v.blendIndices.z = v.blendIndices.w = boneId;
-	v.color = color;
-	v.blendWeights.x = v.blendWeights.y = v.blendWeights.z = 0;
-	v.normal.x = 1;
-	v.normal.y = 0;
-	v.normal.z = 0;
-	v.uv.x = v.uv.y = 0;
-	v.xyz.x = v.xyz.y = v.xyz.z = 0;
-}
-
 int Bvh::GetDepth(BONE_ID id)
 {
 	int depth = 0;
@@ -223,36 +211,7 @@ int Bvh::GetDepth(BONE_ID id)
 	return depth;
 }
 
-void CreateCone(Block& b, XMVECTOR v1, XMVECTOR v2, BONE_ID boneId, DWORD color)
-{
-	float radius = 0.15f;
-	XMVECTOR boneDir = XMVectorSubtract(v2, v1);
-	XMVECTOR vRot0 = XMVector3Cross(boneDir, XMVectorSet(0, 0, radius, 0));
-	if (XMVector3Equal(XMVectorZero(), vRot0)) {
-		vRot0 = XMVector3Cross(boneDir, XMVectorSet(0, radius, 0, 0));
-	}
-	XMVECTOR vRot90 = XMVector3Cross(vRot0, XMVector3Normalize(boneDir));
-	XMVECTOR vRotLast = XMVectorAdd(v1, vRot0);
-	static const int div = 10;
-	for (int j = 0; j < div; j++) {
-		MeshVertex vert[3];
-		for (auto& it : vert) {
-			InitVertex(it, boneId, color);
-		}
-		float rad = XM_2PI / div * (j + 1);
-		XMVECTOR vRot = XMVectorAdd(v1, XMVectorScale(vRot0, cosf(rad)) + XMVectorScale(vRot90, sinf(rad)));
-		XMStoreFloat3(&vert[0].xyz, vRotLast);
-		XMStoreFloat3(&vert[1].xyz, v2);
-		XMStoreFloat3(&vert[2].xyz, vRot);
-		XMVECTOR normal = XMVector3Cross(XMVectorSubtract(vRotLast, v2), XMVectorSubtract(v2, vRot));
-		for (auto& it : vert) {
-			XMStoreFloat3(&it.normal, normal);
-			b.vertices.push_back(it);
-			b.indices.push_back(b.indices.size());
-		}
-		vRotLast = vRot;
-	}
-}
+
 
 Bvh::Bvh(const char *fileName)
 {
@@ -276,7 +235,6 @@ Bvh::Bvh(const char *fileName)
     SetCurrentDirectoryA(strCWD);
 
 	CreateBoneMesh();
-	CreatePivotMesh();
 }
 
 void Bvh::CreateBoneMesh()
@@ -332,45 +290,6 @@ void Bvh::CreateBoneMesh()
 	map.faceStartIndex = 0;
 	map.faces = m_block.indices.size() / 3;
 	m_block.materialMaps.push_back(map);
-}
-
-void Bvh::CreatePivotMesh()
-{
-	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-		XMVECTOR v = XMVectorZero();
-		float len = 50.0f;
-		CreateCone(pivots, v, v + XMVectorSet(len, 0, 0, 0), i, 0xff0000ff);
-		CreateCone(pivots, v, v + XMVectorSet(0, len, 0, 0), i, 0xff00ff00);
-		CreateCone(pivots, v, v + XMVectorSet(0, 0, len, 0), i, 0xffff0000);
-	}
-
-	int sizeVertices = pivots.vertices.size() * sizeof(pivots.vertices[0]);
-	int sizeIndices = pivots.indices.size() * sizeof(pivots.indices[0]);
-	if (sizeVertices && sizeIndices) {
-		pivotsRenderer.Init(sizeVertices, sizeIndices, &pivots.vertices[0], &pivots.indices[0]);
-	}
-
-	Material mat;
-	mat.faceColor.x = 0.6f;
-	mat.faceColor.y = 0.6f;
-	mat.faceColor.z = 0.6f;
-	mat.faceColor.w = 1.0f;
-	mat.power = 1.0f;
-	mat.specular.x = 1.0f;
-	mat.specular.y = 1.0f;
-	mat.specular.z = 1.0f;
-	mat.specular.w = 1.0f;
-	mat.emissive.x = 0.4f;
-	mat.emissive.y = 0.4f;
-	mat.emissive.z = 0.4f;
-	mat.emissive.w = 1.0f;
-	mat.tmid = texMan.Create("white.bmp", true);
-
-	MaterialMap map;
-	map.materialId = matMan.Create(mat);
-	map.faceStartIndex = 0;
-	map.faces = pivots.indices.size() / 3;
-	pivots.materialMaps.push_back(map);
 }
 
 static DWORD _conv1To255(float f, int bit)
@@ -568,7 +487,6 @@ void Bvh::LoadSub(const char *fileName)
 Bvh::~Bvh()
 {
 	m_meshRenderer.Destroy();
-	pivotsRenderer.Destroy();
 }
 
 void Bvh::CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent)
@@ -651,7 +569,7 @@ void Bvh::Draw(int animId, double time)
 			XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
 			BoneMatrices[i] = frameTransform;
 		}
-		pivotsRenderer.Draw(BoneMatrices, dimof(BoneMatrices), pivots);
+		debugRenderer.DrawPivots(BoneMatrices, m_frames.size());
 	} else {
 		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 			BvhFrame& f = m_frames[i];

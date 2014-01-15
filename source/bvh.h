@@ -31,7 +31,6 @@ private:
 	void CalcAnimation(double time);
 	int GetDepth(BONE_ID id);
 	void CreateBoneMesh();
-	void CreatePivotMesh();
 
 	std::vector<BvhFrame> m_frames;
 	std::vector<float> motion;
@@ -41,9 +40,6 @@ private:
 
 	MeshRenderer m_meshRenderer;
 	Block m_block;
-
-	MeshRenderer pivotsRenderer;
-	Block pivots;
 public:
 	const Block& GetRawDatas() const { return m_block; }
 	const std::vector<BvhFrame>& GetFrames() const { return m_frames; }
