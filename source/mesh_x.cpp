@@ -909,13 +909,14 @@ void MeshX::DumpFrames(BONE_ID frameId, int depth) const
 	printf("%s: ", f.name);
 	for (int r = 0; r < 4; r++) {
 		for (int c = 0; c < 4; c++) {
-			float m = f.frameTransformMatrix.m[r][c];
+			float m = f.initialMatrix.m[r][c];
 			if (m - int(m)) {
-				printf("%.3f,", m);
+				printf("%.2f,", m);
 			}else{
 				printf("%d,", (int)m);
 			}
 		}
+		printf(" ");
 	}
 	printf("\n");
 	if (f.siblingId >= 0) {
@@ -1063,6 +1064,7 @@ void MeshX::LoadSub(const char *fileName)
 	PrintStatistics();
 	printf("===============DumpStatistics end\n");
 
+
 	MakeInitialMatrixPerfectTStance();
 }
 
@@ -1079,6 +1081,8 @@ void MeshX::MakeInitialMatrixPerfectTStance()
 	CalcFrameMatrices(0, XMMatrixIdentity());
 
 	Frame* f = &m_frames[_getFrameIdByName("Bip01_R_UpperArm")];
+//	assert(f->childId >= 0);
+//	Frame* child =  &m_frames[f->childId];
 	XMVECTOR world100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
 	XMVECTOR worldBone = XMVectorSet(1, 0, 0, 0);
 	XMVECTOR rotAxis = XMVector3Cross(worldBone, world100);
@@ -1086,6 +1090,9 @@ void MeshX::MakeInitialMatrixPerfectTStance()
 	XMVECTOR rotAxisLocal = XMVector3Transform(rotAxis, XMMatrixInverse(&dummy, XMLoadFloat4x4(&f->result)));
 	float rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
 	XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, -rotRad) * XMLoadFloat4x4(&f->initialMatrix));
+
+	
+
 
 	f = &m_frames[_getFrameIdByName("Bip01_L_UpperArm")];
 	world100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
