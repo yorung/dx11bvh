@@ -14,12 +14,16 @@ static void InitVertex(MeshVertex& v, BONE_ID boneId, DWORD color)
 	v.xyz.x = v.xyz.y = v.xyz.z = 0;
 }
 
+static inline float len(XMVECTOR v) {
+	return XMVectorGetX(XMVector3Length(v));
+}
+
 void CreateCone(Block& b, XMVECTOR v1, XMVECTOR v2, BONE_ID boneId, DWORD color)
 {
 	float radius = 0.15f;
 	XMVECTOR boneDir = XMVectorSubtract(v2, v1);
 	XMVECTOR vRot0 = XMVector3Cross(boneDir, XMVectorSet(0, 0, radius, 0));
-	if (XMVector3Equal(XMVectorZero(), vRot0)) {
+	if (len(vRot0) < 0.001f) {
 		vRot0 = XMVector3Cross(boneDir, XMVectorSet(0, radius, 0, 0));
 	}
 	XMVECTOR vRot90 = XMVector3Cross(vRot0, XMVector3Normalize(boneDir));
