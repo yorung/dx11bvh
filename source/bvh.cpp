@@ -3,6 +3,12 @@
 static float bvhScale = 3.0f;
 void *LoadFile(const char *fileName);
 
+static XMMATRIX q2m(const Quaternion& q)
+{
+	return Matrix::CreateFromQuaternion(q);
+}
+
+
 static void _enterBrace(char*& p)
 {
 	if (!p) {
@@ -517,11 +523,6 @@ void Bvh::CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent)
 	}
 }
 
-static XMMATRIX q2m(const Quaternion& q)
-{
-	return Matrix::CreateFromQuaternion(q);
-}
-
 void Bvh::CalcAnimation(double time)
 {
 	int frame = (int)(time / frameTime);
@@ -540,7 +541,10 @@ void Bvh::CalcAnimation(double time)
 			transMat = XMMatrixTranslation(it.offset.x, it.offset.y, it.offset.z);
 		}
 		
-		Quaternion quatParentAxisAlignInv = it.parentId >= 0 ? m_frames[it.parentId].axisAlignQuat.Inverse() : Quaternion();
+		Quaternion quatParentAxisAlignInv;
+		if (it.parentId >= 0) {
+			m_frames[it.parentId].axisAlignQuat.Inverse(quatParentAxisAlignInv);
+		}
 		it.frameTransformMatrix = q2m(it.axisAlignQuat) * q2m(q) * transMat * q2m(quatParentAxisAlignInv);
 	}
 }
@@ -587,7 +591,7 @@ void Bvh::CalcRotAnimForAlignedAxis(XMMATRIX RotAnimMatrices[50], double time) c
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		const BvhFrame& f = m_frames[i];
 
-		XMMATRIX AA = XMLoadFloat4x4(&f.axisAlignMatrix);
+		XMMATRIX AA = q2m(f.axisAlignQuat);
 		XMVECTOR dummy;
 		XMMATRIX invAA = XMMatrixInverse(&dummy, AA);
 
@@ -609,7 +613,7 @@ BONE_ID Bvh::BoneNameToId(const char* name)
 void Bvh::SetLocalAxis(BONE_ID frameId, const Quaternion& q)
 {
 	BvhFrame* f = &m_frames[frameId];
-	XMStoreFloat4x4(&f->axisAlignQuat, q);
+	f->axisAlignQuat = q;
 	CalcBoneOffsetMatrix(frameId);
 }
 
