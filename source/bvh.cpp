@@ -538,10 +538,14 @@ void Bvh::CalcAnimation(double time)
 			transMat = XMMatrixTranslation(it.offset.x, it.offset.y, it.offset.z);
 		}
 		if (it.rotIndies.x >= 0) {
+			XMMATRIX rotMat = XMMatrixRotationZ(mot[it.rotIndies.z] * XM_PI / 180) * XMMatrixRotationX(-mot[it.rotIndies.x] * XM_PI / 180) * XMMatrixRotationY(-mot[it.rotIndies.y] * XM_PI / 180);
+			q = Quaternion::CreateFromRotationMatrix(rotMat);
+			/*
 			Quaternion qx = Quaternion::CreateFromAxisAngle(Vector3(0,0,1), mot[it.rotIndies.z] * XM_PI / 180);
 			Quaternion qy = Quaternion::CreateFromAxisAngle(Vector3(1,0,0), -mot[it.rotIndies.x] * XM_PI / 180);
 			Quaternion qz = Quaternion::CreateFromAxisAngle(Vector3(0,1,0), -mot[it.rotIndies.y] * XM_PI / 180);
 			q = qz * qx * qy;
+			*/
 		}
 		
 		XMVECTOR dummy;
