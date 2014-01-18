@@ -534,7 +534,7 @@ void Bvh::CalcAnimation(double time)
 	const float* mot = &rawMotion[frame * channels];
 	const Pose& pose = motion.poses[frame];
 
-	for (int i = 0; i < m_frames.size(); i++) {
+	for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++) {
 		auto& it = m_frames[i];
 		XMMATRIX transMat = XMMatrixIdentity();
 		Quaternion q = pose.quats[i];
@@ -544,9 +544,8 @@ void Bvh::CalcAnimation(double time)
 			transMat = XMMatrixTranslation(it.offset.x, it.offset.y, it.offset.z);
 		}
 		
-		XMVECTOR dummy;
-		XMMATRIX matParentAxisAlignInv = it.parentId >= 0 ? XMMatrixInverse(&dummy, XMLoadFloat4x4(&m_frames[it.parentId].axisAlignMatrix)) : XMMatrixIdentity();
-		XMStoreFloat4x4(&it.frameTransformMatrix, XMLoadFloat4x4(&it.axisAlignMatrix) * q2m(q) * transMat * matParentAxisAlignInv);
+		XMMATRIX matParentAxisAlignInv = it.parentId >= 0 ? m_frames[it.parentId].axisAlignMatrix.Invert() : XMMatrixIdentity();
+		it.frameTransformMatrix = it.axisAlignMatrix * q2m(q) * transMat * matParentAxisAlignInv;
 	}
 }
 

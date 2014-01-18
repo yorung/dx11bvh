@@ -18,10 +18,10 @@ struct BvhFrame
 	BONE_ID siblingId;
 	XMINT3 rotIndies;
 	XMINT3 posIndies;
-	XMFLOAT4X4 axisAlignMatrix;
-	XMFLOAT4X4 frameTransformMatrix;
-	XMFLOAT4X4 boneOffsetMatrix;
-	XMFLOAT4X4 result;
+	Matrix axisAlignMatrix;
+	Matrix frameTransformMatrix;
+	Matrix boneOffsetMatrix;
+	Matrix result;
 };
 
 class Bvh : public Mesh
