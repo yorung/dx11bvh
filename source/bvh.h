@@ -18,7 +18,7 @@ struct BvhFrame
 	BONE_ID siblingId;
 	XMINT3 rotIndies;
 	XMINT3 posIndies;
-	Matrix axisAlignMatrix;
+	Quaternion axisAlignQuat;
 	Matrix frameTransformMatrix;
 	Matrix boneOffsetMatrix;
 	Matrix result;
@@ -61,6 +61,6 @@ public:
 	void Draw(int animId, double time);
 	void CalcRotAnimForAlignedAxis(XMMATRIX RotAnimMatrices[50], double time) const;
 	BONE_ID BoneNameToId(const char* name);
-	void SetLocalAxis(BONE_ID boneId, const XMMATRIX& m);
+	void SetLocalAxis(BONE_ID boneId, const Quaternion& q);
 };
 

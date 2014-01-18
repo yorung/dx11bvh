@@ -320,10 +320,6 @@ BONE_ID Bvh::_getFrameIdByName(const char* name)
 	f.posIndies.x = -1;
 	f.posIndies.y = -1;
 	f.posIndies.z = -1;
-	XMStoreFloat4x4(&f.axisAlignMatrix, XMMatrixIdentity());
-//	XMStoreFloat4x4(&f.axisAlignMatrix, XMMatrixRotationZ(XM_PI / 2));
-//	XMStoreFloat4x4(&f.axisAlignMatrix, XMMatrixRotationZ(XM_2PI * (rand() / float(RAND_MAX))));
-//	XMStoreFloat4x4(&f.axisAlignMatrix, XMMatrixRotationZ(XM_2PI * (rand() / float(RAND_MAX))) * XMMatrixRotationX(XM_2PI * (rand() / float(RAND_MAX))));
 	m_frames.push_back(f);
 	return m_frames.size() - 1;
 }
@@ -378,7 +374,7 @@ void Bvh::CalcBoneOffsetMatrix(BONE_ID frameId)
 {
 	BvhFrame& frame = m_frames[frameId];
 	XMVECTOR dummy;
-	XMStoreFloat4x4(&frame.boneOffsetMatrix, XMMatrixInverse(&dummy, (XMLoadFloat4x4(&frame.axisAlignMatrix) * XMMatrixTranslation(frame.offsetCombined.x, frame.offsetCombined.y, frame.offsetCombined.z))));
+	frame.boneOffsetMatrix = XMMatrixInverse(&dummy, q2m(frame.axisAlignQuat) * XMMatrixTranslation(frame.offsetCombined.x, frame.offsetCombined.y, frame.offsetCombined.z));
 }
 
 void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
@@ -544,8 +540,8 @@ void Bvh::CalcAnimation(double time)
 			transMat = XMMatrixTranslation(it.offset.x, it.offset.y, it.offset.z);
 		}
 		
-		XMMATRIX matParentAxisAlignInv = it.parentId >= 0 ? m_frames[it.parentId].axisAlignMatrix.Invert() : XMMatrixIdentity();
-		it.frameTransformMatrix = it.axisAlignMatrix * q2m(q) * transMat * matParentAxisAlignInv;
+		Quaternion quatParentAxisAlignInv = it.parentId >= 0 ? m_frames[it.parentId].axisAlignQuat.Inverse() : Quaternion();
+		it.frameTransformMatrix = q2m(it.axisAlignQuat) * q2m(q) * transMat * q2m(quatParentAxisAlignInv);
 	}
 }
 
@@ -610,10 +606,10 @@ BONE_ID Bvh::BoneNameToId(const char* name)
 	return -1;
 }
 
-void Bvh::SetLocalAxis(BONE_ID frameId, const XMMATRIX& m)
+void Bvh::SetLocalAxis(BONE_ID frameId, const Quaternion& q)
 {
 	BvhFrame* f = &m_frames[frameId];
-	XMStoreFloat4x4(&f->axisAlignMatrix, m);
+	XMStoreFloat4x4(&f->axisAlignQuat, q);
 	CalcBoneOffsetMatrix(frameId);
 }
 

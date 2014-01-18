@@ -1305,14 +1305,11 @@ static BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, Bvh* bvh)
 	return bvhBoneId;
 }
 
-XMMATRIX MeshX::GetWorldRotation(const char* frameName)
+Quaternion MeshX::GetWorldRotation(const char* frameName)
 {
 	BONE_ID id = _getFrameIdByName(frameName);
 	Matrix r = m_frames[id].result;
-	r._41 = 0;
-	r._42 = 0;
-	r._43 = 0;
-	return XMLoadFloat4x4(&r);
+	return Quaternion::CreateFromRotationMatrix(r);
 }
 
 void MeshX::ApplyXLocalAxisToBvh(Bvh* bvh)

@@ -137,7 +137,7 @@ private:
 	void DeleteDummyFrames();
 	bool UnlinkFrame(BONE_ID id);
 	void MakeInitialMatrixPerfectTStance();
-	XMMATRIX GetWorldRotation(const char* frameName);
+	Quaternion GetWorldRotation(const char* frameName);
 	void ApplyXLocalAxisToBvh(Bvh* bvh);
 
 
