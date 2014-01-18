@@ -376,11 +376,11 @@ void Bvh::_linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId)
 	}
 }
 
-void Bvh::CalcBoneOffsetMatrix(BONE_ID frameId)
+void Bvh::CalcBoneOffsetMatrix(BONE_ID frameId, const Quaternion& axisAlignQuat)
 {
 	BvhFrame& frame = m_frames[frameId];
 	XMVECTOR dummy;
-	frame.boneOffsetMatrix = XMMatrixInverse(&dummy, q2m(frame.axisAlignQuat) * XMMatrixTranslation(frame.offsetCombined.x, frame.offsetCombined.y, frame.offsetCombined.z));
+	frame.boneOffsetMatrix = XMMatrixInverse(&dummy, q2m(axisAlignQuat) * XMMatrixTranslation(frame.offsetCombined.x, frame.offsetCombined.y, frame.offsetCombined.z));
 }
 
 void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
@@ -408,7 +408,7 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 				_linkFrame(parentFrameId, frameId);
 			}
 
-			CalcBoneOffsetMatrix(frameId);
+			CalcBoneOffsetMatrix(frameId, Quaternion());
 
 			if ("CHANNELS" == _getToken(child)) {
 				int nChannels = _getI(child);
@@ -610,10 +610,10 @@ BONE_ID Bvh::BoneNameToId(const char* name)
 	return -1;
 }
 
-void Bvh::SetLocalAxis(BONE_ID frameId, const Quaternion& q)
+void Bvh::SetLocalAxis(BONE_ID frameId, const Quaternion& axisAlignQuat)
 {
 	BvhFrame* f = &m_frames[frameId];
-	f->axisAlignQuat = q;
-	CalcBoneOffsetMatrix(frameId);
+	f->axisAlignQuat = axisAlignQuat;
+	CalcBoneOffsetMatrix(frameId, axisAlignQuat);
 }
 
