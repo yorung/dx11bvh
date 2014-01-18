@@ -93,11 +93,11 @@ struct MaterialMap
 struct Frame
 {
 	char name[32];
-	XMFLOAT4X4 initialMatrix;
-	XMFLOAT4X4 frameTransformMatrixOrg;
-	XMFLOAT4X4 frameTransformMatrix;
-	XMFLOAT4X4 boneOffsetMatrix;
-	XMFLOAT4X4 result;
+	Matrix initialMatrix;
+	Matrix frameTransformMatrixOrg;
+	Matrix frameTransformMatrix;
+	Matrix boneOffsetMatrix;
+	Matrix result;
 	BONE_ID parentId;
 	BONE_ID childId;
 	BONE_ID siblingId;
