@@ -517,6 +517,11 @@ static XMMATRIX Interpolate(const XMMATRIX& m1, const XMMATRIX& m2, float ratio)
 	return m3;
 }
 
+static XMMATRIX q2m(const Quaternion& q)
+{
+	return Matrix::CreateFromQuaternion(q);
+}
+
 void Bvh::CalcAnimation(double time)
 {
 	int frame = (int)(time / frameTime);
@@ -525,20 +530,23 @@ void Bvh::CalcAnimation(double time)
 	const float* mot = &motion[frame * channels];
 
 	for (auto& it : m_frames) {
-		XMMATRIX rotMat = XMMatrixIdentity(), transMat = XMMatrixIdentity();
+		XMMATRIX transMat = XMMatrixIdentity();
+		Quaternion q;
 		if (it.posIndies.x >= 0) {
 			transMat = XMMatrixTranslation(mot[it.posIndies.x] * bvhScale, mot[it.posIndies.y] * bvhScale, -mot[it.posIndies.z] * bvhScale);
 		} else {
 			transMat = XMMatrixTranslation(it.offset.x, it.offset.y, it.offset.z);
 		}
 		if (it.rotIndies.x >= 0) {
-			rotMat = XMMatrixRotationZ(mot[it.rotIndies.z] * XM_PI / 180) * XMMatrixRotationX(-mot[it.rotIndies.x] * XM_PI / 180) * XMMatrixRotationY(-mot[it.rotIndies.y] * XM_PI / 180);
-//			rotMat = XMMatrixIdentity();
+			Quaternion qx = Quaternion::CreateFromAxisAngle(Vector3(0,0,1), mot[it.rotIndies.z] * XM_PI / 180);
+			Quaternion qy = Quaternion::CreateFromAxisAngle(Vector3(1,0,0), -mot[it.rotIndies.x] * XM_PI / 180);
+			Quaternion qz = Quaternion::CreateFromAxisAngle(Vector3(0,1,0), -mot[it.rotIndies.y] * XM_PI / 180);
+			q = qz * qx * qy;
 		}
-
+		
 		XMVECTOR dummy;
 		XMMATRIX matParentAxisAlignInv = it.parentId >= 0 ? XMMatrixInverse(&dummy, XMLoadFloat4x4(&m_frames[it.parentId].axisAlignMatrix)) : XMMatrixIdentity();
-		XMStoreFloat4x4(&it.frameTransformMatrix, XMLoadFloat4x4(&it.axisAlignMatrix) * rotMat * transMat * matParentAxisAlignInv);
+		XMStoreFloat4x4(&it.frameTransformMatrix, XMLoadFloat4x4(&it.axisAlignMatrix) * q2m(q) * transMat * matParentAxisAlignInv);
 		/*
 		if (!!strstr(it.name, "tShoulder") || !!strstr(it.name, "tHip") || !!strstr(it.name, "tKnee") || !!strstr(it.name, "tElbow")) {
 			float time = GetTickCount() / 1000.0f;

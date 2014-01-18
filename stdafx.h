@@ -35,6 +35,7 @@
 #include <SpriteFont.h>
 
 using namespace DirectX;
+using namespace SimpleMath;
 
 // TODO: reference additional headers your program requires here
 #include "source/device_man11.h"
