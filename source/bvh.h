@@ -1,11 +1,11 @@
-struct MotionFrame
+struct Pose
 {
-	std::vector<SimpleMath::Quaternion> q;
+	std::vector<SimpleMath::Quaternion> quats;
 };
 
 struct Motion
 {
-	std::vector<MotionFrame> frames;
+	std::vector<Pose> poses;
 };
 
 struct BvhFrame
@@ -38,12 +38,14 @@ private:
 	void CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent);
 	void DumpFrames(BONE_ID frameId, int depth) const;
 	void ParseMotion(const char *p);
+	void PreCalculateMotion();
 	void CalcAnimation(double time);
 	int GetDepth(BONE_ID id);
 	void CreateBoneMesh();
 
 	std::vector<BvhFrame> m_frames;
 	std::vector<float> rawMotion;
+	Motion motion;
 
 	int motionFrames;
 	float frameTime;

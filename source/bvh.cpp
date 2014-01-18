@@ -464,6 +464,24 @@ void Bvh::ParseMotion(const char *p)
 	}
 }
 
+void Bvh::PreCalculateMotion()
+{
+	motion.poses.resize(motionFrames);
+	for (int i = 0; i < motionFrames; i++) {
+		const float* mot = &rawMotion[i * channels];
+		Pose& pose = motion.poses[i];
+
+		for (auto& it : m_frames) {
+			Quaternion q;
+			if (it.rotIndies.x >= 0) {
+				XMMATRIX rotMat = XMMatrixRotationZ(mot[it.rotIndies.z] * XM_PI / 180) * XMMatrixRotationX(-mot[it.rotIndies.x] * XM_PI / 180) * XMMatrixRotationY(-mot[it.rotIndies.y] * XM_PI / 180);
+				q = Quaternion::CreateFromRotationMatrix(rotMat);
+			}
+			pose.quats.push_back(q);
+		}
+	}
+}
+
 void Bvh::LoadSub(const char *fileName)
 {
 	void *img = LoadFile(fileName);
@@ -476,6 +494,7 @@ void Bvh::LoadSub(const char *fileName)
 	channels = 0;
 	ParseFrame("ROOT", body, -1);
 	ParseMotion(body);
+	PreCalculateMotion();
 	free(img);
 
 	printf("===============DumpFrames begin\n");
@@ -502,21 +521,6 @@ void Bvh::CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent)
 	}
 }
 
-static XMMATRIX Interpolate(const XMMATRIX& m1, const XMMATRIX& m2, float ratio)
-{
-	XMVECTOR q1 = XMQuaternionRotationMatrix(m1);
-	XMVECTOR q2 = XMQuaternionRotationMatrix(m2);
-	XMVECTOR q3 = XMQuaternionSlerp(q1, q2, ratio);
-
-	XMVECTOR t1 = m1.r[3];
-	XMVECTOR t2 = m2.r[3];
-	XMVECTOR t3 = XMVectorLerp(t1, t2, ratio);
-
-	XMMATRIX m3 = XMMatrixRotationQuaternion(q3);
-	m3.r[3] = t3;
-	return m3;
-}
-
 static XMMATRIX q2m(const Quaternion& q)
 {
 	return Matrix::CreateFromQuaternion(q);
@@ -528,36 +532,21 @@ void Bvh::CalcAnimation(double time)
 	frame %= motionFrames;
 
 	const float* mot = &rawMotion[frame * channels];
+	const Pose& pose = motion.poses[frame];
 
-	for (auto& it : m_frames) {
+	for (int i = 0; i < m_frames.size(); i++) {
+		auto& it = m_frames[i];
 		XMMATRIX transMat = XMMatrixIdentity();
-		Quaternion q;
+		Quaternion q = pose.quats[i];
 		if (it.posIndies.x >= 0) {
 			transMat = XMMatrixTranslation(mot[it.posIndies.x] * bvhScale, mot[it.posIndies.y] * bvhScale, -mot[it.posIndies.z] * bvhScale);
 		} else {
 			transMat = XMMatrixTranslation(it.offset.x, it.offset.y, it.offset.z);
 		}
-		if (it.rotIndies.x >= 0) {
-			XMMATRIX rotMat = XMMatrixRotationZ(mot[it.rotIndies.z] * XM_PI / 180) * XMMatrixRotationX(-mot[it.rotIndies.x] * XM_PI / 180) * XMMatrixRotationY(-mot[it.rotIndies.y] * XM_PI / 180);
-			q = Quaternion::CreateFromRotationMatrix(rotMat);
-			/*
-			Quaternion qx = Quaternion::CreateFromAxisAngle(Vector3(0,0,1), mot[it.rotIndies.z] * XM_PI / 180);
-			Quaternion qy = Quaternion::CreateFromAxisAngle(Vector3(1,0,0), -mot[it.rotIndies.x] * XM_PI / 180);
-			Quaternion qz = Quaternion::CreateFromAxisAngle(Vector3(0,1,0), -mot[it.rotIndies.y] * XM_PI / 180);
-			q = qz * qx * qy;
-			*/
-		}
 		
 		XMVECTOR dummy;
 		XMMATRIX matParentAxisAlignInv = it.parentId >= 0 ? XMMatrixInverse(&dummy, XMLoadFloat4x4(&m_frames[it.parentId].axisAlignMatrix)) : XMMatrixIdentity();
 		XMStoreFloat4x4(&it.frameTransformMatrix, XMLoadFloat4x4(&it.axisAlignMatrix) * q2m(q) * transMat * matParentAxisAlignInv);
-		/*
-		if (!!strstr(it.name, "tShoulder") || !!strstr(it.name, "tHip") || !!strstr(it.name, "tKnee") || !!strstr(it.name, "tElbow")) {
-			float time = GetTickCount() / 1000.0f;
-
-			XMMATRIX rot = XMMatrixRotationZ(cos(time * XM_PI / 3) * 50.0f * XM_PI / 180);
-			XMStoreFloat4x4(&it.frameTransformMatrix, rot * XMLoadFloat4x4(&it.axisAlignMatrix) * transMat * matParentAxisAlignInv);
-		}*/
 	}
 }
 
@@ -598,21 +587,16 @@ void Bvh::CalcRotAnimForAlignedAxis(XMMATRIX RotAnimMatrices[50], double time) c
 	int frame = (int)(time / frameTime);
 	frame %= motionFrames;
 
-	const float* mot = &rawMotion[frame * channels];
+	const Pose& pose = motion.poses[frame];
 
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		const BvhFrame& f = m_frames[i];
-
-		XMMATRIX rotMat = XMMatrixIdentity(), transMat = XMMatrixIdentity();
-		if (f.rotIndies.x >= 0) {
-			rotMat = XMMatrixRotationZ(mot[f.rotIndies.z] * XM_PI / 180) * XMMatrixRotationX(-mot[f.rotIndies.x] * XM_PI / 180) * XMMatrixRotationY(-mot[f.rotIndies.y] * XM_PI / 180);
-		}
 
 		XMMATRIX AA = XMLoadFloat4x4(&f.axisAlignMatrix);
 		XMVECTOR dummy;
 		XMMATRIX invAA = XMMatrixInverse(&dummy, AA);
 
-		RotAnimMatrices[i] = AA * rotMat * invAA;
+		RotAnimMatrices[i] = AA * q2m(pose.quats[i]) * invAA;
 	}
 }
 
