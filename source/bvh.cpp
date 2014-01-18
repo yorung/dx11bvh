@@ -460,7 +460,7 @@ void Bvh::ParseMotion(const char *p)
 	motionFrames = _getI(m);
 	frameTime = _getF(m);
 	while (m && *m) {
-		motion.push_back(_getF(m));
+		rawMotion.push_back(_getF(m));
 	}
 }
 
@@ -527,7 +527,7 @@ void Bvh::CalcAnimation(double time)
 	int frame = (int)(time / frameTime);
 	frame %= motionFrames;
 
-	const float* mot = &motion[frame * channels];
+	const float* mot = &rawMotion[frame * channels];
 
 	for (auto& it : m_frames) {
 		XMMATRIX transMat = XMMatrixIdentity();
@@ -598,7 +598,7 @@ void Bvh::CalcRotAnimForAlignedAxis(XMMATRIX RotAnimMatrices[50], double time) c
 	int frame = (int)(time / frameTime);
 	frame %= motionFrames;
 
-	const float* mot = &motion[frame * channels];
+	const float* mot = &rawMotion[frame * channels];
 
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		const BvhFrame& f = m_frames[i];

@@ -43,7 +43,7 @@ private:
 	void CreateBoneMesh();
 
 	std::vector<BvhFrame> m_frames;
-	std::vector<float> motion;
+	std::vector<float> rawMotion;
 
 	int motionFrames;
 	float frameTime;
