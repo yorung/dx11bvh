@@ -1,3 +1,13 @@
+struct MotionFrame
+{
+	std::vector<SimpleMath::Quaternion> q;
+};
+
+struct Motion
+{
+	std::vector<MotionFrame> frames;
+};
+
 struct BvhFrame
 {
 	char name[32];
@@ -34,6 +44,7 @@ private:
 
 	std::vector<BvhFrame> m_frames;
 	std::vector<float> motion;
+
 	int motionFrames;
 	float frameTime;
 	int channels;
