@@ -612,8 +612,15 @@ BONE_ID Bvh::BoneNameToId(const char* name)
 
 void Bvh::SetLocalAxis(BONE_ID frameId, const Quaternion& axisAlignQuat)
 {
-	BvhFrame* f = &m_frames[frameId];
-	f->axisAlignQuat = axisAlignQuat;
+	BvhFrame& f = m_frames[frameId];
+	f.axisAlignQuat = axisAlignQuat;
 	CalcBoneOffsetMatrix(frameId, axisAlignQuat);
+	/*
+	for (auto& it : motion.poses) {
+		assert(frameId < it.quats.size());
+		Quaternion inv;
+		axisAlignQuat.Inverse(inv);
+		it.quats[frameId] = axisAlignQuat * it.quats[frameId] * inv;
+	}*/
 }
 
