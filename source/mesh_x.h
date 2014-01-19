@@ -138,7 +138,6 @@ private:
 	bool UnlinkFrame(BONE_ID id);
 	void MakeInitialMatrixPerfectTStance();
 	Quaternion GetWorldRotation(const char* frameName);
-	void ApplyXLocalAxisToBvh(Bvh* bvh);
 
 
 	std::vector<Frame> m_frames;
@@ -155,5 +154,6 @@ public:
 	~MeshX();
 	void Draw(int animId, double time);
 	void DrawBvh(class Bvh* bvh, double time);
+	void ApplyXLocalAxisToBvh(Bvh* bvh);
 };
 
