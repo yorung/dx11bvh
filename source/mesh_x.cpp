@@ -1333,8 +1333,6 @@ void MeshX::ApplyXLocalAxisToBvh(Bvh* bvh)
 
 void MeshX::DrawBvh(Bvh* bvh, double time)
 {
-	ApplyXLocalAxisToBvh(bvh);
-
 	XMMATRIX RotAnim[50];
 	bvh->CalcRotAnimForAlignedAxis(RotAnim, time);
 
