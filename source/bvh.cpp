@@ -380,7 +380,7 @@ void Bvh::CalcBoneOffsetMatrix(BONE_ID frameId, const Quaternion& axisAlignQuat)
 {
 	BvhFrame& frame = m_frames[frameId];
 	XMVECTOR dummy;
-	frame.boneOffsetMatrix = XMMatrixInverse(&dummy, Matrix(q2m(axisAlignQuat)) * frame.offsetCombined);
+	frame.boneOffsetMatrix = XMMatrixInverse(&dummy, frame.offsetCombined);
 }
 
 void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
@@ -523,6 +523,19 @@ void Bvh::CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent)
 	}
 }
 
+void Bvh::CalcCombinedOffsets(BONE_ID frameId)
+{
+	BvhFrame& f = m_frames[frameId];
+	Matrix parentOffset = f.parentId >= 0 ? m_frames[f.parentId].offsetCombined : Matrix();
+	f.offsetCombined = f.offset * parentOffset;
+	if (f.siblingId >= 0) {
+		CalcCombinedOffsets(f.siblingId);
+	}
+	if (f.childId >= 0) {
+		CalcCombinedOffsets(f.childId);
+	}
+}
+
 void Bvh::CalcAnimation(double time)
 {
 	int frame = (int)(time / frameTime);
@@ -538,12 +551,13 @@ void Bvh::CalcAnimation(double time)
 		if (it.posIndies.x >= 0) {
 			transMat = XMMatrixTranslation(mot[it.posIndies.x] * bvhScale, mot[it.posIndies.y] * bvhScale, -mot[it.posIndies.z] * bvhScale);
 		} else {
-			Quaternion quatParentAxisAlignInv;
-			if (it.parentId >= 0) {
-				m_frames[it.parentId].axisAlignQuat.Inverse(quatParentAxisAlignInv);
-			}
-			Quaternion AA = it.axisAlignQuat;
-			transMat = q2m(AA) * (XMMATRIX)it.offset * q2m(quatParentAxisAlignInv);
+//			Quaternion quatParentAxisAlignInv;
+//			if (it.parentId >= 0) {
+//				m_frames[it.parentId].axisAlignQuat.Inverse(quatParentAxisAlignInv);
+//			}
+//			Quaternion AA = it.axisAlignQuat;
+//			transMat = q2m(AA) * (XMMATRIX)it.offset * q2m(quatParentAxisAlignInv);
+			transMat = it.offset;
 		}
 		
 		it.frameTransformMatrix = q2m(q) * transMat;
@@ -611,17 +625,26 @@ void Bvh::SetLocalAxis(BONE_ID frameId, const Quaternion& axisAlignQuat)
 	BvhFrame& f = m_frames[frameId];
 	f.axisAlignQuat = axisAlignQuat;
 
-
-
-
-	CalcBoneOffsetMatrix(frameId, axisAlignQuat);
+	Quaternion inv;
+	axisAlignQuat.Inverse(inv);
 
 	for (auto& it : motion.poses) {
 		assert(frameId < (BONE_ID)it.quats.size());
-		Quaternion inv;
-		axisAlignQuat.Inverse(inv);
 		it.quats[frameId] = axisAlignQuat * it.quats[frameId] * inv;
 	}
+
+	f.offset = (Matrix)q2m(axisAlignQuat) * f.offset;
+
+	if (f.childId >= 0) {
+		BvhFrame* c = &m_frames[f.childId];
+		while (c) {
+			c->offset = c->offset * (Matrix)q2m(inv);
+			c = c->siblingId >= 0 ? &m_frames[c->siblingId] : nullptr;
+		}
+	}
+	CalcCombinedOffsets(0);
+
+	CalcBoneOffsetMatrix(frameId, axisAlignQuat);
 }
 
 
