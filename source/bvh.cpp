@@ -476,8 +476,11 @@ void Bvh::PreCalculateMotion()
 		for (auto& it : m_frames) {
 			Quaternion q;
 			if (it.rotIndies.x >= 0) {
-				XMMATRIX rotMat = XMMatrixRotationZ(mot[it.rotIndies.z] * XM_PI / 180) * XMMatrixRotationX(-mot[it.rotIndies.x] * XM_PI / 180) * XMMatrixRotationY(-mot[it.rotIndies.y] * XM_PI / 180);
-				q = Quaternion::CreateFromRotationMatrix(rotMat);
+//				XMMATRIX rotMat = XMMatrixRotationZ(mot[it.rotIndies.z] * XM_PI / 180) * XMMatrixRotationX(-mot[it.rotIndies.x] * XM_PI / 180) * XMMatrixRotationY(-mot[it.rotIndies.y] * XM_PI / 180);
+//				q = Quaternion::CreateFromRotationMatrix(rotMat);
+				q = Quaternion::CreateFromRotationMatrix(XMMatrixRotationZ(mot[it.rotIndies.z] * XM_PI / 180))
+				  * Quaternion::CreateFromRotationMatrix(XMMatrixRotationX(-mot[it.rotIndies.x] * XM_PI / 180))
+				  * Quaternion::CreateFromRotationMatrix(XMMatrixRotationY(-mot[it.rotIndies.y] * XM_PI / 180));
 			}
 			pose.quats.push_back(q);
 		}
