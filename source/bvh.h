@@ -11,8 +11,8 @@ struct Motion
 struct BvhFrame
 {
 	char name[32];
-	XMFLOAT3 offset;
-	XMFLOAT3 offsetCombined;
+	Vector3 offset;
+	Matrix offsetCombined;
 	BONE_ID parentId;
 	BONE_ID childId;
 	BONE_ID siblingId;

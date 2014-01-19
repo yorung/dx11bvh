@@ -253,8 +253,8 @@ void Bvh::CreateBoneMesh()
 		}
 		int depth = GetDepth(pId);
 		BvhFrame& f1 = m_frames[pId];
-		XMVECTOR v1 = XMLoadFloat3(&f1.offsetCombined);
-		XMVECTOR v2 = XMLoadFloat3(&f2.offsetCombined);
+		XMVECTOR v1 = f1.offsetCombined.Translation();
+		XMVECTOR v2 = f2.offsetCombined.Translation();
 
 		static const DWORD depthToColor[] = {
 			0xffffffff,
@@ -363,7 +363,7 @@ void Bvh::_linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId)
 	BvhFrame* frameChild = &m_frames[childFrameId];
 
 	frameChild->parentId = parentFrameId;
-	XMStoreFloat3(&frameChild->offsetCombined, XMVectorAdd(XMLoadFloat3(&frameParent->offsetCombined), XMLoadFloat3(&frameChild->offset)));
+	frameChild->offsetCombined = Matrix::CreateTranslation(frameChild->offset) * frameParent->offsetCombined;
 
 	if (frameParent->childId < 0) {
 		frameParent->childId = childFrameId;
@@ -380,7 +380,7 @@ void Bvh::CalcBoneOffsetMatrix(BONE_ID frameId, const Quaternion& axisAlignQuat)
 {
 	BvhFrame& frame = m_frames[frameId];
 	XMVECTOR dummy;
-	frame.boneOffsetMatrix = XMMatrixInverse(&dummy, q2m(axisAlignQuat) * XMMatrixTranslation(frame.offsetCombined.x, frame.offsetCombined.y, frame.offsetCombined.z));
+	frame.boneOffsetMatrix = XMMatrixInverse(&dummy, Matrix(q2m(axisAlignQuat)) * frame.offsetCombined);
 }
 
 void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
@@ -400,9 +400,7 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 			frame.offset.y = _getF(child) * bvhScale;
 			frame.offset.z = -_getF(child) * bvhScale;
 
-			frame.offsetCombined.x = 0;
-			frame.offsetCombined.y = 0; 
-			frame.offsetCombined.z = 0;
+			frame.offsetCombined.Identity();
 
 			if (parentFrameId >= 0) {
 				_linkFrame(parentFrameId, frameId);
@@ -445,7 +443,7 @@ void Bvh::DumpFrames(BONE_ID frameId, int depth) const
 	}
 	printf("%s(%d) p=%d s=%d c=%d ", f.name, frameId, f.parentId, f.siblingId, f.childId);
 	const XMFLOAT3& m = f.offset;
-	const XMFLOAT3& m2 = f.offsetCombined;
+	const XMFLOAT3& m2 = f.offsetCombined.Translation();
 	printf("(%3.3f,%3.3f,%3.3f) (%3.3f,%3.3f,%3.3f)", m.x, m.y, m.z, m2.x, m2.y, m2.z);
 	printf("\n");
 	if (f.siblingId >= 0) {
