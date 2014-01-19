@@ -52,7 +52,10 @@ void App::Init(const char* fileName)
 
 	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, 0.1f, 1000.0f));
 
-	dynamic_cast<Bvh*>(mesh[0])->FixBones("Hips");
+	dynamic_cast<Bvh*>(mesh[0])->FixBones("Chest");
+	dynamic_cast<Bvh*>(mesh[0])->FixBones("Chest2");
+	dynamic_cast<Bvh*>(mesh[0])->FixBones("Chest3");
+	dynamic_cast<Bvh*>(mesh[0])->FixBones("Chest4");
 	meshTiny->ApplyXLocalAxisToBvh(dynamic_cast<Bvh*>(mesh[0]));
 }
 

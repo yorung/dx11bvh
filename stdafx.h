@@ -55,5 +55,5 @@ using namespace SimpleMath;
 #define SAFE_DELETE(p)       { if (p) { delete (p);     (p)=NULL; } }
 #define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p)=NULL; } }
 
-#define SCR_W 640
-#define SCR_H 480
+#define SCR_W 1024
+#define SCR_H 600
