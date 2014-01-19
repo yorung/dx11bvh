@@ -593,11 +593,10 @@ void Bvh::CalcRotAnimForAlignedAxis(XMMATRIX RotAnimMatrices[50], double time) c
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		const BvhFrame& f = m_frames[i];
 
-		XMMATRIX AA = q2m(f.axisAlignQuat);
-		XMVECTOR dummy;
-		XMMATRIX invAA = XMMatrixInverse(&dummy, AA);
+		Quaternion AA = f.axisAlignQuat;
+		Quaternion invAA = XMQuaternionInverse(AA);
 
-		RotAnimMatrices[i] = AA * q2m(pose.quats[i]) * invAA;
+		RotAnimMatrices[i] = q2m(AA * pose.quats[i] * invAA);
 	}
 }
 
