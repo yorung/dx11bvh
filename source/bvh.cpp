@@ -551,12 +551,6 @@ void Bvh::CalcAnimation(double time)
 		if (it.posIndies.x >= 0) {
 			transMat = XMMatrixTranslation(mot[it.posIndies.x] * bvhScale, mot[it.posIndies.y] * bvhScale, -mot[it.posIndies.z] * bvhScale);
 		} else {
-//			Quaternion quatParentAxisAlignInv;
-//			if (it.parentId >= 0) {
-//				m_frames[it.parentId].axisAlignQuat.Inverse(quatParentAxisAlignInv);
-//			}
-//			Quaternion AA = it.axisAlignQuat;
-//			transMat = q2m(AA) * (XMMATRIX)it.offset * q2m(quatParentAxisAlignInv);
 			transMat = it.offset;
 		}
 		
@@ -623,7 +617,6 @@ BONE_ID Bvh::BoneNameToId(const char* name)
 void Bvh::SetLocalAxis(BONE_ID frameId, const Quaternion& axisAlignQuat)
 {
 	BvhFrame& f = m_frames[frameId];
-	f.axisAlignQuat = axisAlignQuat;
 
 	Quaternion inv;
 	axisAlignQuat.Inverse(inv);

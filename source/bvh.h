@@ -18,7 +18,6 @@ struct BvhFrame
 	BONE_ID siblingId;
 	XMINT3 rotIndies;
 	XMINT3 posIndies;
-	Quaternion axisAlignQuat;
 	Matrix frameTransformMatrix;
 	Matrix boneOffsetMatrix;
 	Matrix result;
