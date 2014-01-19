@@ -616,6 +616,7 @@ void Bvh::SetLocalAxis(BONE_ID frameId, const Quaternion& axisAlignQuat)
 		Quaternion inv;
 		axisAlignQuat.Inverse(inv);
 		it.quats[frameId] = axisAlignQuat * it.quats[frameId] * inv;
+//		it.quats[frameId] = Quaternion();
 	}
 }
 
