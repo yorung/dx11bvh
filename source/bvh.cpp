@@ -545,7 +545,9 @@ void Bvh::CalcAnimation(double time)
 		if (it.parentId >= 0) {
 			m_frames[it.parentId].axisAlignQuat.Inverse(quatParentAxisAlignInv);
 		}
-		it.frameTransformMatrix = q2m(it.axisAlignQuat) * q2m(q) * transMat * q2m(quatParentAxisAlignInv);
+		Quaternion AA = it.axisAlignQuat;
+		Quaternion AAInv = XMQuaternionInverse(AA);
+		it.frameTransformMatrix = q2m(AA) * q2m(q) * q2m(AAInv) * q2m(AA) * transMat * q2m(quatParentAxisAlignInv);
 	}
 }
 
