@@ -363,7 +363,7 @@ void Bvh::_linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId)
 	BvhFrame* frameChild = &m_frames[childFrameId];
 
 	frameChild->parentId = parentFrameId;
-	frameChild->offsetCombined = Matrix::CreateTranslation(frameChild->offset) * frameParent->offsetCombined;
+	frameChild->offsetCombined = frameChild->offset * frameParent->offsetCombined;
 
 	if (frameParent->childId < 0) {
 		frameParent->childId = childFrameId;
@@ -396,9 +396,10 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 			BvhFrame& frame = m_frames[frameId];
 
 			_getToken(child);	// "OFFSET"
-			frame.offset.x = _getF(child) * bvhScale;
-			frame.offset.y = _getF(child) * bvhScale;
-			frame.offset.z = -_getF(child) * bvhScale;
+			float x = _getF(child) * bvhScale;
+			float y = _getF(child) * bvhScale;
+			float z = -_getF(child) * bvhScale;
+			frame.offset = XMMatrixTranslation(x, y, z);
 
 			frame.offsetCombined.Identity();
 
@@ -442,7 +443,7 @@ void Bvh::DumpFrames(BONE_ID frameId, int depth) const
 		printf(" ");
 	}
 	printf("%s(%d) p=%d s=%d c=%d ", f.name, frameId, f.parentId, f.siblingId, f.childId);
-	const XMFLOAT3& m = f.offset;
+	const XMFLOAT3& m = f.offset.Translation();
 	const XMFLOAT3& m2 = f.offsetCombined.Translation();
 	printf("(%3.3f,%3.3f,%3.3f) (%3.3f,%3.3f,%3.3f)", m.x, m.y, m.z, m2.x, m2.y, m2.z);
 	printf("\n");
@@ -537,7 +538,7 @@ void Bvh::CalcAnimation(double time)
 		if (it.posIndies.x >= 0) {
 			transMat = XMMatrixTranslation(mot[it.posIndies.x] * bvhScale, mot[it.posIndies.y] * bvhScale, -mot[it.posIndies.z] * bvhScale);
 		} else {
-			transMat = XMMatrixTranslation(it.offset.x, it.offset.y, it.offset.z);
+			transMat = it.offset;
 		}
 		
 		Quaternion quatParentAxisAlignInv;
