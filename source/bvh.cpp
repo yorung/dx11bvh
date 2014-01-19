@@ -640,4 +640,27 @@ void Bvh::SetLocalAxis(BONE_ID frameId, const Quaternion& axisAlignQuat)
 	CalcBoneOffsetMatrix(frameId, axisAlignQuat);
 }
 
+void Bvh::FixBones(const char* name)
+{
+	BONE_ID id = BoneNameToId(name);
+
+	BvhFrame& f = m_frames[id];
+	if (f.childId < 0) {
+		return;
+	}
+	BONE_ID childId = f.childId;
+	while (childId >= 0) {
+		for (auto& it : motion.poses) {
+			assert(id < (BONE_ID)it.quats.size());
+			assert(childId < (BONE_ID)it.quats.size());
+			it.quats[childId] *= it.quats[id];
+		}
+		childId = m_frames[childId].siblingId;
+	}
+	for (auto& it : motion.poses) {
+		assert(id < (BONE_ID)it.quats.size());
+		it.quats[id] = Quaternion();
+	}
+}
+
 

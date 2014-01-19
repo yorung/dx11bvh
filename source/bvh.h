@@ -62,5 +62,6 @@ public:
 	void CalcRotAnimForAlignedAxis(XMMATRIX RotAnimMatrices[50], double time) const;
 	BONE_ID BoneNameToId(const char* name);
 	void SetLocalAxis(BONE_ID boneId, const Quaternion& q);
+	void FixBones(const char* name);
 };
 

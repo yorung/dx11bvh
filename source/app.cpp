@@ -52,8 +52,8 @@ void App::Init(const char* fileName)
 
 	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, 0.1f, 1000.0f));
 
+	dynamic_cast<Bvh*>(mesh[0])->FixBones("Hips");
 	meshTiny->ApplyXLocalAxisToBvh(dynamic_cast<Bvh*>(mesh[0]));
-
 }
 
 void App::MouseWheel(float delta)
