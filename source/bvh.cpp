@@ -548,7 +548,7 @@ void Bvh::CalcAnimation(double time)
 		}
 		Quaternion AA = it.axisAlignQuat;
 		Quaternion AAInv = XMQuaternionInverse(AA);
-		it.frameTransformMatrix = q2m(AA * q * AAInv) * q2m(AA) * transMat * q2m(quatParentAxisAlignInv);
+		it.frameTransformMatrix = q2m(q) * q2m(AA) * transMat * q2m(quatParentAxisAlignInv);
 	}
 }
 
@@ -597,7 +597,7 @@ void Bvh::CalcRotAnimForAlignedAxis(XMMATRIX RotAnimMatrices[50], double time) c
 		Quaternion AA = f.axisAlignQuat;
 		Quaternion invAA = XMQuaternionInverse(AA);
 
-		RotAnimMatrices[i] = q2m(AA * pose.quats[i] * invAA);
+		RotAnimMatrices[i] = q2m(pose.quats[i]);
 	}
 }
 
@@ -614,8 +614,16 @@ BONE_ID Bvh::BoneNameToId(const char* name)
 
 void Bvh::SetLocalAxis(BONE_ID frameId, const Quaternion& axisAlignQuat)
 {
-	BvhFrame* f = &m_frames[frameId];
-	f->axisAlignQuat = axisAlignQuat;
+	BvhFrame& f = m_frames[frameId];
+	f.axisAlignQuat = axisAlignQuat;
 	CalcBoneOffsetMatrix(frameId, axisAlignQuat);
+
+	for (auto& it : motion.poses) {
+		assert(frameId < (BONE_ID)it.quats.size());
+		Quaternion inv;
+		axisAlignQuat.Inverse(inv);
+		it.quats[frameId] = axisAlignQuat * it.quats[frameId] * inv;
+	}
 }
+
 
