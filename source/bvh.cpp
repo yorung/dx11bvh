@@ -551,7 +551,7 @@ void Bvh::CalcAnimation(double time)
 		XMMATRIX transMat = XMMatrixIdentity();
 		Quaternion q = pose.quats[i];
 		if (it.posIndies.x >= 0) {
-			transMat = XMMatrixTranslation(mot[it.posIndies.x] * bvhScale, mot[it.posIndies.y] * bvhScale, -mot[it.posIndies.z] * bvhScale);
+			transMat = q2m(rootAxisAlignQuat) * XMMatrixTranslation(mot[it.posIndies.x] * bvhScale, mot[it.posIndies.y] * bvhScale, -mot[it.posIndies.z] * bvhScale);
 		} else {
 			transMat = it.offset;
 		}
@@ -629,6 +629,10 @@ void Bvh::SetLocalAxis(BONE_ID frameId, const Quaternion& axisAlignQuat)
 	}
 
 	f.offset = (Matrix)q2m(axisAlignQuat) * f.offset;
+
+	if (frameId == 0) {
+		rootAxisAlignQuat = axisAlignQuat;
+	}
 
 	if (f.childId >= 0) {
 		BvhFrame* c = &m_frames[f.childId];

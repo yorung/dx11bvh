@@ -46,6 +46,7 @@ private:
 	std::vector<BvhFrame> m_frames;
 	std::vector<float> rawMotion;
 	Motion motion;
+	Quaternion rootAxisAlignQuat;
 
 	int motionFrames;
 	float frameTime;

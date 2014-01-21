@@ -1217,55 +1217,12 @@ void MeshX::Draw(int animId, double time)
 
 static BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, Bvh* bvh)
 {
-		struct BoneConvTbl {
+	struct BoneConvTbl {
 		char* bvh;
 		char* x;
 	};
 	const BoneConvTbl tbl[] =
 	{
-	//	{ "@myroot", "Hips" },
-	//	{ "Scene_Root", "Hips" },
-	//	{ "body", "Hips" },
-	//	{ "Box01", "Hips" },
-	//	{ "Bip01", "Hips" },
-	//	{ "Bip01_Footsteps", "Hips" },
-	//	{ "Bip01_Pelvis", "Hips" },
-	//	{ "Bip01_Spine", "Chest2" },
-	//	{ "Bip01_Spine1", "Chest2" },
-	//	{ "Bip01_L_Thigh", "LeftKnee" },
-	//	{ "Bip01_R_Thigh", "RightKnee" },
-	//	{ "Bip01_R_Calf", "RightAnkle" },
-	//	{ "Bip01_R_Foot", "RightAnkle" },
-	//	{ "Bip01_R_Toe0", "RightToe" },
-	//	{ "Dummy11", "End of RightToe" },
-	//	{ "Bip01_L_Foot", "LeftAnkle" },
-	//	{ "Bip01_L_Toe0", "LeftToe" },
-	//	{ "Dummy16", "End of LeftToe" },
-	//	{ "Bip01_Spine2", "Chest3" },
-	//	{ "Bip01_Spine3", "Chest4" },
-	//	{ "Bip01_Neck", "Neck" },
-	//	{ "Bip01_R_UpperArm", "RightShoulder" },
-	//	{ "Bip01_R_Finger0", "End of RightWrist" },
-	//	{ "Bip01_R_Finger1", "End of RightWrist" },
-	//	{ "Bip01_R_Finger11", "End of RightWrist" },
-	//	{ "Bip01_R_Finger12", "End of RightWrist" },
-	//	{ "Dummy02", "End of RightWrist" },
-	//	{ "Bip01_R_Finger01", "End of RightWrist" },
-	//	{ "Bip01_R_Finger02", "End of RightWrist" },
-	//	{ "Dummy01", "End of RightWrist" },
-	//	{ "Bip01_L_UpperArm", "LeftShoulder" },
-	//	{ "Bip01_L_Hand", "LeftWrist" },
-	//	{ "Bip01_L_Finger0", "End of LeftWrist" },
-	//	{ "Bip01_L_Finger1", "End of LeftWrist" },
-	//	{ "Bip01_L_Finger11", "End of LeftWrist" },
-	//	{ "Bip01_L_Finger12", "End of LeftWrist" },
-	//	{ "Dummy03", "End of LeftWrist" },
-	//	{ "Bip01_L_Finger01", "End of LeftWrist" },
-	//	{ "Bip01_L_Finger02", "End of LeftWrist" },
-	//	{ "Dummy06", "End of LeftWrist" },
-	//	{ "Dummy21", "End of LeftWrist" },
-
-
 		{ "Bip01_L_Hand", "RightWrist" },
 		{ "Bip01_R_Hand", "LeftWrist" },
 		{ "Bip01_L_Forearm", "RightElbow" },
@@ -1280,7 +1237,7 @@ static BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, Bvh* bvh)
 		{ "Bip01_Spine2", "Chest3" },
 		{ "Bip01_Spine1", "Chest2" },
 		{ "Bip01_Spine", "Chest" },
-	//	{ "Bip01_Pelvis", "Hips" },			// ?
+		{ "Bip01_Pelvis", "Hips" },
 		{ "Bip01_L_Thigh", "RightHip" },
 		{ "Bip01_R_Thigh", "LeftHip" },
 		{ "Bip01_L_Calf", "RightKnee" },
@@ -1344,42 +1301,11 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 	assert(m_frames.size() <= dimof(BonesForX));
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		Frame& f = m_frames[i];
-
-//		XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.initialMatrix));
-		XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.initialMatrix));
-
-
 		BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
-
-		XMMATRIX rot = XMMatrixIdentity();
-
-		if (bvhBoneId >= 0 && (!!strstr(f.name, "_UpperArm") || !!strstr(f.name, "_Thigh") || !!strstr(f.name, "_Calf") || !!strstr(f.name, "_Forearm"))) {
-//		if (bvhBoneId >= 0 && !strcmp(f.name, "Bip01_R_UpperArm")) {
-
-			rot = RotAnim[bvhBoneId];
-		//	rot = XMMatrixRotationZ(sin(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationX(cos(time * XM_PI / 10) * 10.0f * XM_PI / 180) * XMMatrixRotationY(sin(time * XM_PI / 8) * 10.0f * XM_PI / 180);
-		}
-		XMStoreFloat4x4(&f.frameTransformMatrix, rot * XMLoadFloat4x4(&f.initialMatrix));
+		f.frameTransformMatrix = bvhBoneId < 0 ? f.initialMatrix : (Matrix)RotAnim[bvhBoneId] * f.initialMatrix;
 	}
 
 	CalcFrameMatrices(0, XMMatrixIdentity());
-	/*
-	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-		Frame& f = m_frames[i];
-
-		BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
-		if (bvhBoneId >= 0)
-		{
-			const BvhFrame& bh = bvh->GetFrames()[bvhBoneId];
-			XMMATRIX boneOffset = XMLoadFloat4x4(&bh.boneOffsetMatrix);
-			XMMATRIX frameTransform = XMLoadFloat4x4(&bh.result);
-			BonesForX[i] = boneOffset * frameTransform;
-		} else {
-			XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
-			XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
-			BonesForX[i] = boneOffset * frameTransform;
-		}
-	}*/
 
 	if (g_type == "pivot") {
 		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
