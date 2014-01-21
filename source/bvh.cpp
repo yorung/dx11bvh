@@ -378,7 +378,7 @@ void Bvh::_linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId)
 	}
 }
 
-void Bvh::CalcBoneOffsetMatrix(BONE_ID frameId, const Quaternion& axisAlignQuat)
+void Bvh::CalcBoneOffsetMatrix(BONE_ID frameId)
 {
 	BvhFrame& frame = m_frames[frameId];
 	XMVECTOR dummy;
@@ -409,7 +409,7 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 				_linkFrame(parentFrameId, frameId);
 			}
 
-			CalcBoneOffsetMatrix(frameId, Quaternion());
+			CalcBoneOffsetMatrix(frameId);
 
 			if ("CHANNELS" == _getToken(child)) {
 				int nChannels = _getI(child);
@@ -639,7 +639,7 @@ void Bvh::SetLocalAxis(BONE_ID frameId, const Quaternion& axisAlignQuat)
 	}
 	CalcCombinedOffsets(0);
 
-	CalcBoneOffsetMatrix(frameId, axisAlignQuat);
+	CalcBoneOffsetMatrix(frameId);
 }
 
 void Bvh::FixBones(const char* name)
@@ -690,6 +690,12 @@ void Bvh::LinkTo(const char* me, const char* linkTo)
 	f.siblingId = m_frames[linkToId].childId;
 	m_frames[linkToId].childId = id;
 
+	f.offset *= m_frames[linkToId].offset.Invert();
+
+	CalcCombinedOffsets(0);
+	for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++) {
+		CalcBoneOffsetMatrix(i);
+	}
 	CreateBoneMesh();
 }
 
