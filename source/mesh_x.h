@@ -142,9 +142,8 @@ private:
 	void GetAnimStatistics(std::vector<int>& animCnts) const;
 	void DeleteDummyFrames();
 	bool UnlinkFrame(BONE_ID id);
-	void MakeInitialMatrixPerfectTStance();
+	void ApplyBvhInitialStance(const Bvh* bvh);
 	Quaternion GetWorldRotation(const char* frameName);
-
 
 	std::vector<Frame> m_frames;
 	std::vector<AnimationSet> m_animationSets;
@@ -160,6 +159,6 @@ public:
 	~MeshX();
 	void Draw(int animId, double time);
 	void DrawBvh(class Bvh* bvh, double time);
-	void ApplyXLocalAxisToBvh(Bvh* bvh);
+	void SyncLocalAxisWithBvh(Bvh* bvh);
 };
 

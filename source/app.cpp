@@ -58,7 +58,7 @@ void App::Init(const char* fileName)
 	dynamic_cast<Bvh*>(mesh[0])->FixBones("Neck");
 	dynamic_cast<Bvh*>(mesh[0])->LinkTo("RightCollar", "Neck");
 	dynamic_cast<Bvh*>(mesh[0])->LinkTo("LeftCollar", "Neck");
-	meshTiny->ApplyXLocalAxisToBvh(dynamic_cast<Bvh*>(mesh[0]));
+	meshTiny->SyncLocalAxisWithBvh(dynamic_cast<Bvh*>(mesh[0]));
 }
 
 void App::MouseWheel(float delta)

@@ -1019,9 +1019,6 @@ void MeshX::LoadSub(const char *fileName)
 	printf("===============DumpStatistics begin\n");
 	PrintStatistics();
 	printf("===============DumpStatistics end\n");
-
-
-	MakeInitialMatrixPerfectTStance();
 }
 
 inline XMMATRIX inv(const XMMATRIX& m)
@@ -1030,7 +1027,7 @@ inline XMMATRIX inv(const XMMATRIX& m)
 	return XMMatrixInverse(&dummy, m);
 }
 
-void MeshX::MakeInitialMatrixPerfectTStance()
+void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 {
 	XMStoreFloat4x4(&m_frames[0].initialMatrix, XMLoadFloat4x4(&m_frames[0].initialMatrix) * XMMatrixRotationY(XM_PI));
 
@@ -1043,30 +1040,18 @@ void MeshX::MakeInitialMatrixPerfectTStance()
 	CalcFrameMatrices(0, XMMatrixIdentity());
 
 	Frame* f = &m_frames[_getFrameIdByName("Bip01_R_UpperArm")];
-//	assert(f->childId >= 0);
 	assert(f->parentId >= 0);
-//	Frame* child =  &m_frames[f->childId];
 	Frame* parent =  &m_frames[f->parentId];
 	XMVECTOR world100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
 	XMVECTOR worldBone = XMVectorSet(1, 0, 0, 0);
 	XMVECTOR rotAxis = XMVector3Cross(world100, worldBone);
 	float rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
 
-	XMVECTOR testResult = XMVector3Transform(world100, XMMatrixRotationAxis(rotAxis, rotRad));
-	printf("testResult %f, %f, %f", XMVectorGetX(testResult), XMVectorGetY(testResult), XMVectorGetZ(testResult));
-
 	XMFLOAT4X4 rotMat = parent->result;
 	rotMat._41 = rotMat._42 = rotMat._43 = 0;
 	XMVECTOR rotAxisLocal = XMVector3Transform(rotAxis, inv(XMLoadFloat4x4(&rotMat)));
-//	XMVECTOR rotAxisLocal2 = XMVector3Transform(rotAxis, XMMatrixInverse(&dummy, XMLoadFloat4x4(&f->result)));
-
-
-//	XMVECTOR local100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
-//	XMVECTOR localBone = XMVectorSet(1, 0, 0, 0);
-
 
 	XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, rotRad) * XMLoadFloat4x4(&f->initialMatrix));
-
 
 
 	f = &m_frames[_getFrameIdByName("Bip01_L_UpperArm")];
@@ -1269,8 +1254,10 @@ Quaternion MeshX::GetWorldRotation(const char* frameName)
 	return Quaternion::CreateFromRotationMatrix(r);
 }
 
-void MeshX::ApplyXLocalAxisToBvh(Bvh* bvh)
+void MeshX::SyncLocalAxisWithBvh(Bvh* bvh)
 {
+	ApplyBvhInitialStance(bvh);
+
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		Frame& f = m_frames[i];
 		XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.initialMatrix));
