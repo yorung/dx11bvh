@@ -245,6 +245,8 @@ Bvh::Bvh(const char *fileName)
 
 void Bvh::CreateBoneMesh()
 {
+	m_block.Clear();
+
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		BvhFrame& f2 = m_frames[i];
 		BONE_ID pId = f2.parentId;
@@ -681,6 +683,14 @@ void Bvh::LinkTo(const char* me, const char* linkTo)
 	if (linkToId < 0) {
 		return;
 	}
+
+	assert(f.siblingId < 0);
+	assert(f.parentId < 0);
+	f.parentId = linkToId;
+	f.siblingId = m_frames[linkToId].childId;
+	m_frames[linkToId].childId = id;
+
+	CreateBoneMesh();
 }
 
 bool Bvh::UnlinkFromParent(BONE_ID id)
