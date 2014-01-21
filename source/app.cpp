@@ -53,11 +53,11 @@ void App::Init(const char* fileName)
 	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, 0.1f, 1000.0f));
 
 	dynamic_cast<Bvh*>(mesh[0])->FixBones("Chest");
-	dynamic_cast<Bvh*>(mesh[0])->FixBones("Chest2");
-	dynamic_cast<Bvh*>(mesh[0])->FixBones("Chest3");
-	dynamic_cast<Bvh*>(mesh[0])->FixBones("Chest4");
 	dynamic_cast<Bvh*>(mesh[0])->LinkTo("RightHip", "Chest");
 	dynamic_cast<Bvh*>(mesh[0])->LinkTo("LeftHip", "Chest");
+	dynamic_cast<Bvh*>(mesh[0])->FixBones("Neck");
+	dynamic_cast<Bvh*>(mesh[0])->LinkTo("RightCollar", "Neck");
+	dynamic_cast<Bvh*>(mesh[0])->LinkTo("LeftCollar", "Neck");
 	meshTiny->ApplyXLocalAxisToBvh(dynamic_cast<Bvh*>(mesh[0]));
 }
 
