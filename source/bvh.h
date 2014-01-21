@@ -63,5 +63,7 @@ public:
 	BONE_ID BoneNameToId(const char* name);
 	void SetLocalAxis(BONE_ID boneId, const Quaternion& q);
 	void FixBones(const char* name);
+	void LinkTo(const char* me, const char* linkTo);
+	bool UnlinkFromParent(BONE_ID id);
 };
 

@@ -56,6 +56,8 @@ void App::Init(const char* fileName)
 	dynamic_cast<Bvh*>(mesh[0])->FixBones("Chest2");
 	dynamic_cast<Bvh*>(mesh[0])->FixBones("Chest3");
 	dynamic_cast<Bvh*>(mesh[0])->FixBones("Chest4");
+	dynamic_cast<Bvh*>(mesh[0])->LinkTo("RightHip", "Chest");
+	dynamic_cast<Bvh*>(mesh[0])->LinkTo("LeftHip", "Chest");
 	meshTiny->ApplyXLocalAxisToBvh(dynamic_cast<Bvh*>(mesh[0]));
 }
 

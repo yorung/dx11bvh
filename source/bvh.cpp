@@ -663,4 +663,46 @@ void Bvh::FixBones(const char* name)
 	}
 }
 
+void Bvh::LinkTo(const char* me, const char* linkTo)
+{
+	BONE_ID id = BoneNameToId(me);
 
+	BvhFrame& f = m_frames[id];
+	if (f.childId < 0) {
+		return;
+	}
+	BONE_ID parentId = f.parentId;
+	if (parentId < 0) {
+		return;
+	}
+	UnlinkFromParent(id);
+
+	BONE_ID linkToId = BoneNameToId(linkTo);
+	if (linkToId < 0) {
+		return;
+	}
+}
+
+bool Bvh::UnlinkFromParent(BONE_ID id)
+{
+	BvhFrame& f = m_frames[id];
+	if (f.parentId < 0) {
+		return false;
+	}
+	BvhFrame& p = m_frames[f.parentId];
+	if (p.childId == id) {
+		p.childId = f.siblingId;
+	}
+	else {
+		BvhFrame* mySibling = &m_frames[p.childId];
+		do {
+			if (mySibling->siblingId == id)
+			{
+				mySibling->siblingId = f.siblingId;
+			}
+			mySibling = mySibling->siblingId >= 0 ? &m_frames[mySibling->siblingId] : nullptr;
+		} while (mySibling);
+	}
+	f.parentId = -1;
+	f.siblingId = -1;
+}
