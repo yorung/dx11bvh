@@ -219,13 +219,15 @@ void App::Draw()
 			if (bvh) {
 				meshTiny->DrawBvh(bvh, time);
 			//	meshTiny->Draw(animationNumber, time);
-				DrawBoneNames(bvh);
+				if (GetKeyState('T') & 0x01) {
+					DrawBoneNames(bvh);
+				}
 			}
 		}
 	}
 
 	MeshX* x = dynamic_cast<MeshX*>(meshTiny);
-	if (x) {
+	if (x && (GetKeyState('T') & 0x01)) {
 		DrawBoneNames(x);
 	}
 
