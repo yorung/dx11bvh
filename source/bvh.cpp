@@ -705,4 +705,5 @@ bool Bvh::UnlinkFromParent(BONE_ID id)
 	}
 	f.parentId = -1;
 	f.siblingId = -1;
+	return true;
 }
