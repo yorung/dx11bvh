@@ -61,7 +61,7 @@ public:
 	~Bvh();
 	void Draw(int animId, double time);
 	void CalcRotAnimForAlignedAxis(XMMATRIX RotAnimMatrices[50], double time) const;
-	BONE_ID BoneNameToId(const char* name);
+	BONE_ID BoneNameToId(const char* name) const;
 	void SetLocalAxis(BONE_ID boneId, const Quaternion& q);
 	void FixBones(const char* name);
 	void LinkTo(const char* me, const char* linkTo);

@@ -1027,51 +1027,6 @@ inline XMMATRIX inv(const XMMATRIX& m)
 	return XMMatrixInverse(&dummy, m);
 }
 
-void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
-{
-	XMStoreFloat4x4(&m_frames[0].initialMatrix, XMLoadFloat4x4(&m_frames[0].initialMatrix) * XMMatrixRotationY(XM_PI));
-
-	for (auto& f : m_frames) {
-		f.frameTransformMatrix = f.initialMatrix;
-		f.frameTransformMatrix._41 = 0;
-		f.frameTransformMatrix._42 = 0;
-		f.frameTransformMatrix._43 = 0;
-	}
-	CalcFrameMatrices(0, XMMatrixIdentity());
-
-	Frame* f = &m_frames[_getFrameIdByName("Bip01_R_UpperArm")];
-	assert(f->parentId >= 0);
-	Frame* parent =  &m_frames[f->parentId];
-	XMVECTOR world100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
-	XMVECTOR worldBone = XMVectorSet(1, 0, 0, 0);
-	XMVECTOR rotAxis = XMVector3Cross(world100, worldBone);
-	float rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
-
-	XMFLOAT4X4 rotMat = parent->result;
-	rotMat._41 = rotMat._42 = rotMat._43 = 0;
-	XMVECTOR rotAxisLocal = XMVector3Transform(rotAxis, inv(XMLoadFloat4x4(&rotMat)));
-
-	XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, rotRad) * XMLoadFloat4x4(&f->initialMatrix));
-
-
-	f = &m_frames[_getFrameIdByName("Bip01_L_UpperArm")];
-	assert(f->parentId >= 0);
-	parent =  &m_frames[f->parentId];
-	world100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
-	worldBone = XMVectorSet(-1, 0, 0, 0);
-	rotAxis = XMVector3Cross(world100, worldBone);
-
-	rotMat = parent->result;
-	rotMat._41 = rotMat._42 = rotMat._43 = 0;
-	rotAxisLocal = XMVector3Transform(rotAxis, inv(XMLoadFloat4x4(&rotMat)));
-
-	rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
-	XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, rotRad) * XMLoadFloat4x4(&f->initialMatrix));
-
-	CalcFrameMatrices(0, XMMatrixIdentity());
-	printf("f.result %f, %f, %f", f->result._11, f->result._12, f->result._13);
-}
-
 MeshX::~MeshX()
 {
 	m_meshRenderer.Destroy();
@@ -1200,7 +1155,7 @@ void MeshX::Draw(int animId, double time)
 	}
 }
 
-static BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, Bvh* bvh)
+static BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, const Bvh* bvh)
 {
 	struct BoneConvTbl {
 		char* bvh;
@@ -1316,3 +1271,48 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 	}
 }
 
+void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
+{
+	XMStoreFloat4x4(&m_frames[0].initialMatrix, XMLoadFloat4x4(&m_frames[0].initialMatrix) * XMMatrixRotationY(XM_PI));
+
+
+
+//	const char* xBoneNames[] = {"Bip01_R_UpperArm", "Bip01_L_UpperArm", "Bip01_L_Thigh", "Bip01_R_Thigh" };
+	const char* xBoneNames[] = {"Bip01_R_UpperArm", "Bip01_L_UpperArm", "Bip01_L_Calf", "Bip01_R_Calf" };
+//	const char* xBoneNames[] = {"Bip01_R_UpperArm", "Bip01_L_UpperArm" };
+//	const char* xBoneNames[] = {"Bip01_R_UpperArm"};
+	/*
+	{ "Bip01_L_Calf", "RightKnee" },
+		{ "Bip01_R_Calf", "LeftKnee" },
+		{ "Bip01_L_Foot", "RightAnkle" },
+		{ "Bip01_R_Foot", "LeftAnkle" },
+		{ "Bip01_L_Toe0", "RightToe" },
+		{ "Bip01_R_Toe0", "LeftToe" },
+		*/
+
+
+	for(const char* xBoneName : xBoneNames) {
+		for (auto& f : m_frames) {
+			f.frameTransformMatrix = f.initialMatrix;
+		}
+		CalcFrameMatrices(0, XMMatrixIdentity());
+
+		const std::vector<BvhFrame>& bvhFrames = bvh->GetFrames();
+		BONE_ID bvhFrameId = GetBvhBoneIdByTinyBoneName(xBoneName, bvh);
+		assert(bvhFrameId >= 0);
+		const BvhFrame& bvhF = bvhFrames[bvhFrameId];
+		Frame* f = &m_frames[_getFrameIdByName(xBoneName)];
+		assert(f->parentId >= 0);
+		Frame* parent =  &m_frames[f->parentId];
+		XMVECTOR world100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
+		XMVECTOR worldBone = XMVector3Normalize(bvhF.offset.Translation());
+		XMVECTOR rotAxis = XMVector3Cross(world100, worldBone);
+		float rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
+
+		XMFLOAT4X4 rotMat = parent->result;
+		rotMat._41 = rotMat._42 = rotMat._43 = 0;
+		XMVECTOR rotAxisLocal = XMVector3Transform(rotAxis, inv(XMLoadFloat4x4(&rotMat)));
+
+		XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, rotRad) * XMLoadFloat4x4(&f->initialMatrix));
+	}
+}

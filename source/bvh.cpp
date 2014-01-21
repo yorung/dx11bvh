@@ -605,10 +605,10 @@ void Bvh::CalcRotAnimForAlignedAxis(XMMATRIX RotAnimMatrices[50], double time) c
 	}
 }
 
-BONE_ID Bvh::BoneNameToId(const char* name)
+BONE_ID Bvh::BoneNameToId(const char* name) const
 {
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-		BvhFrame& f = m_frames[i];
+		const BvhFrame& f = m_frames[i];
 		if (!strcmp(f.name, name)) {
 			return i;
 		}
