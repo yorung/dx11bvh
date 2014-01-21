@@ -812,7 +812,7 @@ bool MeshX::UnlinkFrame(BONE_ID id)
 			{
 				mySibling->siblingId = f.siblingId;
 			}
-			mySibling = &m_frames[mySibling->siblingId];
+			mySibling = mySibling->siblingId >= 0 ? &m_frames[mySibling->siblingId] : nullptr;
 		} while (mySibling);
 	}
 	f.parentId = -1;
