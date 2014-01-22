@@ -1,5 +1,13 @@
 #include "stdafx.h"
 
+static double GetTime()
+{
+	LARGE_INTEGER t, f;
+	QueryPerformanceCounter(&t);
+	QueryPerformanceFrequency(&f);
+	return (double)t.QuadPart / f.QuadPart;
+}
+
 static float CalcRadius(const Mesh* m)
 {
 	const Block& b = m->GetRawDatas();
@@ -15,6 +23,7 @@ App::App() : scale(1), lastX(-1), lastY(-1), sprite(nullptr), font(nullptr), mes
 {
 	quat = XMQuaternionIdentity();
 	ZeroMemory(mesh, sizeof(mesh));
+	startTime = GetTime();
 }
 
 App::~App()
@@ -59,6 +68,8 @@ void App::Init(const char* fileName)
 	dynamic_cast<Bvh*>(mesh[0])->LinkTo("RightCollar", "Neck");
 	dynamic_cast<Bvh*>(mesh[0])->LinkTo("LeftCollar", "Neck");
 	meshTiny->SyncLocalAxisWithBvh(dynamic_cast<Bvh*>(mesh[0]));
+
+	startTime = GetTime();
 }
 
 void App::MouseWheel(float delta)
@@ -191,10 +202,7 @@ void App::Update()
 
 void App::Draw()
 {
-	LARGE_INTEGER t, f;
-	QueryPerformanceCounter(&t);
-	QueryPerformanceFrequency(&f);
-	double time = ((double)t.QuadPart / f.QuadPart);
+	double time = GetTime() - startTime;
 //	float time = 0;
 
 //	XMMATRIX mRot = XMMatrixRotationQuaternion(XMQuaternionRotationAxis(XMVectorSet(1, 0, 0, 0), time / 2 * XM_PI));

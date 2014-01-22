@@ -8,6 +8,7 @@ class App {
 	SpriteBatch* sprite;
 	SpriteFont* font;
 	int animationNumber;
+	double startTime;
 public:
 	App();
 	~App();
