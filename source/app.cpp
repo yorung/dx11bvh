@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#pragma comment(lib, "winmm.lib")
+
 static double GetTime()
 {
 	LARGE_INTEGER t, f;
@@ -70,6 +72,7 @@ void App::Init(const char* fileName)
 	meshTiny->SyncLocalAxisWithBvh(dynamic_cast<Bvh*>(mesh[0]));
 
 	startTime = GetTime();
+	PlaySoundA("D:\\github\\Perfume_globalsite_sound.wav", NULL, SND_FILENAME | SND_ASYNC);
 }
 
 void App::MouseWheel(float delta)

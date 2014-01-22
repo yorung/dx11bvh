@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-static float bvhScale = 3.0f;
+static float bvhScale = 2.0f;
 void *LoadFile(const char *fileName);
 
 static XMMATRIX q2m(const Quaternion& q)
