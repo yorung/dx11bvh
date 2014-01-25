@@ -1318,8 +1318,16 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		Frame* f = &m_frames[_getFrameIdByName(xBoneName)];
 		assert(f->parentId >= 0);
 		Frame* parent =   &m_frames[f->parentId];
-		XMVECTOR world100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
-		XMVECTOR worldBone = XMVector3Normalize(bvhF.offset.Translation());
+
+		assert(bvhF.childId >= 0);
+		assert(f->childId >= 0);
+		const BvhFrame& bvhChild = bvhFrames[bvhF.childId]; 
+		const Frame& xChild = m_frames[f->childId]; 
+		XMVECTOR world100 = XMVector3Normalize(bvhChild.result.Translation() - bvhF.result.Translation());
+		XMVECTOR worldBone = XMVector3Normalize(xChild.result.Translation() - f->result.Translation());
+
+//		XMVECTOR world100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
+//		XMVECTOR worldBone = XMVector3Normalize(bvhF.offset.Translation());
 		XMVECTOR rotAxis = XMVector3Cross(world100, worldBone);
 		float rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
 
@@ -1327,6 +1335,6 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		rotMat._41 = rotMat._42 = rotMat._43 = 0;
 		XMVECTOR rotAxisLocal = XMVector3Transform(rotAxis, inv(XMLoadFloat4x4(&rotMat)));
 
-		XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, rotRad) * XMLoadFloat4x4(&f->initialMatrix));
+		XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, -rotRad) * XMLoadFloat4x4(&f->initialMatrix));
 	}
 }
