@@ -1330,13 +1330,13 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 
 //		XMVECTOR world100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
 //		XMVECTOR worldBone = XMVector3Normalize(bvhF.offset.Translation());
-		XMVECTOR rotAxis = XMVector3Cross(world100, worldBone);
+		XMVECTOR rotAxis = XMVector3Cross(worldBone, world100);
 		float rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
 
 		XMFLOAT4X4 rotMat = f->result;
 		rotMat._41 = rotMat._42 = rotMat._43 = 0;
 		XMVECTOR rotAxisLocal = XMVector3Transform(rotAxis, inv(XMLoadFloat4x4(&rotMat)));
 
-		XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, -rotRad) * XMLoadFloat4x4(&f->initialMatrix));
+		XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, rotRad) * XMLoadFloat4x4(&f->initialMatrix));
 	}
 }
