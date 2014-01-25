@@ -1278,12 +1278,14 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 
 //	const char* xBoneNames[] = {"Bip01_R_UpperArm", "Bip01_L_UpperArm", "Bip01_L_Thigh", "Bip01_R_Thigh" };
 	const char* xBoneNames[] = {
-		"Bip01_L_Clavicle",
-		"Bip01_R_Clavicle",
+		"Bip01_L_Clavicle", "Bip01_R_Clavicle",
 		"Bip01_R_UpperArm",
 		"Bip01_L_UpperArm",
 		"Bip01_L_Forearm",
 		"Bip01_R_Forearm",
+		"Bip01_L_Thigh",
+		"Bip01_R_Thigh",
+		"Bip01_R_Calf",
 		"Bip01_L_Calf",
 		"Bip01_R_Calf",
 		"Bip01_L_Foot",
@@ -1331,7 +1333,7 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		XMVECTOR rotAxis = XMVector3Cross(world100, worldBone);
 		float rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
 
-		XMFLOAT4X4 rotMat = parent->result;
+		XMFLOAT4X4 rotMat = f->result;
 		rotMat._41 = rotMat._42 = rotMat._43 = 0;
 		XMVECTOR rotAxisLocal = XMVector3Transform(rotAxis, inv(XMLoadFloat4x4(&rotMat)));
 
