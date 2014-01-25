@@ -1278,12 +1278,18 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 
 //	const char* xBoneNames[] = {"Bip01_R_UpperArm", "Bip01_L_UpperArm", "Bip01_L_Thigh", "Bip01_R_Thigh" };
 	const char* xBoneNames[] = {
+		"Bip01_Spine",
+		"Bip01_Spine1",
+		"Bip01_Spine2",
+		"Bip01_Spine3",
+		"Bip01_Neck",
 		"Bip01_L_Clavicle", "Bip01_R_Clavicle",
 		"Bip01_R_UpperArm", "Bip01_L_UpperArm",
 		"Bip01_L_Forearm", "Bip01_R_Forearm",
 		"Bip01_L_Thigh", "Bip01_R_Thigh",
 		"Bip01_R_Calf", "Bip01_L_Calf",
 		"Bip01_L_Foot", "Bip01_R_Foot",
+//		"Bip01_L_Toe0", "Bip01_R_Toe0",
 	};
 //	const char* xBoneNames[] = {"Bip01_R_UpperArm" };
 //	const char* xBoneNames[] = {"Bip01_L_Calf", "Bip01_R_Calf", "Bip01_R_UpperArm", "Bip01_L_UpperArm",  };
@@ -1317,10 +1323,16 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 
 		assert(bvhF.childId >= 0);
 		assert(f->childId >= 0);
-		const BvhFrame& bvhChild = bvhFrames[bvhF.childId]; 
-		const Frame& xChild = m_frames[f->childId]; 
-		XMVECTOR world100 = XMVector3Normalize(bvhChild.result.Translation() - bvhF.result.Translation());
-		XMVECTOR worldBone = XMVector3Normalize(xChild.result.Translation() - f->result.Translation());
+		const BvhFrame* bvhChild = &bvhFrames[bvhF.childId];
+		while (bvhChild->siblingId >= 0 && (strstr(bvhChild->name, "Left") || strstr(bvhChild->name, "Right"))) {
+			bvhChild = &bvhFrames[bvhChild->siblingId];
+		}
+		const Frame* xChild = &m_frames[f->childId]; 
+		while (xChild->siblingId >= 0 && (strstr(xChild->name, "_L_") || strstr(xChild->name, "_R_"))) {
+			xChild = &m_frames[xChild->siblingId];
+		}
+		XMVECTOR world100 = XMVector3Normalize(bvhChild->result.Translation() - bvhF.result.Translation());
+		XMVECTOR worldBone = XMVector3Normalize(xChild->result.Translation() - f->result.Translation());
 
 		XMVECTOR rotAxis = XMVector3Cross(worldBone, world100);
 		float rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
