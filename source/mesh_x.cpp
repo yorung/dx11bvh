@@ -1278,6 +1278,7 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 
 //	const char* xBoneNames[] = {"Bip01_R_UpperArm", "Bip01_L_UpperArm", "Bip01_L_Thigh", "Bip01_R_Thigh" };
 	const char* xBoneNames[] = {
+		"Bip01_Pelvis",
 		"Bip01_Spine",
 		"Bip01_Spine1",
 		"Bip01_Spine2",

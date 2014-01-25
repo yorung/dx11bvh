@@ -207,8 +207,9 @@ void App::Update()
 
 void App::Draw()
 {
-	double time = GetTime() - startTime;
-//	double time = 0;
+//	double time = GetTime() - startTime;
+//	double time = 65;
+	double time = 0;
 
 //	XMMATRIX mRot = XMMatrixRotationQuaternion(XMQuaternionRotationAxis(XMVectorSet(1, 0, 0, 0), time / 2 * XM_PI));
 	XMMATRIX mRot = XMMatrixRotationQuaternion(quat);
