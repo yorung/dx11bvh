@@ -104,12 +104,12 @@ void DebugRenderer::Init()
 
 void DebugRenderer::DrawPivots(const XMMATRIX mat[BONE_MAX], int num)
 {
-	int facesBackup = pivots.materialMaps.begin()->faces;
-	pivots.materialMaps.begin()->faces = facesBackup * num / BONE_MAX;
+	XMMATRIX mat2[BONE_MAX];
+	for (int i = 0; i < BONE_MAX; i++) {
+		mat2[i] = i < num ? mat[i] : XMMatrixIdentity();
+	}
 
-	pivotsRenderer.Draw(mat, num, pivots);
-
-	pivots.materialMaps.begin()->faces = facesBackup;
+	pivotsRenderer.Draw(mat2, BONE_MAX, pivots);
 }
 
 void DebugRenderer::Destroy()
