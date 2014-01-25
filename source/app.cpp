@@ -74,7 +74,7 @@ void App::Init(const char* fileName)
 	meshTiny->SyncLocalAxisWithBvh(dynamic_cast<Bvh*>(mesh[0]));
 
 	startTime = GetTime();
-	PlaySoundA("D:\\github\\Perfume_globalsite_sound.wav", NULL, SND_FILENAME | SND_ASYNC);
+//	PlaySoundA("D:\\github\\Perfume_globalsite_sound.wav", NULL, SND_FILENAME | SND_ASYNC);
 }
 
 void App::MouseWheel(float delta)
@@ -207,8 +207,8 @@ void App::Update()
 
 void App::Draw()
 {
-	double time = GetTime() - startTime;
-//	float time = 0;
+//	double time = GetTime() - startTime;
+	double time = 0;
 
 //	XMMATRIX mRot = XMMatrixRotationQuaternion(XMQuaternionRotationAxis(XMVectorSet(1, 0, 0, 0), time / 2 * XM_PI));
 	XMMATRIX mRot = XMMatrixRotationQuaternion(quat);
@@ -230,8 +230,8 @@ void App::Draw()
 			Bvh* bvh = dynamic_cast<Bvh*>(it);
 
 			if (bvh) {
-				meshTiny->DrawBvh(bvh, time);
-			//	meshTiny->Draw(animationNumber, time);
+			//	meshTiny->DrawBvh(bvh, time);
+				meshTiny->Draw(animationNumber, time);
 				if (GetKeyState('T') & 0x01) {
 					DrawBoneNames(bvh);
 				}

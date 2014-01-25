@@ -1065,7 +1065,8 @@ void MeshX::CalcAnimation(int animId, double time)
 {
 	if (animId < 0 || animId >= (int)m_animationSets.size()) {
 		for (auto& f : m_frames) {
-			XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.frameTransformMatrixOrg));
+//			XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.frameTransformMatrixOrg));
+			XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.initialMatrix));
 		}
 		return;
 	}
@@ -1275,12 +1276,23 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 {
 	XMStoreFloat4x4(&m_frames[0].initialMatrix, XMLoadFloat4x4(&m_frames[0].initialMatrix) * XMMatrixRotationY(XM_PI));
 
-
-
 //	const char* xBoneNames[] = {"Bip01_R_UpperArm", "Bip01_L_UpperArm", "Bip01_L_Thigh", "Bip01_R_Thigh" };
-	const char* xBoneNames[] = {"Bip01_R_UpperArm", "Bip01_L_UpperArm", "Bip01_L_Calf", "Bip01_R_Calf" };
+	const char* xBoneNames[] = {
+	//	"Bip01_L_Clavicle",
+	//	"Bip01_R_Clavicle",
+		"Bip01_R_UpperArm",
+		"Bip01_L_UpperArm",
+		"Bip01_L_Forearm",
+		"Bip01_R_Forearm",
+		"Bip01_L_Calf",
+		"Bip01_R_Calf",
+	};
+//	const char* xBoneNames[] = {"Bip01_R_UpperArm" };
+//	const char* xBoneNames[] = {"Bip01_L_Calf", "Bip01_R_Calf", "Bip01_R_UpperArm", "Bip01_L_UpperArm",  };
 //	const char* xBoneNames[] = {"Bip01_R_UpperArm", "Bip01_L_UpperArm" };
 //	const char* xBoneNames[] = {"Bip01_R_UpperArm"};
+//	const char* xBoneNames[] = {"Bip01_Pelvis"};
+//	const char* xBoneNames[] = {"Bip01_Spine"};
 	/*
 	{ "Bip01_L_Calf", "RightKnee" },
 		{ "Bip01_R_Calf", "LeftKnee" },
@@ -1303,7 +1315,7 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		const BvhFrame& bvhF = bvhFrames[bvhFrameId];
 		Frame* f = &m_frames[_getFrameIdByName(xBoneName)];
 		assert(f->parentId >= 0);
-		Frame* parent =  &m_frames[f->parentId];
+		Frame* parent =   &m_frames[f->parentId];
 		XMVECTOR world100 = XMVector3Normalize(XMLoadFloat4x4(&f->result).r[0]);
 		XMVECTOR worldBone = XMVector3Normalize(bvhF.offset.Translation());
 		XMVECTOR rotAxis = XMVector3Cross(world100, worldBone);
