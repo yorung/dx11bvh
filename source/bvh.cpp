@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-static float bvhScale = 2.0f;
 void *LoadFile(const char *fileName);
 
 static XMMATRIX q2m(const Quaternion& q)
@@ -398,9 +397,9 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 			BvhFrame& frame = m_frames[frameId];
 
 			_getToken(child);	// "OFFSET"
-			float x = _getF(child) * bvhScale;
-			float y = _getF(child) * bvhScale;
-			float z = -_getF(child) * bvhScale;
+			float x = _getF(child);
+			float y = _getF(child);
+			float z = -_getF(child);
 			frame.offset = XMMatrixTranslation(x, y, z);
 
 			frame.offsetCombined.Identity();
@@ -551,7 +550,7 @@ void Bvh::CalcAnimation(double time)
 		XMMATRIX transMat = XMMatrixIdentity();
 		Quaternion q = pose.quats[i];
 		if (it.posIndies.x >= 0) {
-			transMat = q2m(rootAxisAlignQuat) * XMMatrixTranslation(mot[it.posIndies.x] * bvhScale, mot[it.posIndies.y] * bvhScale, -mot[it.posIndies.z] * bvhScale);
+			transMat = q2m(rootAxisAlignQuat) * XMMatrixTranslation(mot[it.posIndies.x], mot[it.posIndies.y], -mot[it.posIndies.z]);
 		} else {
 			transMat = it.offset;
 		}
