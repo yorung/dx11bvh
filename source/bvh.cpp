@@ -559,6 +559,13 @@ void Bvh::CalcAnimation(double time)
 	}
 }
 
+void Bvh::ResetAnim()
+{
+	for (auto& it : m_frames) {
+		it.frameTransformMatrix = it.offset;
+	}
+	CalcFrameMatrices(0, XMMatrixIdentity());
+}
 
 void Bvh::Draw(int animId, double time)
 {

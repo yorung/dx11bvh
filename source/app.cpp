@@ -69,6 +69,8 @@ void App::Init(const char* fileName)
 	dynamic_cast<Bvh*>(mesh[0])->FixBones("Neck");
 	dynamic_cast<Bvh*>(mesh[0])->LinkTo("RightCollar", "Neck");
 	dynamic_cast<Bvh*>(mesh[0])->LinkTo("LeftCollar", "Neck");
+
+	dynamic_cast<Bvh*>(mesh[0])->ResetAnim();
 	meshTiny->SyncLocalAxisWithBvh(dynamic_cast<Bvh*>(mesh[0]));
 
 	startTime = GetTime();
