@@ -21,11 +21,11 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), lastX(-1), lastY(-1), sprite(nullptr), font(nullptr), meshTiny(nullptr), animationNumber(0)
+App::App() : scale(1), lastX(-1), lastY(-1), sprite(nullptr), font(nullptr), meshTiny(nullptr), animationNumber(0), trackTime(0)
 {
 	quat = XMQuaternionIdentity();
 	ZeroMemory(mesh, sizeof(mesh));
-	startTime = GetTime();
+	lastTime = GetTime();
 }
 
 App::~App()
@@ -73,7 +73,7 @@ void App::Init(const char* fileName)
 	dynamic_cast<Bvh*>(mesh[0])->ResetAnim();
 	meshTiny->SyncLocalAxisWithBvh(dynamic_cast<Bvh*>(mesh[0]));
 
-	startTime = GetTime();
+	lastTime = GetTime();
 //	PlaySoundA("D:\\github\\Perfume_globalsite_sound.wav", NULL, SND_FILENAME | SND_ASYNC);
 }
 
@@ -198,7 +198,7 @@ void App::Update()
 	if (GetKeyState('B') & 0x80) {
 		g_type = "bone";
 	}
-	for (auto& i : {'0', '1', '2', '3', '4'}) {
+	for (auto& i : {'0', '1', '2', '3', '4', '9'}) {
 		if (GetKeyState(i) & 0x80) {
 			animationNumber = i - '0';
 		}
@@ -207,9 +207,15 @@ void App::Update()
 
 void App::Draw()
 {
+	double currentTime = GetTime();
+	double deltaTime = currentTime - lastTime;
+	lastTime = currentTime;
 //	double time = GetTime() - startTime;
 //	double time = 65;
-	double time = 0;
+
+	if (GetKeyState(VK_RETURN) & 0x01) {
+		trackTime += deltaTime;
+	}
 
 //	XMMATRIX mRot = XMMatrixRotationQuaternion(XMQuaternionRotationAxis(XMVectorSet(1, 0, 0, 0), time / 2 * XM_PI));
 	XMMATRIX mRot = XMMatrixRotationQuaternion(quat);
@@ -226,13 +232,16 @@ void App::Draw()
 
 	for (auto& it : mesh) {
 		if (it && meshTiny) {
-			it->Draw(0, time);
+			it->Draw(0, trackTime);
 
 			Bvh* bvh = dynamic_cast<Bvh*>(it);
 
 			if (bvh) {
-				meshTiny->DrawBvh(bvh, time);
-			//	meshTiny->Draw(animationNumber, time);
+				if (animationNumber == 9) {
+					meshTiny->DrawBvh(bvh, trackTime);
+				} else {
+					meshTiny->Draw(animationNumber, trackTime);
+				}
 				if (GetKeyState('T') & 0x01) {
 					DrawBoneNames(bvh);
 				}
