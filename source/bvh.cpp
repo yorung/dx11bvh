@@ -7,6 +7,10 @@ static XMMATRIX q2m(const Quaternion& q)
 	return Matrix::CreateFromQuaternion(q);
 }
 
+static Quaternion m2q(const XMMATRIX& m)
+{
+	return Quaternion::CreateFromRotationMatrix(m);
+}
 
 static void _enterBrace(char*& p)
 {
@@ -576,7 +580,13 @@ void Bvh::Draw(int animId, double time)
 	XMMATRIX BoneMatrices[50];
 	assert(m_frames.size() <= dimof(BoneMatrices));
 
-	CalcAnimation(time);
+	if (animId != 0) {
+		for (auto& it : m_frames) {
+			it.frameTransformMatrix = it.offset;
+		}
+	} else {
+		CalcAnimation(time);
+	}
 
 	CalcFrameMatrices(0, XMMatrixIdentity());
 
@@ -622,10 +632,14 @@ BONE_ID Bvh::BoneNameToId(const char* name) const
 	return -1;
 }
 
-void Bvh::SetLocalAxis(BONE_ID frameId, const Quaternion& axisAlignQuat)
+void Bvh::SetLocalAxis(BONE_ID frameId, const Quaternion axisAlignQuat)
 {
 	BvhFrame& f = m_frames[frameId];
-
+	/*
+	Quaternion orgQ = m2q(f.offset);
+	Quaternion diffQ = Quaternion(XMQuaternionInverse(orgQ)) * axisAlignQuat;
+	axisAlignQuat = diffQ;
+	*/
 	Quaternion inv;
 	axisAlignQuat.Inverse(inv);
 

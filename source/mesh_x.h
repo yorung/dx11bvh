@@ -144,6 +144,7 @@ private:
 	bool UnlinkFrame(BONE_ID id);
 	void ApplyBvhInitialStance(const Bvh* bvh);
 	Quaternion GetWorldRotation(const char* frameName);
+	void SetBvhLocalAxis(BONE_ID id, Bvh* bvh);
 
 	std::vector<Frame> m_frames;
 	std::vector<AnimationSet> m_animationSets;

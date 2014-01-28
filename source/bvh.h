@@ -63,7 +63,7 @@ public:
 	void ResetAnim();
 	void CalcRotAnimForAlignedAxis(XMMATRIX RotAnimMatrices[50], double time) const;
 	BONE_ID BoneNameToId(const char* name) const;
-	void SetLocalAxis(BONE_ID boneId, const Quaternion& q);
+	void SetLocalAxis(BONE_ID boneId, const Quaternion q);
 	void FixBones(const char* name);
 	void LinkTo(const char* me, const char* linkTo);
 	bool UnlinkFromParent(BONE_ID id);

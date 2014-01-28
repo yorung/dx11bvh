@@ -1210,6 +1210,23 @@ Quaternion MeshX::GetWorldRotation(const char* frameName)
 	return Quaternion::CreateFromRotationMatrix(r);
 }
 
+void MeshX::SetBvhLocalAxis(BONE_ID id, Bvh* bvh)
+{
+	Frame& f = m_frames[id];
+	BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
+	if (bvhBoneId >= 0) {
+		if (strstr(f.name, "rm")) {
+			bvh->SetLocalAxis(bvhBoneId, GetWorldRotation(f.name));
+		}
+	}
+	if (f.siblingId >= 0) {
+		SetBvhLocalAxis(f.siblingId, bvh);
+	}
+	if (f.childId >= 0) {
+		SetBvhLocalAxis(f.childId, bvh);
+	}
+}
+
 void MeshX::SyncLocalAxisWithBvh(Bvh* bvh)
 {
 	ApplyBvhInitialStance(bvh);
@@ -1220,15 +1237,7 @@ void MeshX::SyncLocalAxisWithBvh(Bvh* bvh)
 	}
 
 	CalcFrameMatrices(0, XMMatrixIdentity());
-
-	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-		Frame& f = m_frames[i];
-
-		BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
-		if (bvhBoneId >= 0) {
-			bvh->SetLocalAxis(bvhBoneId, GetWorldRotation(f.name));
-		}
-	}
+	SetBvhLocalAxis(0, bvh);
 }
 
 void MeshX::DrawBvh(Bvh* bvh, double time)

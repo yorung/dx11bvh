@@ -232,7 +232,7 @@ void App::Draw()
 
 	for (auto& it : mesh) {
 		if (it && meshTiny) {
-			it->Draw(0, trackTime);
+			it->Draw(animationNumber == 9 ? 0 : animationNumber, trackTime);
 
 			Bvh* bvh = dynamic_cast<Bvh*>(it);
 
