@@ -1207,6 +1207,25 @@ Quaternion MeshX::GetWorldRotation(const char* frameName)
 {
 	BONE_ID id = _getFrameIdByName(frameName);
 	Matrix r = m_frames[id].result;
+
+	Vector3 y = r.Up();
+	Vector3 x = r.Right();
+	Vector3 z = r.Backward();
+	float dotXY = x.Dot(y);
+	float dotYZ = y.Dot(z);
+	float dotZX = z.Dot(x);
+
+	Quaternion q = Quaternion::CreateFromRotationMatrix(r);
+	Matrix rr = Matrix::CreateFromQuaternion(q);
+
+	y = rr.Up();
+	x = rr.Right();
+	z = rr.Backward();
+	dotXY = x.Dot(y);
+	dotYZ = y.Dot(z);
+	dotZX = z.Dot(x);
+
+
 	return Quaternion::CreateFromRotationMatrix(r);
 }
 
