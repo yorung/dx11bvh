@@ -113,10 +113,10 @@ static float _getF(char*& p)
 	return (float)_getD(p);
 }
 
-static void _getFloat3Array(char*& p, std::vector<XMFLOAT3>& vertices, int nVertices)
+static void _getFloat3Array(char*& p, std::vector<Vector3>& vertices, int nVertices)
 {
 	for (int i = 0; i < nVertices; i++) {
-		XMFLOAT3 f3;
+		Vector3 f3;
 		f3.x = _getF(p);
 		f3.y = _getF(p);
 		f3.z = _getF(p);
@@ -124,20 +124,20 @@ static void _getFloat3Array(char*& p, std::vector<XMFLOAT3>& vertices, int nVert
 	}
 }
 
-static void _getFloat2Array(char*& p, std::vector<XMFLOAT2>& vertices, int nVertices)
+static void _getFloat2Array(char*& p, std::vector<Vector2>& vertices, int nVertices)
 {
 	for (int i = 0; i < nVertices; i++) {
-		XMFLOAT2 f2;
+		Vector2 f2;
 		f2.x = _getF(p);
 		f2.y = _getF(p);
 		vertices.push_back(f2);
 	}
 }
 
-static void _getVertexColors(char*& p, std::vector<XMFLOAT4>& vertices, int nVertices)
+static void _getVertexColors(char*& p, std::vector<Vector4>& vertices, int nVertices)
 {
 	for (int i = 0; i < nVertices; i++) {
-		XMFLOAT4 f4;
+		Vector4 f4;
 		_getF(p);
 		f4.x = _getF(p);
 		f4.y = _getF(p);
@@ -147,7 +147,7 @@ static void _getVertexColors(char*& p, std::vector<XMFLOAT4>& vertices, int nVer
 	}
 }
 
-static void _getMatrix(char*& p, XMFLOAT4X4& m)
+static void _getMatrix(char*& p, Matrix& m)
 {
 	if (!p) {
 		XMStoreFloat4x4(&m, XMMatrixIdentity());
@@ -526,7 +526,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 
 	char *p = imgMesh;
 	int nVertices = _getI(p);
-	std::vector<XMFLOAT3> vertPos;
+	std::vector<Vector3> vertPos;
 	_getFloat3Array(p, vertPos, nVertices);
 	int nOrgFaces = _getI(p);
 	std::vector<bool> isOrgFace4Vertices;
@@ -535,7 +535,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 	p = _searchChildTag((char*)imgMesh, "MeshTextureCoords");
 	int nVerticesCoords = _getI(p);
 	assert(nVertices == nVerticesCoords || nVerticesCoords == 0);
-	std::vector<XMFLOAT2> texCoords;
+	std::vector<Vector2> texCoords;
 	_getFloat2Array(p, texCoords, nVerticesCoords);
 
 	if (nVertices > nVerticesCoords) {
@@ -544,12 +544,12 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 
 	p = _searchChildTag((char*)imgMesh, "MeshVertexColors");
 	int nVertexColors = _getI(p);
-	std::vector<XMFLOAT4> vertexColors;
+	std::vector<Vector4> vertexColors;
 	_getVertexColors(p, vertexColors, nVertexColors);
 
 	p = _searchChildTag((char*)imgMesh, "MeshNormals");
 	int nNormals = _getI(p);
-	std::vector<XMFLOAT3> normals;
+	std::vector<Vector3> normals;
 	_getFloat3Array(p, normals, nNormals);
 	int nOrgNormalFaces = _getI(p);
 	std::vector<bool> isOrgFace4VerticesNormal;
@@ -1062,8 +1062,7 @@ void MeshX::CalcAnimation(int animId, double time)
 {
 	if (animId < 0 || animId >= (int)m_animationSets.size()) {
 		for (auto& f : m_frames) {
-//			XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.frameTransformMatrixOrg));
-			XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.initialMatrix));
+			f.frameTransformMatrix = f.initialMatrix;
 		}
 		return;
 	}
@@ -1128,20 +1127,17 @@ void MeshX::Draw(int animId, double time)
 	CalcAnimation(animId, time * m_animTicksPerSecond);
 	CalcFrameMatrices(0, XMMatrixIdentity());
 
-
 	if (g_type == "pivot") {
 		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 			Frame& f = m_frames[i];
-			BoneMatrices[i] = XMLoadFloat4x4(&f.result);
+			BoneMatrices[i] = f.result;
 		}
 
 		debugRenderer.DrawPivots(BoneMatrices, m_frames.size());
 	} else {
 		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 			Frame& f = m_frames[i];
-			XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
-			XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
-			BoneMatrices[i] = boneOffset * frameTransform;
+			BoneMatrices[i] = f.boneOffsetMatrix * f.result;
 		}
 
 		if (g_type == "mesh") {
@@ -1277,15 +1273,13 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 	if (g_type == "pivot") {
 		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 			Frame& f = m_frames[i];
-			BonesForX[i] = XMLoadFloat4x4(&f.result);
+			BonesForX[i] = f.result;
 		}
 		debugRenderer.DrawPivots(BonesForX, dimof(BonesForX));
 	} else {
 		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 			Frame& f = m_frames[i];
-			XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
-			XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
-			BonesForX[i] = boneOffset * frameTransform;
+			BonesForX[i] = f.boneOffsetMatrix * f.result;
 		}
 		if (g_type == "mesh") {
 			m_meshRenderer.Draw(BonesForX, dimof(BonesForX), m_block);

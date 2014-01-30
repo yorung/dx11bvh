@@ -11,7 +11,7 @@ public:
 struct TimedFloatKeys
 {
 	DWORD time;
-	XMFLOAT4X4 mat;
+	Matrix mat;
 };
 
 typedef int BONE_ID;
@@ -75,11 +75,11 @@ struct ubyte4
 
 struct MeshVertex
 {
-	XMFLOAT3 xyz;
-	XMFLOAT3 normal;
+	Vector3 xyz;
+	Vector3 normal;
 	DWORD color;
-	XMFLOAT2 uv;
-	XMFLOAT3 blendWeights;
+	Vector2 uv;
+	Vector3 blendWeights;
 	ubyte4 blendIndices;
 };
 
