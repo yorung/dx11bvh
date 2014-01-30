@@ -1015,6 +1015,9 @@ void MeshX::LoadSub(const char *fileName)
 
 	DeleteDummyFrames();
 
+	if (m_frames.empty()) {
+		m_frames.resize(1);
+	}
 	printf("===============DumpFrames begin\n");
 	DumpFrames(0, 0);
 	printf("===============DumpFrames end\n");

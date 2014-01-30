@@ -53,9 +53,21 @@ void App::Init(const char* fileName)
 			mesh[0] = new MeshX(fileName);
 		}
 	} else {
-		mesh[0] = new Bvh("D:\\github\\aachan.bvh");
+		Bvh* bvh = new Bvh("D:\\github\\kashiyuka.bvh");
+		mesh[0] = bvh;
+	//	mesh[0] = new Bvh("D:\\github\\aachan.bvh");
 	//	mesh[1] = new Bvh("D:\\github\\kashiyuka.bvh");
 	//	mesh[2] = new Bvh("D:\\github\\nocchi.bvh");
+
+		bvh->FixBones("Chest");
+		bvh->LinkTo("RightHip", "Chest");
+		bvh->LinkTo("LeftHip", "Chest");
+		bvh->FixBones("Neck");
+		bvh->LinkTo("RightCollar", "Neck");
+		bvh->LinkTo("LeftCollar", "Neck");
+
+		bvh->ResetAnim();
+		meshTiny->SyncLocalAxisWithBvh(bvh);
 	}
 
 	float radius = CalcRadius(mesh[0]);
@@ -63,15 +75,7 @@ void App::Init(const char* fileName)
 
 	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, 0.1f, 1000.0f));
 
-	dynamic_cast<Bvh*>(mesh[0])->FixBones("Chest");
-	dynamic_cast<Bvh*>(mesh[0])->LinkTo("RightHip", "Chest");
-	dynamic_cast<Bvh*>(mesh[0])->LinkTo("LeftHip", "Chest");
-	dynamic_cast<Bvh*>(mesh[0])->FixBones("Neck");
-	dynamic_cast<Bvh*>(mesh[0])->LinkTo("RightCollar", "Neck");
-	dynamic_cast<Bvh*>(mesh[0])->LinkTo("LeftCollar", "Neck");
 
-	dynamic_cast<Bvh*>(mesh[0])->ResetAnim();
-	meshTiny->SyncLocalAxisWithBvh(dynamic_cast<Bvh*>(mesh[0]));
 
 	lastTime = GetTime();
 //	PlaySoundA("D:\\github\\Perfume_globalsite_sound.wav", NULL, SND_FILENAME | SND_ASYNC);
