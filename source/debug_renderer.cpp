@@ -103,11 +103,13 @@ void DebugRenderer::Init()
 }
 
 // http://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process
-Vector3 Proj(Vector3 u, Vector3 v) {
+Vector3 Proj(Vector3 u, Vector3 v)
+{
 	return (u.Dot(v) / u.Dot(u)) * u;
 }
 
-Matrix Orthogonalization(Matrix	v) {
+Matrix Orthogonalization(Matrix	v)
+{
 	Vector3 vx = v.Right();
 	Vector3 vy = v.Up();
 	Vector3 vz = v.Backward();
@@ -119,6 +121,9 @@ Matrix Orthogonalization(Matrix	v) {
 	ux.Normalize();
 	uy.Normalize();
 	uz.Normalize();
+	ux *= vx.Length();
+	uy *= vx.Length();
+	uz *= vx.Length();
 
 	Matrix u = Matrix(ux, uy, uz);
 	u._41 = v._41;

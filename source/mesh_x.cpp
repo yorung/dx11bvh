@@ -976,6 +976,8 @@ void MeshX::ParseAnimationSets(char* p)
 	}
 }
 
+Matrix Orthogonalization(Matrix	v);
+
 void MeshX::LoadSub(const char *fileName)
 {
 	void *img = LoadFile(fileName);
@@ -997,6 +999,7 @@ void MeshX::LoadSub(const char *fileName)
 		if (f.parentId >= 0) {
 			XMVECTOR dummy;
 			XMStoreFloat4x4(&f.initialMatrix, XMMatrixInverse(&dummy, XMLoadFloat4x4(&f.boneOffsetMatrix)) * XMLoadFloat4x4(&m_frames[f.parentId].boneOffsetMatrix));
+			f.initialMatrix = Orthogonalization(f.initialMatrix);
 		}
 	}
 
