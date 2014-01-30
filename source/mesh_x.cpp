@@ -1375,4 +1375,8 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 
 		XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, rotRad) * XMLoadFloat4x4(&f->initialMatrix));
 	}
+
+	for (auto& it : m_frames) {
+		it.initialMatrix = Orthogonalization(it.initialMatrix);
+	}
 }
