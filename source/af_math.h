@@ -27,3 +27,13 @@ inline Matrix inv(const Matrix& m)
 	XMVECTOR dummy;
 	return XMMatrixInverse(&dummy, m);
 }
+
+inline Matrix q2m(const Quaternion& q)
+{
+	return Matrix::CreateFromQuaternion(q);
+}
+
+inline Quaternion m2q(const Matrix& m)
+{
+	return Quaternion::CreateFromRotationMatrix(m);
+}

@@ -2,15 +2,6 @@
 
 void *LoadFile(const char *fileName);
 
-static XMMATRIX q2m(const Quaternion& q)
-{
-	return Matrix::CreateFromQuaternion(q);
-}
-
-static Quaternion m2q(const XMMATRIX& m)
-{
-	return Quaternion::CreateFromRotationMatrix(m);
-}
 
 static void _enterBrace(char*& p)
 {
@@ -314,8 +305,7 @@ void Bvh::_linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId)
 void Bvh::CalcBoneOffsetMatrix(BONE_ID frameId)
 {
 	BvhFrame& frame = m_frames[frameId];
-	XMVECTOR dummy;
-	frame.boneOffsetMatrix = XMMatrixInverse(&dummy, frame.offsetCombined);
+	frame.boneOffsetMatrix = inv(frame.offsetCombined);
 }
 
 void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
@@ -523,16 +513,13 @@ void Bvh::Draw(int animId, double time)
 	if (g_type == "pivot") {
 		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 			BvhFrame& f = m_frames[i];
-			XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
-			BoneMatrices[i] = frameTransform;
+			BoneMatrices[i] = f.result;
 		}
 		debugRenderer.DrawPivots(BoneMatrices, m_frames.size());
 	} else {
 		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 			BvhFrame& f = m_frames[i];
-			XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
-			XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
-			BoneMatrices[i] = boneOffset * frameTransform;
+			BoneMatrices[i] = f.boneOffsetMatrix * f.result;
 		}
 		m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
 	}
