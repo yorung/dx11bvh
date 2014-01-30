@@ -1234,9 +1234,9 @@ void MeshX::SetBvhLocalAxis(BONE_ID id, Bvh* bvh)
 	Frame& f = m_frames[id];
 	BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
 	if (bvhBoneId >= 0) {
-		if (strstr(f.name, "rm")) {
+	//	if (strstr(f.name, "rm")) {
 			bvh->SetLocalAxis(bvhBoneId, GetWorldRotation(f.name));
-		}
+	//	}
 	}
 	if (f.siblingId >= 0) {
 		SetBvhLocalAxis(f.siblingId, bvh);
