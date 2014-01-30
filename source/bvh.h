@@ -33,14 +33,14 @@ private:
 	void _linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId);
 	void _storeWeight(MeshVertex& v, int frameId, float weight);
 	void CalcAnimation(int animId, double time);
-	void CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent);
+	void CalcFrameMatrices();
 	void DumpFrames(BONE_ID frameId, int depth) const;
 	void ParseMotion(const char *p);
 	void PreCalculateMotion();
 	void CalcAnimation(double time);
 	int GetDepth(BONE_ID id);
 	void CreateBoneMesh();
-	void CalcCombinedOffsets(BONE_ID frameId);
+	void CalcCombinedOffsets();
 
 	std::vector<BvhFrame> m_frames;
 	std::vector<float> rawMotion;

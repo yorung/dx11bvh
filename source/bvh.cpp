@@ -435,29 +435,17 @@ Bvh::~Bvh()
 	m_meshRenderer.Destroy();
 }
 
-void Bvh::CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent)
+void Bvh::CalcFrameMatrices()
 {
-	BvhFrame& f = m_frames[frameId];
-	XMMATRIX result = XMLoadFloat4x4(&f.frameTransformMatrix) * parent;
-	XMStoreFloat4x4(&f.result, result);
-	if (f.siblingId >= 0) {
-		CalcFrameMatrices(f.siblingId, parent);
-	}
-	if (f.childId >= 0) {
-		CalcFrameMatrices(f.childId, result);
+	for (auto& f : m_frames) {
+		f.result = f.frameTransformMatrix * (f.parentId >= 0 ? m_frames[f.parentId].result : Matrix());
 	}
 }
 
-void Bvh::CalcCombinedOffsets(BONE_ID frameId)
+void Bvh::CalcCombinedOffsets()
 {
-	BvhFrame& f = m_frames[frameId];
-	Matrix parentOffset = f.parentId >= 0 ? m_frames[f.parentId].offsetCombined : Matrix();
-	f.offsetCombined = f.offset * parentOffset;
-	if (f.siblingId >= 0) {
-		CalcCombinedOffsets(f.siblingId);
-	}
-	if (f.childId >= 0) {
-		CalcCombinedOffsets(f.childId);
+	for (auto& f : m_frames) {
+		f.offsetCombined = f.offset * (f.parentId >= 0 ? m_frames[f.parentId].offsetCombined : Matrix());
 	}
 }
 
@@ -471,10 +459,10 @@ void Bvh::CalcAnimation(double time)
 
 	for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++) {
 		auto& it = m_frames[i];
-		XMMATRIX transMat = XMMatrixIdentity();
+		Matrix transMat;
 		Quaternion q = pose.quats[i];
 		if (it.posIndies.x >= 0) {
-			transMat = q2m(rootAxisAlignQuat) * XMMatrixTranslation(mot[it.posIndies.x], mot[it.posIndies.y], -mot[it.posIndies.z]);
+			transMat = q2m(rootAxisAlignQuat) * Matrix::CreateTranslation(mot[it.posIndies.x], mot[it.posIndies.y], -mot[it.posIndies.z]);
 		} else {
 			transMat = it.offset;
 		}
@@ -488,7 +476,7 @@ void Bvh::ResetAnim()
 	for (auto& it : m_frames) {
 		it.frameTransformMatrix = it.offset;
 	}
-	CalcFrameMatrices(0, XMMatrixIdentity());
+	CalcFrameMatrices();
 }
 
 void Bvh::Draw(int animId, double time)
@@ -508,7 +496,7 @@ void Bvh::Draw(int animId, double time)
 		CalcAnimation(time);
 	}
 
-	CalcFrameMatrices(0, XMMatrixIdentity());
+	CalcFrameMatrices();
 
 	if (g_type == "pivot") {
 		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
@@ -578,7 +566,7 @@ void Bvh::SetLocalAxis(BONE_ID frameId, const Quaternion axisAlignQuat)
 			c = c->siblingId >= 0 ? &m_frames[c->siblingId] : nullptr;
 		}
 	}
-	CalcCombinedOffsets(0);
+	CalcCombinedOffsets();
 
 	CalcBoneOffsetMatrix(frameId);
 }
@@ -633,7 +621,7 @@ void Bvh::LinkTo(const char* me, const char* linkTo)
 
 	f.offset *= m_frames[linkToId].offset.Invert();
 
-	CalcCombinedOffsets(0);
+	CalcCombinedOffsets();
 	for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++) {
 		CalcBoneOffsetMatrix(i);
 	}
