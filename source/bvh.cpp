@@ -336,7 +336,7 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 			float z = -_getF(child);
 			frame.offset = XMMatrixTranslation(x, y, z);
 
-			frame.offsetCombined.Identity();
+			frame.offsetCombined = Matrix();
 
 			if (parentFrameId >= 0) {
 				_linkFrame(parentFrameId, frameId);
