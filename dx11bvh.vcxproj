@@ -84,6 +84,7 @@
   <ItemGroup>
     <ClInclude Include="dx11bvh.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="source\af_math.h" />
     <ClInclude Include="source\app.h" />
     <ClInclude Include="source\bvh.h" />
     <ClInclude Include="source\debug_renderer.h" />

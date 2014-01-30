@@ -60,6 +60,9 @@
     <ClInclude Include="source\debug_renderer.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="source\af_math.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

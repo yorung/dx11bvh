@@ -1024,12 +1024,6 @@ void MeshX::LoadSub(const char *fileName)
 	printf("===============DumpStatistics end\n");
 }
 
-inline XMMATRIX inv(const XMMATRIX& m)
-{
-	XMVECTOR dummy;
-	return XMMatrixInverse(&dummy, m);
-}
-
 MeshX::~MeshX()
 {
 	m_meshRenderer.Destroy();
@@ -1228,7 +1222,6 @@ Quaternion MeshX::GetWorldRotation(const char* frameName)
 	dotYZ = y.Dot(z);
 	dotZX = z.Dot(x);
 
-
 	return Quaternion::CreateFromRotationMatrix(r);
 }
 
@@ -1351,7 +1344,7 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		const BvhFrame& bvhF = bvhFrames[bvhFrameId];
 		Frame* f = &m_frames[_getFrameIdByName(xBoneName)];
 		assert(f->parentId >= 0);
-		Frame* parent =   &m_frames[f->parentId];
+		Frame* parent = &m_frames[f->parentId];
 
 		assert(bvhF.childId >= 0);
 		assert(f->childId >= 0);
@@ -1363,17 +1356,17 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		while (xChild->siblingId >= 0 && (strstr(xChild->name, "_L_") || strstr(xChild->name, "_R_"))) {
 			xChild = &m_frames[xChild->siblingId];
 		}
-		XMVECTOR world100 = XMVector3Normalize(bvhChild->result.Translation() - bvhF.result.Translation());
-		XMVECTOR worldBone = XMVector3Normalize(xChild->result.Translation() - f->result.Translation());
+		Vector3 worldBvh = normalize(bvhChild->result.Translation() - bvhF.result.Translation());
+		Vector3 worldTiny = normalize(xChild->result.Translation() - f->result.Translation());
 
-		XMVECTOR rotAxis = XMVector3Cross(worldBone, world100);
-		float rotRad = acosf(XMVectorGetX(XMVector3Dot(worldBone, world100)));
+		Vector3 rotAxis = cross(worldTiny, worldBvh);
+		float rotRad = acosf(dot(worldTiny, worldBvh));
 
-		XMFLOAT4X4 rotMat = f->result;
+		Matrix rotMat = f->result;
 		rotMat._41 = rotMat._42 = rotMat._43 = 0;
-		XMVECTOR rotAxisLocal = XMVector3Transform(rotAxis, inv(XMLoadFloat4x4(&rotMat)));
+		Vector3 rotAxisLocal = XMVector3Transform(rotAxis, inv(rotMat));
 
-		XMStoreFloat4x4(&f->initialMatrix, XMMatrixRotationAxis(rotAxisLocal, rotRad) * XMLoadFloat4x4(&f->initialMatrix));
+		f->initialMatrix = Matrix::CreateFromAxisAngle(rotAxisLocal, rotRad) * f->initialMatrix;
 	}
 
 	for (auto& it : m_frames) {
