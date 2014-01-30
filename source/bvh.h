@@ -26,7 +26,6 @@ struct BvhFrame
 class Bvh : public Mesh
 {
 private:
-	bool ParseMesh(char* imgFrame, Block& block, BONE_ID frameId);
 	void CalcBoneOffsetMatrix(BONE_ID frameId);
 	void ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId);
 	void LoadSub(const char* fileName);
