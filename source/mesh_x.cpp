@@ -347,9 +347,6 @@ void MeshX::CreateBoneMesh()
 		}
 		int depth = GetDepth(pId);
 		Frame& f1 = m_frames[pId];
-		XMVECTOR dummy;
-		XMVECTOR v1 = XMMatrixInverse(&dummy, XMLoadFloat4x4(&f1.boneOffsetMatrix)).r[3];
-		XMVECTOR v2 = XMMatrixInverse(&dummy, XMLoadFloat4x4(&f2.boneOffsetMatrix)).r[3];
 
 		if (XMMatrixIsIdentity(XMLoadFloat4x4(&f1.boneOffsetMatrix))) {
 		//	v1 = XMLoadFloat4x4(&f1.frameTransformMatrixOrg).r[3];
@@ -371,6 +368,8 @@ void MeshX::CreateBoneMesh()
 			0xff0000ff,
 			0xff000000,
 		};
+		Vector3 v1 = inv(f1.boneOffsetMatrix).Translation();
+		Vector3 v2 = inv(f2.boneOffsetMatrix).Translation();
 		CreateCone(bones, v1, v2, pId, depthToColor[depth % dimof(depthToColor)]);
 	}
 

@@ -215,8 +215,8 @@ void Bvh::CreateBoneMesh()
 		}
 		int depth = GetDepth(pId);
 		BvhFrame& f1 = m_frames[pId];
-		XMVECTOR v1 = f1.offsetCombined.Translation();
-		XMVECTOR v2 = f2.offsetCombined.Translation();
+		Vector3 v1 = f1.offsetCombined.Translation();
+		Vector3 v2 = f2.offsetCombined.Translation();
 
 		static const DWORD depthToColor[] = {
 			0xffffffff,
