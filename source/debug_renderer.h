@@ -15,4 +15,4 @@ public:
 
 extern DebugRenderer debugRenderer;
 
-void CreateCone(Block& b, XMVECTOR v1, XMVECTOR v2, BONE_ID boneId, DWORD color);
+void CreateCone(Block& b, const Vector3& v1, const Vector3& v2, BONE_ID boneId, DWORD color);

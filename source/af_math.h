@@ -17,6 +17,11 @@ template <class VEC3> inline VEC3 cross(const VEC3& l, const VEC3& r)
 #undef _
 }
 
+template <class VEC3> inline float length(const VEC3& v)
+{
+	return v.Length();
+}
+
 inline Matrix inv(const Matrix& m)
 {
 	XMVECTOR dummy;

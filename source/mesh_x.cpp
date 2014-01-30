@@ -150,7 +150,7 @@ static void _getVertexColors(char*& p, std::vector<Vector4>& vertices, int nVert
 static void _getMatrix(char*& p, Matrix& m)
 {
 	if (!p) {
-		XMStoreFloat4x4(&m, XMMatrixIdentity());
+		m = Matrix();
 		return;
 	}
 	m._11 = _getF(p);
@@ -326,8 +326,6 @@ static MatMan::MMID _getMaterial(char*& p)
 	mat.tmid = texMan.Create(textureFilename.c_str(), true);	// load it at current directory
 	return matMan.Create(mat);
 }
-
-void CreateCone(Block& b, XMVECTOR v1, XMVECTOR v2, BONE_ID boneId, DWORD color);
 
 int MeshX::GetDepth(BONE_ID id)
 {
@@ -667,14 +665,10 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 	} else {
 		for (int i = 0; (unsigned)i < indices.size() / 3; i++) {
 			int idx = i * 3;
-			XMVECTOR v[3];
-			v[0] = XMLoadFloat3(&vertices[indices[idx]].xyz);
-			v[1] = XMLoadFloat3(&vertices[indices[idx + 1]].xyz);
-			v[2] = XMLoadFloat3(&vertices[indices[idx + 2]].xyz);
-			XMVECTOR result = XMVector3Cross(v[1] - v[0], v[2] - v[1]);
-			XMStoreFloat3(&vertices[indices[idx]].normal, result);
-			XMStoreFloat3(&vertices[indices[idx + 1]].normal, result);
-			XMStoreFloat3(&vertices[indices[idx + 2]].normal, result);
+			MeshVertex& v0 = vertices[indices[idx]];
+			MeshVertex& v1 = vertices[indices[idx + 1]];
+			MeshVertex& v2 = vertices[indices[idx + 2]];
+			v0.normal = v1.normal = v2.normal = cross(v1.xyz - v0.xyz, v2.xyz - v1.xyz);
 		}
 	}
 
@@ -915,14 +909,12 @@ static void ParseAnimationKeys(char* p, Animation& animation)
 				break;
 			case 1:		// scale
 				assert(nValues == 3);
-				XMStoreFloat4x4(&k.mat, XMMatrixIdentity());
 				k.mat._11 = _getF(key);
 				k.mat._22 = _getF(key);
 				k.mat._33 = _getF(key);
 				break;
 			case 2:		// position
 				assert(nValues == 3);
-				XMStoreFloat4x4(&k.mat, XMMatrixIdentity());
 				k.mat._41 = _getF(key);
 				k.mat._42 = _getF(key);
 				k.mat._43 = _getF(key);
@@ -1018,6 +1010,7 @@ void MeshX::LoadSub(const char *fileName)
 	if (m_frames.empty()) {
 		m_frames.resize(1);
 	}
+
 	printf("===============DumpFrames begin\n");
 	DumpFrames(0, 0);
 	printf("===============DumpFrames end\n");
