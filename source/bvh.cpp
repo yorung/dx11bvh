@@ -70,49 +70,6 @@ static float _getF(char*& p)
 	return (float)_getD(p);
 }
 
-static void _getFloat3Array(char*& p, std::vector<XMFLOAT3>& vertices, int nVertices)
-{
-	for (int i = 0; i < nVertices; i++) {
-		XMFLOAT3 f3;
-		f3.x = _getF(p);
-		f3.y = _getF(p);
-		f3.z = _getF(p);
-		vertices.push_back(f3);
-	}
-}
-
-static void _getFloat2Array(char*& p, std::vector<XMFLOAT2>& vertices, int nVertices)
-{
-	for (int i = 0; i < nVertices; i++) {
-		XMFLOAT2 f2;
-		f2.x = _getF(p);
-		f2.y = _getF(p);
-		vertices.push_back(f2);
-	}
-}
-
-static int _getIndices(char*& p, std::vector<unsigned>& indices, int nOrgFaces, std::vector<bool>& isOrgFace4Vertices)
-{
-	int nDividedTotalFaces = 0;
-	for (int i = 0; i < nOrgFaces; i++) {
-		int nVertices = _getI(p);
-		assert(nVertices == 3 || nVertices == 4);
-		int begin = indices.size();
-		indices.push_back(_getI(p));
-		indices.push_back(_getI(p));
-		indices.push_back(_getI(p));
-		nDividedTotalFaces++;
-		if (nVertices == 4) {
-			indices.push_back(indices[begin + 2]);
-			indices.push_back(_getI(p));
-			indices.push_back(indices[begin]);
-			nDividedTotalFaces++;
-		}
-		isOrgFace4Vertices.push_back(nVertices == 4);
-	}
-	return nDividedTotalFaces;
-}
-
 static std::string _getToken(char*& p)
 {
 	while(*p && !isalpha(*p)) {
@@ -362,33 +319,6 @@ BONE_ID Bvh::_getFrameIdByName(const char* name)
 	f.posIndices.z = -1;
 	m_frames.push_back(f);
 	return m_frames.size() - 1;
-}
-
-bool Bvh::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
-{
-	auto& vertices = block.vertices;
-	auto& indices = block.indices;
-	vertices.clear();
-	indices.clear();
-	block.materialMaps.clear();
-
-	char *imgMesh = _searchChildTag(imgFrame, "Mesh");
-	if (!imgMesh) {
-		return false;
-	}
-
-	char *p = imgMesh;
-	int nVertices = _getI(p);
-	std::vector<XMFLOAT3> vertPos;
-	_getFloat3Array(p, vertPos, nVertices);
-	int nOrgFaces = _getI(p);
-	std::vector<bool> isOrgFace4Vertices;
-	int nDividedTotalFaces = _getIndices(p, indices, nOrgFaces, isOrgFace4Vertices);
-
-
-	p = imgMesh;
-
-	return !!vertices.size();
 }
 
 void Bvh::_linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId)
