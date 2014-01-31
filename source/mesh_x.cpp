@@ -1116,7 +1116,7 @@ void MeshX::Draw(int animId, double time)
 		return;
 	}
 
-	XMMATRIX BoneMatrices[50];
+	XMMATRIX BoneMatrices[BONE_MAX];
 	assert(m_frames.size() <= dimof(BoneMatrices));
 
 	CalcAnimation(animId, time * m_animTicksPerSecond);
@@ -1248,10 +1248,10 @@ void MeshX::SyncLocalAxisWithBvh(Bvh* bvh)
 
 void MeshX::DrawBvh(Bvh* bvh, double time)
 {
-	XMMATRIX RotAnim[50];
+	XMMATRIX RotAnim[BONE_MAX];
 	bvh->CalcRotAnimForAlignedAxis(RotAnim, time);
 
-	XMMATRIX BonesForX[50];
+	XMMATRIX BonesForX[BONE_MAX];
 	for (auto& it : BonesForX) {
 		it = XMMatrixIdentity();
 	}

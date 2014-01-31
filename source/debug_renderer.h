@@ -1,5 +1,3 @@
-static const int BONE_MAX = 50;
-
 class DebugRenderer
 {
 	MeshRenderer pivotsRenderer;

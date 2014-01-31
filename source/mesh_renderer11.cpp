@@ -8,7 +8,7 @@ struct MeshConstantBuffer
 	XMFLOAT4 emissive;
 	XMFLOAT4 padding1;
 	XMFLOAT4 padding2;
-	XMFLOAT4X4 bone[50];
+	XMFLOAT4X4 bone[BONE_MAX];
 };
 
 MeshRenderer11::MeshRenderer11()
@@ -92,7 +92,7 @@ void MeshRenderer11::Draw(const XMMATRIX BoneMatrices[], int nBones, const Block
 		XMStoreFloat4x4(&cBuf.matVP, matVP);
 		cBuf.faceColor = mat->faceColor;
 		cBuf.emissive = mat->emissive;
-		CopyMemory(cBuf.bone, BoneMatrices, 50 * sizeof(XMMATRIX));
+		CopyMemory(cBuf.bone, BoneMatrices, BONE_MAX * sizeof(XMMATRIX));
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		HRESULT hr = deviceMan11.GetContext()->Map(pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &cBuf, sizeof(cBuf));

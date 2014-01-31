@@ -485,7 +485,7 @@ void Bvh::Draw(int animId, double time)
 		return;
 	}
 
-	XMMATRIX BoneMatrices[50];
+	XMMATRIX BoneMatrices[BONE_MAX];
 	assert(m_frames.size() <= dimof(BoneMatrices));
 
 	if (animId != 0) {
@@ -513,7 +513,7 @@ void Bvh::Draw(int animId, double time)
 	}
 }
 
-void Bvh::CalcRotAnimForAlignedAxis(XMMATRIX RotAnimMatrices[50], double time) const
+void Bvh::CalcRotAnimForAlignedAxis(XMMATRIX RotAnimMatrices[BONE_MAX], double time) const
 {
 	int frame = (int)(time / frameTime);
 	frame %= motionFrames;
