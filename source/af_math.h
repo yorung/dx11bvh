@@ -22,6 +22,13 @@ template <class VEC3> inline VEC3 normalize(const VEC3& v)
 	return v / length(v);
 }
 
+template <class QUAT> inline QUAT inv(const QUAT& q)
+{
+	QUAT c = q.Conjugate();
+	affloat lenSq = q.w * q.w + dot(q.v, q.v);
+	return QUAT(c.w / lenSq, c.v / lenSq);
+}
+
 struct Vec3
 {
 	affloat x, y, z;
@@ -58,13 +65,6 @@ inline Matrix inv(const Matrix& m)
 {
 	XMVECTOR dummy;
 	return XMMatrixInverse(&dummy, m);
-}
-
-inline Quaternion inv(const Quaternion& q)
-{
-	Quaternion r;
-	q.Inverse(r);
-	return r;
 }
 
 inline Matrix q2m(const Quaternion& q)

@@ -891,11 +891,11 @@ static void ParseAnimationKeys(char* p, Animation& animation)
 			case 0:		// rotation
 				assert(nValues == 4);
 				{
-					Quaternion q;
+					Quat q;
 					q.w = _getF(key);
-					q.x = _getF(key);
-					q.y = _getF(key);
-					q.z = _getF(key);
+					q.v.x = _getF(key);
+					q.v.y = _getF(key);
+					q.v.z = _getF(key);
 					k.mat = q2m(inv(q));
 				}
 				break;

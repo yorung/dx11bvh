@@ -540,13 +540,10 @@ BONE_ID Bvh::BoneNameToId(const char* name) const
 void Bvh::SetLocalAxis(BONE_ID frameId, const Quat axisAlignQuat)
 {
 	BvhFrame& f = m_frames[frameId];
-	Quat inv = axisAlignQuat.Conjugate();
-
+	Quat aaInv = inv(axisAlignQuat);
 	for (auto& it : motion.poses) {
 		assert(frameId < (BONE_ID)it.quats.size());
-
-
-		it.quats[frameId] = axisAlignQuat * it.quats[frameId] * inv;
+		it.quats[frameId] = axisAlignQuat * it.quats[frameId] * aaInv;
 	}
 
 	f.offset = (Matrix)q2m(axisAlignQuat) * f.offset;
@@ -558,7 +555,7 @@ void Bvh::SetLocalAxis(BONE_ID frameId, const Quat axisAlignQuat)
 	if (f.childId >= 0) {
 		BvhFrame* c = &m_frames[f.childId];
 		while (c) {
-			c->offset = c->offset * (Matrix)q2m(inv);
+			c->offset = c->offset * (Matrix)q2m(aaInv);
 			c = c->siblingId >= 0 ? &m_frames[c->siblingId] : nullptr;
 		}
 	}
