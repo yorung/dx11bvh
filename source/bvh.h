@@ -1,6 +1,6 @@
 struct Pose
 {
-	std::vector<SimpleMath::Quaternion> quats;
+	std::vector<Quat> quats;
 };
 
 struct Motion
