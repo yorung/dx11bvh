@@ -1193,12 +1193,12 @@ Quaternion MeshX::GetWorldRotation(const char* frameName)
 	BONE_ID id = _getFrameIdByName(frameName);
 	Matrix r = m_frames[id].result;
 
-	Vector3 y = r.Up();
-	Vector3 x = r.Right();
-	Vector3 z = r.Backward();
-	float dotXY = x.Dot(y);
-	float dotYZ = y.Dot(z);
-	float dotZX = z.Dot(x);
+	Vec3 y = r.Up();
+	Vec3 x = r.Right();
+	Vec3 z = r.Backward();
+	float dotXY = dot(x, y);
+	float dotYZ = dot(y, z);
+	float dotZX = dot(z, x);
 
 	Quaternion q = Quaternion::CreateFromRotationMatrix(r);
 	Matrix rr = Matrix::CreateFromQuaternion(q);
@@ -1206,9 +1206,9 @@ Quaternion MeshX::GetWorldRotation(const char* frameName)
 	y = rr.Up();
 	x = rr.Right();
 	z = rr.Backward();
-	dotXY = x.Dot(y);
-	dotYZ = y.Dot(z);
-	dotZX = z.Dot(x);
+	dotXY = dot(x, y);
+	dotYZ = dot(y, z);
+	dotZX = dot(z, x);
 
 	return Quaternion::CreateFromRotationMatrix(r);
 }
@@ -1342,15 +1342,16 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		while (xChild->siblingId >= 0 && (strstr(xChild->name, "_L_") || strstr(xChild->name, "_R_"))) {
 			xChild = &m_frames[xChild->siblingId];
 		}
-		Vector3 worldBvh = normalize(bvhChild->result.Translation() - bvhF.result.Translation());
-		Vector3 worldTiny = normalize(xChild->result.Translation() - f->result.Translation());
+		Vec3 worldBvh = normalize(bvhChild->result.Translation() - bvhF.result.Translation());
+		Vec3 worldTiny = normalize(xChild->result.Translation() - f->result.Translation());
 
-		Vector3 rotAxis = cross(worldTiny, worldBvh);
+		Vec3 rotAxis = cross(worldTiny, worldBvh);
 		float rotRad = acosf(dot(worldTiny, worldBvh));
 
 		Matrix rotMat = f->result;
 		rotMat._41 = rotMat._42 = rotMat._43 = 0;
-		Vector3 rotAxisLocal = XMVector3Transform(rotAxis, inv(rotMat));
+	//	Vec3 rotAxisLocal = XMVector3Transform(Vector3(rotAxis), inv(rotMat));
+		Vec3 rotAxisLocal = transform(rotAxis, inv(rotMat));
 
 		f->initialMatrix = Matrix::CreateFromAxisAngle(rotAxisLocal, rotRad) * f->initialMatrix;
 	}

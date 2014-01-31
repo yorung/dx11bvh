@@ -59,3 +59,10 @@ inline Quaternion m2q(const Matrix& m)
 {
 	return Quaternion::CreateFromRotationMatrix(m);
 }
+
+inline Vec3 transform(const Vec3& v, const Matrix& m)
+{
+#define _(c) (m._1##c## * v.x + m._2##c## * v.y + m._3##c## * v.z + m._4##c##)
+	return Vec3(_(1), _(2), _(3));
+#undef _
+}
