@@ -7,7 +7,7 @@ public:
 	DebugRenderer();
 	~DebugRenderer();
 	void Init();
-	void DrawPivots(const XMMATRIX mat[BONE_MAX], int num);
+	void DrawPivots(const Matrix mat[BONE_MAX], int num);
 	void Destroy();
 };
 

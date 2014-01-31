@@ -127,11 +127,11 @@ Matrix Orthogonalization(Matrix	v)
 	return u;
 }
 
-void DebugRenderer::DrawPivots(const XMMATRIX mat[BONE_MAX], int num)
+void DebugRenderer::DrawPivots(const Matrix mat[BONE_MAX], int num)
 {
-	XMMATRIX mat2[BONE_MAX];
+	Matrix mat2[BONE_MAX];
 	for (int i = 0; i < BONE_MAX; i++) {
-		mat2[i] = i < num ? mat[i] : XMMatrixIdentity();
+		mat2[i] = i < num ? mat[i] : Matrix();
 	}
 
 	pivotsRenderer.Draw(mat2, BONE_MAX, pivots);

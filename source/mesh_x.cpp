@@ -1109,7 +1109,7 @@ void MeshX::Draw(int animId, double time)
 		return;
 	}
 
-	XMMATRIX BoneMatrices[BONE_MAX];
+	Matrix BoneMatrices[BONE_MAX];
 	assert(m_frames.size() <= dimof(BoneMatrices));
 
 	CalcAnimation(animId, time * m_animTicksPerSecond);
@@ -1241,10 +1241,10 @@ void MeshX::SyncLocalAxisWithBvh(Bvh* bvh)
 
 void MeshX::DrawBvh(Bvh* bvh, double time)
 {
-	XMMATRIX RotAnim[BONE_MAX];
+	Matrix RotAnim[BONE_MAX];
 	bvh->CalcRotAnimForAlignedAxis(RotAnim, time);
 
-	XMMATRIX BonesForX[BONE_MAX];
+	Matrix BonesForX[BONE_MAX];
 	for (auto& it : BonesForX) {
 		it = XMMatrixIdentity();
 	}
@@ -1253,7 +1253,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		Frame& f = m_frames[i];
 		BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
-		f.frameTransformMatrix = bvhBoneId < 0 ? f.initialMatrix : (Matrix)RotAnim[bvhBoneId] * f.initialMatrix;
+		f.frameTransformMatrix = bvhBoneId < 0 ? f.initialMatrix : RotAnim[bvhBoneId] * f.initialMatrix;
 	}
 
 	CalcFrameMatrices(0, XMMatrixIdentity());
@@ -1338,7 +1338,7 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		while (xChild->siblingId >= 0 && (strstr(xChild->name, "_L_") || strstr(xChild->name, "_R_"))) {
 			xChild = &m_frames[xChild->siblingId];
 		}
-		Vec3 worldBvh = normalize(bvhChild->result.Translation() - bvhF.result.Translation());
+		Vec3 worldBvh = normalize(bvhChild->offsetCombined.Translation() - bvhF.offsetCombined.Translation());
 		Vec3 worldTiny = normalize(xChild->result.Translation() - f->result.Translation());
 
 		Vec3 rotAxis = cross(worldTiny, worldBvh);
