@@ -45,7 +45,7 @@ private:
 	std::vector<BvhFrame> m_frames;
 	std::vector<float> rawMotion;
 	Motion motion;
-	Quaternion rootAxisAlignQuat;
+	Quat rootAxisAlignQuat;
 
 	int motionFrames;
 	float frameTime;
@@ -62,7 +62,7 @@ public:
 	void ResetAnim();
 	void CalcRotAnimForAlignedAxis(Matrix RotAnimMatrices[BONE_MAX], double time) const;
 	BONE_ID BoneNameToId(const char* name) const;
-	void SetLocalAxis(BONE_ID boneId, const Quaternion q);
+	void SetLocalAxis(BONE_ID boneId, const Quat q);
 	void FixBones(const char* name);
 	void LinkTo(const char* me, const char* linkTo);
 	bool UnlinkFromParent(BONE_ID id);

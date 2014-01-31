@@ -35,6 +35,8 @@ struct Vec3
 	Vec3 operator-(const Vec3& r) const { return Vec3(x - r.x, y - r.y, z - r.z); }
 	Vec3 operator*(affloat r) const { return Vec3(x * r, y * r, z * r); }
 	Vec3 operator/(affloat r) const { return Vec3(x / r, y / r, z / r); }
+
+	Vec3 operator-() const { return Vec3(-x, -y, -z); }
 };
 
 struct Quat
@@ -47,8 +49,9 @@ struct Quat
 	Quat(const Quaternion& q) : Quat(q.w, Vec3(q.x, q.y, q.z)) {}
 	operator Quaternion() const { return Quaternion(v.x, v.y, v.z, w); }
 
-	Quat operator*(const Quat& r) const { return Quat(w * r.w - dot(v, r.v), w * r.v + r.w * v + cross(v, r.v)); }
+	Quat operator*(const Quat& r) const { return Quat(w * r.w - dot(v, r.v), r.v * w + v * r.w + cross(r.v, v)); }
 	const Quat& operator*=(const Quat& r) { *this = *this * r; return *this; }
+	Quat Conjugate() const { return Quat(w, -v); }
 };
 
 inline Matrix inv(const Matrix& m)
