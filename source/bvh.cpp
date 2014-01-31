@@ -368,8 +368,8 @@ void Bvh::DumpFrames(BONE_ID frameId, int depth) const
 		printf(" ");
 	}
 	printf("%s(%d) p=%d s=%d c=%d ", f.name, frameId, f.parentId, f.siblingId, f.childId);
-	const XMFLOAT3& m = f.offset.Translation();
-	const XMFLOAT3& m2 = f.offsetCombined.Translation();
+	const Vector3& m = f.offset.Translation();
+	const Vector3& m2 = f.offsetCombined.Translation();
 	printf("(%3.3f,%3.3f,%3.3f) (%3.3f,%3.3f,%3.3f)", m.x, m.y, m.z, m2.x, m2.y, m2.z);
 	printf("\n");
 	if (f.siblingId >= 0) {
@@ -400,9 +400,9 @@ void Bvh::PreCalculateMotion()
 		for (auto& it : m_frames) {
 			Quaternion q;
 			if (it.rotIndies.x >= 0) {
-				q = Quaternion::CreateFromAxisAngle(XMVectorSet(0,0,1,0), mot[it.rotIndies.z] * XM_PI / 180)
-				  * Quaternion::CreateFromAxisAngle(XMVectorSet(1,0,0,0), -mot[it.rotIndies.x] * XM_PI / 180)
-				  * Quaternion::CreateFromAxisAngle(XMVectorSet(0,1,0,0), -mot[it.rotIndies.y] * XM_PI / 180);
+				q = Quaternion::CreateFromAxisAngle(Vector3(0,0,1), mot[it.rotIndies.z] * XM_PI / 180)
+				  * Quaternion::CreateFromAxisAngle(Vector3(1,0,0), -mot[it.rotIndies.x] * XM_PI / 180)
+				  * Quaternion::CreateFromAxisAngle(Vector3(0,1,0), -mot[it.rotIndies.y] * XM_PI / 180);
 			}
 			pose.quats.push_back(q);
 		}

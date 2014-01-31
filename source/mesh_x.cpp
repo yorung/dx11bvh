@@ -348,13 +348,11 @@ void MeshX::CreateBoneMesh()
 		int depth = GetDepth(pId);
 		Frame& f1 = m_frames[pId];
 
-		if (XMMatrixIsIdentity(XMLoadFloat4x4(&f1.boneOffsetMatrix))) {
-		//	v1 = XMLoadFloat4x4(&f1.frameTransformMatrixOrg).r[3];
+		if (Matrix() == f1.boneOffsetMatrix) {
 			continue;
 		}
 
-		if (XMMatrixIsIdentity(XMLoadFloat4x4(&f2.boneOffsetMatrix))) {
-		//	v2 = XMLoadFloat4x4(&f2.frameTransformMatrixOrg).r[3];
+		if (Matrix() == f2.boneOffsetMatrix) {
 			continue;
 		}
 
@@ -897,13 +895,12 @@ static void ParseAnimationKeys(char* p, Animation& animation)
 			case 0:		// rotation
 				assert(nValues == 4);
 				{
-					XMFLOAT4 q;
+					Quaternion q;
 					q.w = _getF(key);
 					q.x = _getF(key);
 					q.y = _getF(key);
 					q.z = _getF(key);
-				//	XMStoreFloat4x4(&k.mat, XMMatrixRotationQuaternion(XMLoadFloat4(&q)));
-					XMStoreFloat4x4(&k.mat, XMMatrixRotationQuaternion(XMQuaternionInverse(XMLoadFloat4(&q))));
+					k.mat = q2m(inv(q));
 				}
 				break;
 			case 1:		// scale

@@ -28,6 +28,13 @@ inline Matrix inv(const Matrix& m)
 	return XMMatrixInverse(&dummy, m);
 }
 
+inline Quaternion inv(const Quaternion& q)
+{
+	Quaternion r;
+	q.Inverse(r);
+	return r;
+}
+
 inline Matrix q2m(const Quaternion& q)
 {
 	return Matrix::CreateFromQuaternion(q);
