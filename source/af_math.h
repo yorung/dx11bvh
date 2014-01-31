@@ -66,3 +66,12 @@ inline Vec3 transform(const Vec3& v, const Matrix& m)
 	return Vec3(_(1), _(2), _(3));
 #undef _
 }
+
+inline Matrix translate(affloat x, affloat y, affloat z)
+{
+	Matrix m;
+	m._41 = x;
+	m._42 = y;
+	m._43 = z;
+	return m;
+}

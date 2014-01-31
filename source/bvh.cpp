@@ -324,7 +324,7 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 			float x = _getF(child);
 			float y = _getF(child);
 			float z = -_getF(child);
-			frame.offset = XMMatrixTranslation(x, y, z);
+			frame.offset = translate(x, y, z);
 
 			frame.offsetCombined = Matrix();
 

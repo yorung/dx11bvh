@@ -458,10 +458,6 @@ BONE_ID MeshX::_getFrameIdByName(const char* name)
 	f.parentId = -1;
 	f.childId = -1;
 	f.siblingId = -1;
-	XMStoreFloat4x4(&f.frameTransformMatrix, XMMatrixIdentity());
-	XMStoreFloat4x4(&f.frameTransformMatrixOrg, XMMatrixIdentity());
-	XMStoreFloat4x4(&f.boneOffsetMatrix, XMMatrixIdentity());
-	XMStoreFloat4x4(&f.initialMatrix, XMMatrixIdentity());
 	m_frames.push_back(f);
 	return m_frames.size() - 1;
 }
@@ -1350,7 +1346,6 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 
 		Matrix rotMat = f->result;
 		rotMat._41 = rotMat._42 = rotMat._43 = 0;
-	//	Vec3 rotAxisLocal = XMVector3Transform(Vector3(rotAxis), inv(rotMat));
 		Vec3 rotAxisLocal = transform(rotAxis, inv(rotMat));
 
 		f->initialMatrix = Matrix::CreateFromAxisAngle(rotAxisLocal, rotRad) * f->initialMatrix;
