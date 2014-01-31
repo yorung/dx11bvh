@@ -14,16 +14,16 @@ static void InitVertex(MeshVertex& v, BONE_ID boneId, DWORD color)
 	v.xyz.x = v.xyz.y = v.xyz.z = 0;
 }
 
-void CreateCone(Block& b, const Vector3& v1, const Vector3& v2, BONE_ID boneId, DWORD color)
+void CreateCone(Block& b, const Vec3& v1, const Vec3& v2, BONE_ID boneId, DWORD color)
 {
 	float radius = 0.15f;
-	Vector3 boneDir = v2 - v1;
-	Vector3 vRot0 = cross(boneDir, Vector3(0, 0, radius));
+	Vec3 boneDir = v2 - v1;
+	Vec3 vRot0 = cross(boneDir, Vec3(0, 0, radius));
 	if (length(vRot0) < 0.001f) {
-		vRot0 = cross(boneDir, Vector3(0, radius, 0));
+		vRot0 = cross(boneDir, Vec3(0, radius, 0));
 	}
-	Vector3 vRot90 = cross(vRot0, normalize(boneDir));
-	Vector3 vRotLast = v1 + vRot0;
+	Vec3 vRot90 = cross(vRot0, normalize(boneDir));
+	Vec3 vRotLast = v1 + vRot0;
 	static const int div = 10;
 	for (int j = 0; j < div; j++) {
 		MeshVertex vert[3];
@@ -31,11 +31,11 @@ void CreateCone(Block& b, const Vector3& v1, const Vector3& v2, BONE_ID boneId, 
 			InitVertex(it, boneId, color);
 		}
 		float rad = XM_2PI / div * (j + 1);
-		Vector3 vRot = v1 + vRot0 * cosf(rad) + vRot90 * sinf(rad);
+		Vec3 vRot = v1 + vRot0 * cosf(rad) + vRot90 * sinf(rad);
 		vert[0].xyz = vRotLast;
 		vert[1].xyz = v2;
 		vert[2].xyz = vRot;
-		Vector3 normal = cross(vRotLast - v2, v2 - vRot);
+		Vec3 normal = cross(vRotLast - v2, v2 - vRot);
 		for (auto& it : vert) {
 			it.normal = normal;
 			b.vertices.push_back(it);
