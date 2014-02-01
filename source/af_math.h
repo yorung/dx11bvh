@@ -75,9 +75,17 @@ inline Matrix inv(const Matrix& m)
 	return XMMatrixInverse(&dummy, m);
 }
 
-inline Matrix q2m(const Quaternion& q)
+inline Matrix q2m(const Quat& q)
 {
-	return Matrix::CreateFromQuaternion(q);
+#define D(a,b) (1 - 2 * (q.v.a * q.v.a + q.v.b * q.v.b)) // diagonal
+#define P(a,b,c) (2 * (q.v.a * q.v.b + q.v.c * q.w)) // positive
+#define N(a,b,c) (2 * (q.v.a * q.v.b - q.v.c * q.w)) // negative
+	return Matrix(D(y,z), P(x,y,z), N(x,z,y), 0,
+		   N(x,y,z), D(x,z), P(y,z,x), 0,
+		   P(x,z,y), N(y,z,x), D(x,y), 0, 0,0,0,1);
+#undef D
+#undef P
+#undef N
 }
 
 inline Quaternion m2q(const Matrix& m)
