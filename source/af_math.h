@@ -12,9 +12,16 @@ template <class VEC3> inline VEC3 cross(const VEC3& l, const VEC3& r)
 #undef _
 }
 
+inline float afsqrt(float s) { return sqrtf(s); }
+inline double afsqrt(double s) { return sqrt(s); }
+inline float afsin(float s) { return sinf(s); }
+inline double afsin(double s) { return sin(s); }
+inline float afcos(float s) { return cosf(s); }
+inline double afcos(double s) { return cos(s); }
+
 template <class VEC3> inline affloat length(const VEC3& v)
 {
-	return sqrtf(dot(v, v));
+	return afsqrt(dot(v, v));
 }
 
 template <class VEC3> inline VEC3 normalize(const VEC3& v)
@@ -51,7 +58,8 @@ struct Quat
 	Vec3 v;
 	affloat w;
 	Quat() : Quat(0, Vec3()) {}
-	Quat(float W, const Vec3& V) : w(W), v(V) {}
+	Quat(affloat W, const Vec3& V) : w(W), v(V) {}
+	Quat(const Vec3& axis, affloat angle) { w = afcos(angle / 2); v = axis * afsin(angle / 2); }
 
 	Quat(const Quaternion& q) : Quat(q.w, Vec3(q.x, q.y, q.z)) {}
 	operator Quaternion() const { return Quaternion(v.x, v.y, v.z, w); }

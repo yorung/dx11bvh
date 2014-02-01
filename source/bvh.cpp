@@ -398,11 +398,11 @@ void Bvh::PreCalculateMotion()
 		Pose& pose = motion.poses[i];
 
 		for (auto& it : m_frames) {
-			Quaternion q;
+			Quat q;
 			if (it.rotIndies.x >= 0) {
-				q = Quaternion::CreateFromAxisAngle(Vector3(0,0,1), mot[it.rotIndies.z] * XM_PI / 180)
-				  * Quaternion::CreateFromAxisAngle(Vector3(1,0,0), -mot[it.rotIndies.x] * XM_PI / 180)
-				  * Quaternion::CreateFromAxisAngle(Vector3(0,1,0), -mot[it.rotIndies.y] * XM_PI / 180);
+				q = Quat(Vector3(0,0,1), mot[it.rotIndies.z] * XM_PI / 180)
+				  * Quat(Vector3(1,0,0), -mot[it.rotIndies.x] * XM_PI / 180)
+				  * Quat(Vector3(0,1,0), -mot[it.rotIndies.y] * XM_PI / 180);
 			}
 			pose.quats.push_back(q);
 		}
