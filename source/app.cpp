@@ -53,7 +53,7 @@ void App::Init(const char* fileName)
 			mesh[0] = new MeshX(fileName);
 		}
 	} else {
-		Bvh* bvh = new Bvh("D:\\github\\kashiyuka.bvh");
+		Bvh* bvh = new Bvh("D:\\github\\aachan.bvh");
 		mesh[0] = bvh;
 	//	mesh[0] = new Bvh("D:\\github\\aachan.bvh");
 	//	mesh[1] = new Bvh("D:\\github\\kashiyuka.bvh");
@@ -215,7 +215,8 @@ void App::Draw()
 	double deltaTime = currentTime - lastTime;
 	lastTime = currentTime;
 //	double time = GetTime() - startTime;
-//	double time = 65;
+	trackTime = 65;
+	deltaTime = 0;
 
 	if (GetKeyState(VK_RETURN) & 0x01) {
 		trackTime += deltaTime;
