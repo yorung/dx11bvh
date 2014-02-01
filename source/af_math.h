@@ -88,9 +88,32 @@ inline Matrix q2m(const Quat& q)
 #undef N
 }
 
-inline Quaternion m2q(const Matrix& m)
+inline Quat m2q(const Matrix& m_)
 {
-	return Quaternion::CreateFromRotationMatrix(m);
+	Matrix m = m_ * Matrix::CreateScale(1.0f / length(Vec3(m_._11, m_._12, m_._13)));	// kill scaling if needed
+
+	float x, y, z, w = afsqrt(m._11 + m._22 + m._33 + 1) / 2;
+	if (w > 0.5f) {							 // w is the largest
+		z = (m._12 - m._21) / (w * 4);
+		y = (m._31 - m._13) / (w * 4);
+		x = (m._23 - m._32) / (w * 4);
+	} else if (m._11 > m._22 && m._11 > m._33) { // x is the largest
+		x = afsqrt((-m._11 + m._22 + m._33 - 1) / -4);
+		y = (m._12 + m._21) / (x * 4);
+		z = (m._31 + m._13) / (x * 4);
+		w = (m._23 - m._32) / (x * 4);
+	} else if (m._22 > m._33) {					// y is the largest
+		y = afsqrt((m._11 - m._22 + m._33 - 1) / -4);
+		x = (m._12 + m._21) / (y * 4);
+		z = (m._31 - m._13) / (y * 4);
+		w = (m._23 + m._32) / (y * 4);
+	} else {									// z is the largest
+		z = afsqrt((m._11 + m._22 - m._33 - 1) / -4);
+		w = (m._12 - m._21) / (z * 4);
+		x = (m._31 + m._13) / (z * 4);
+		y = (m._23 + m._32) / (z * 4);
+	}
+	return Quat(w, Vec3(x,y,z));
 }
 
 inline Vec3 transform(const Vec3& v, const Matrix& m)

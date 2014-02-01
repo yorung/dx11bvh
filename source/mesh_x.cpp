@@ -1206,7 +1206,7 @@ Quaternion MeshX::GetWorldRotation(const char* frameName)
 	dotYZ = dot(y, z);
 	dotZX = dot(z, x);
 
-	return Quaternion::CreateFromRotationMatrix(r);
+	return m2q(r);
 }
 
 void MeshX::SetBvhLocalAxis(BONE_ID id, Bvh* bvh)
