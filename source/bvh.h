@@ -60,9 +60,8 @@ public:
 	~Bvh();
 	void Draw(int animId, double time);
 	void ResetAnim();
-	void CalcRotAnimForAlignedAxis(Matrix RotAnimMatrices[BONE_MAX], double time) const;
+	void GetRotAnim(Quat quats[BONE_MAX], double time) const;
 	BONE_ID BoneNameToId(const char* name) const;
-	void SetLocalAxis(BONE_ID boneId, const Quat q);
 	void FixBones(const char* name);
 	void LinkTo(const char* me, const char* linkTo);
 	bool UnlinkFromParent(BONE_ID id);

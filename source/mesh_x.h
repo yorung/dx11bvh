@@ -101,6 +101,7 @@ struct Frame
 	BONE_ID parentId;
 	BONE_ID childId;
 	BONE_ID siblingId;
+	Quat axisAlignQuat;
 };
 
 struct Block
@@ -143,8 +144,6 @@ private:
 	void DeleteDummyFrames();
 	bool UnlinkFrame(BONE_ID id);
 	void ApplyBvhInitialStance(const Bvh* bvh);
-	Quaternion GetWorldRotation(const char* frameName);
-	void SetBvhLocalAxis(BONE_ID id, Bvh* bvh);
 
 	std::vector<Frame> m_frames;
 	std::vector<AnimationSet> m_animationSets;

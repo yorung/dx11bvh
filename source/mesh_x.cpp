@@ -1184,65 +1184,22 @@ static BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, const Bvh* b
 	return bvhBoneId;
 }
 
-Quaternion MeshX::GetWorldRotation(const char* frameName)
-{
-	BONE_ID id = _getFrameIdByName(frameName);
-	Matrix r = m_frames[id].result;
-
-	Vec3 y = r.Up();
-	Vec3 x = r.Right();
-	Vec3 z = r.Backward();
-	float dotXY = dot(x, y);
-	float dotYZ = dot(y, z);
-	float dotZX = dot(z, x);
-
-	Quaternion q = Quaternion::CreateFromRotationMatrix(r);
-	Matrix rr = Matrix::CreateFromQuaternion(q);
-
-	y = rr.Up();
-	x = rr.Right();
-	z = rr.Backward();
-	dotXY = dot(x, y);
-	dotYZ = dot(y, z);
-	dotZX = dot(z, x);
-
-	return m2q(r);
-}
-
-void MeshX::SetBvhLocalAxis(BONE_ID id, Bvh* bvh)
-{
-	Frame& f = m_frames[id];
-	BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
-	if (bvhBoneId >= 0) {
-	//	if (strstr(f.name, "rm")) {
-			bvh->SetLocalAxis(bvhBoneId, GetWorldRotation(f.name));
-	//	}
-	}
-	if (f.siblingId >= 0) {
-		SetBvhLocalAxis(f.siblingId, bvh);
-	}
-	if (f.childId >= 0) {
-		SetBvhLocalAxis(f.childId, bvh);
-	}
-}
-
 void MeshX::SyncLocalAxisWithBvh(Bvh* bvh)
 {
 	ApplyBvhInitialStance(bvh);
-
-	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-		Frame& f = m_frames[i];
-		XMStoreFloat4x4(&f.frameTransformMatrix, XMLoadFloat4x4(&f.initialMatrix));
+	for (auto& f : m_frames) {
+		f.frameTransformMatrix = f.initialMatrix;
 	}
-
 	CalcFrameMatrices(0, XMMatrixIdentity());
-	SetBvhLocalAxis(0, bvh);
+	for (auto& f : m_frames) {
+		f.axisAlignQuat = m2q(f.result);
+	}
 }
 
 void MeshX::DrawBvh(Bvh* bvh, double time)
 {
-	Matrix RotAnim[BONE_MAX];
-	bvh->CalcRotAnimForAlignedAxis(RotAnim, time);
+	Quat rotAnim[BONE_MAX];
+	bvh->GetRotAnim(rotAnim, time);
 
 	Matrix BonesForX[BONE_MAX];
 	for (auto& it : BonesForX) {
@@ -1253,7 +1210,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		Frame& f = m_frames[i];
 		BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
-		f.frameTransformMatrix = bvhBoneId < 0 ? f.initialMatrix : RotAnim[bvhBoneId] * f.initialMatrix;
+		f.frameTransformMatrix = bvhBoneId < 0 ? f.initialMatrix : q2m(f.axisAlignQuat * rotAnim[bvhBoneId] * inv(f.axisAlignQuat)) * f.initialMatrix;
 	}
 
 	CalcFrameMatrices(0, XMMatrixIdentity());
@@ -1280,9 +1237,8 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 
 void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 {
-	XMStoreFloat4x4(&m_frames[0].initialMatrix, XMLoadFloat4x4(&m_frames[0].initialMatrix) * XMMatrixRotationY(XM_PI));
+	m_frames[0].initialMatrix *= XMMatrixRotationY(XM_PI);
 
-//	const char* xBoneNames[] = {"Bip01_R_UpperArm", "Bip01_L_UpperArm", "Bip01_L_Thigh", "Bip01_R_Thigh" };
 	const char* xBoneNames[] = {
 		"Bip01_Pelvis",
 		"Bip01_Spine",
@@ -1298,21 +1254,6 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		"Bip01_L_Foot", "Bip01_R_Foot",
 //		"Bip01_L_Toe0", "Bip01_R_Toe0",
 	};
-//	const char* xBoneNames[] = {"Bip01_R_UpperArm" };
-//	const char* xBoneNames[] = {"Bip01_L_Calf", "Bip01_R_Calf", "Bip01_R_UpperArm", "Bip01_L_UpperArm",  };
-//	const char* xBoneNames[] = {"Bip01_R_UpperArm", "Bip01_L_UpperArm" };
-//	const char* xBoneNames[] = {"Bip01_R_UpperArm"};
-//	const char* xBoneNames[] = {"Bip01_Pelvis"};
-//	const char* xBoneNames[] = {"Bip01_Spine"};
-	/*
-	{ "Bip01_L_Calf", "RightKnee" },
-		{ "Bip01_R_Calf", "LeftKnee" },
-		{ "Bip01_L_Foot", "RightAnkle" },
-		{ "Bip01_R_Foot", "LeftAnkle" },
-		{ "Bip01_L_Toe0", "RightToe" },
-		{ "Bip01_R_Toe0", "LeftToe" },
-		*/
-
 
 	for(const char* xBoneName : xBoneNames) {
 		for (auto& f : m_frames) {

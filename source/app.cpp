@@ -214,9 +214,7 @@ void App::Draw()
 	double currentTime = GetTime();
 	double deltaTime = currentTime - lastTime;
 	lastTime = currentTime;
-//	double time = GetTime() - startTime;
-	trackTime = 65;
-	deltaTime = 0;
+
 
 	if (GetKeyState(VK_RETURN) & 0x01) {
 		trackTime += deltaTime;
