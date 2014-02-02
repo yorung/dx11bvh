@@ -1201,6 +1201,9 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 	Quat rotAnim[BONE_MAX];
 	bvh->GetRotAnim(rotAnim, time);
 
+	bvh->CalcAnimation(time);
+	Vec3 pos = bvh->GetFrames()[0].result.Translation();
+
 	Matrix BonesForX[BONE_MAX];
 	for (auto& it : BonesForX) {
 		it = XMMatrixIdentity();
@@ -1211,6 +1214,9 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 		Frame& f = m_frames[i];
 		BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
 		f.frameTransformMatrix = bvhBoneId < 0 ? f.initialMatrix : q2m(f.axisAlignQuat * rotAnim[bvhBoneId] * inv(f.axisAlignQuat)) * f.initialMatrix;
+		if (i == 0) {
+			f.frameTransformMatrix *= v2m(pos);
+		}
 	}
 
 	CalcFrameMatrices(0, XMMatrixIdentity());

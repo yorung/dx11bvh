@@ -468,6 +468,7 @@ void Bvh::CalcAnimation(double time)
 		
 		it.frameTransformMatrix = q2m(q) * v2m(translate);
 	}
+	CalcFrameMatrices();
 }
 
 void Bvh::ResetAnim()
@@ -491,11 +492,10 @@ void Bvh::Draw(int animId, double time)
 		for (auto& it : m_frames) {
 			it.frameTransformMatrix = v2m(it.offset);
 		}
+		CalcFrameMatrices();
 	} else {
 		CalcAnimation(time);
 	}
-
-	CalcFrameMatrices();
 
 	if (g_type == "pivot") {
 		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{

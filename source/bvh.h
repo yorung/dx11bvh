@@ -34,12 +34,10 @@ private:
 	BONE_ID _getFrameIdByName(const char* name);
 	void _linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId);
 	void _storeWeight(MeshVertex& v, int frameId, float weight);
-	void CalcAnimation(int animId, double time);
 	void CalcFrameMatrices();
 	void DumpFrames(BONE_ID frameId, int depth) const;
 	void ParseMotion(const char *p);
 	void PreCalculateMotion();
-	void CalcAnimation(double time);
 	int GetDepth(BONE_ID id);
 	void CreateBoneMesh();
 	void CalcCombinedOffsets();
@@ -66,5 +64,6 @@ public:
 	void FixBones(const char* name);
 	void LinkTo(const char* me, const char* linkTo);
 	bool UnlinkFromParent(BONE_ID id);
+	void CalcAnimation(double time);
 };
 
