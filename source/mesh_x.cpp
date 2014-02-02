@@ -1279,7 +1279,7 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		while (xChild->siblingId >= 0 && (strstr(xChild->name, "_L_") || strstr(xChild->name, "_R_"))) {
 			xChild = &m_frames[xChild->siblingId];
 		}
-		Vec3 worldBvh = normalize(bvhChild->offsetCombined.Translation() - bvhF.offsetCombined.Translation());
+		Vec3 worldBvh = normalize(bvhChild->offsetCombined - bvhF.offsetCombined);
 		Vec3 worldTiny = normalize(xChild->result.Translation() - f->result.Translation());
 
 		Vec3 rotAxis = cross(worldTiny, worldBvh);

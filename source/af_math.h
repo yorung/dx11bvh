@@ -51,6 +51,8 @@ struct Vec3
 	Vec3 operator/(affloat r) const { return Vec3(x / r, y / r, z / r); }
 
 	Vec3 operator-() const { return Vec3(-x, -y, -z); }
+
+	Vec3 operator-=(const Vec3& r) { return *this = *this - r; }
 };
 
 struct Quat
@@ -131,3 +133,9 @@ inline Matrix translate(affloat x, affloat y, affloat z)
 	m._43 = z;
 	return m;
 }
+
+inline Matrix v2m(const Vec3& v)
+{
+	return translate(v.x, v.y, v.z);
+}
+

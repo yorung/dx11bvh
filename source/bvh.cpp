@@ -206,8 +206,8 @@ void Bvh::CreateBoneMesh()
 		}
 		int depth = GetDepth(pId);
 		BvhFrame& f1 = m_frames[pId];
-		Vector3 v1 = f1.offsetCombined.Translation();
-		Vector3 v2 = f2.offsetCombined.Translation();
+		Vector3 v1 = f1.offsetCombined;
+		Vector3 v2 = f2.offsetCombined;
 
 		static const DWORD depthToColor[] = {
 			0xffffffff,
@@ -305,7 +305,7 @@ void Bvh::_linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId)
 void Bvh::CalcBoneOffsetMatrix(BONE_ID frameId)
 {
 	BvhFrame& frame = m_frames[frameId];
-	frame.boneOffsetMatrix = inv(frame.offsetCombined);
+	frame.boneOffsetMatrix = v2m(-frame.offsetCombined);
 }
 
 void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
@@ -321,12 +321,10 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 			BvhFrame& frame = m_frames[frameId];
 
 			_getToken(child);	// "OFFSET"
-			float x = _getF(child);
-			float y = _getF(child);
-			float z = -_getF(child);
-			frame.offset = translate(x, y, z);
-
-			frame.offsetCombined = Matrix();
+			frame.offset.x = _getF(child);
+			frame.offset.y = _getF(child);
+			frame.offset.z = -_getF(child);
+			frame.offsetCombined = Vec3();
 
 			if (parentFrameId >= 0) {
 				_linkFrame(parentFrameId, frameId);
@@ -368,9 +366,9 @@ void Bvh::DumpFrames(BONE_ID frameId, int depth) const
 		printf(" ");
 	}
 	printf("%s(%d) p=%d s=%d c=%d ", f.name, frameId, f.parentId, f.siblingId, f.childId);
-	const Vector3& m = f.offset.Translation();
-	const Vector3& m2 = f.offsetCombined.Translation();
-	printf("(%3.3f,%3.3f,%3.3f) (%3.3f,%3.3f,%3.3f)", m.x, m.y, m.z, m2.x, m2.y, m2.z);
+	const Vec3& v = f.offset;
+	const Vec3& v2 = f.offsetCombined;
+	printf("(%3.3f,%3.3f,%3.3f) (%3.3f,%3.3f,%3.3f)", v.x, v.y, v.z, v2.x, v2.y, v2.z);
 	printf("\n");
 	if (f.siblingId >= 0) {
 		DumpFrames(f.siblingId, depth);
@@ -445,7 +443,7 @@ void Bvh::CalcFrameMatrices()
 void Bvh::CalcCombinedOffsets()
 {
 	for (auto& f : m_frames) {
-		f.offsetCombined = f.offset * (f.parentId >= 0 ? m_frames[f.parentId].offsetCombined : Matrix());
+		f.offsetCombined = f.offset + (f.parentId >= 0 ? m_frames[f.parentId].offsetCombined : Vec3());
 	}
 }
 
@@ -464,7 +462,7 @@ void Bvh::CalcAnimation(double time)
 		if (it.posIndies.x >= 0) {
 			transMat = q2m(rootAxisAlignQuat) * Matrix::CreateTranslation(mot[it.posIndies.x], mot[it.posIndies.y], -mot[it.posIndies.z]);
 		} else {
-			transMat = it.offset;
+			transMat = v2m(it.offset);
 		}
 		
 		it.frameTransformMatrix = q2m(q) * transMat;
@@ -474,7 +472,7 @@ void Bvh::CalcAnimation(double time)
 void Bvh::ResetAnim()
 {
 	for (auto& it : m_frames) {
-		it.frameTransformMatrix = it.offset;
+		it.frameTransformMatrix = v2m(it.offset);
 	}
 	CalcFrameMatrices();
 }
@@ -490,7 +488,7 @@ void Bvh::Draw(int animId, double time)
 
 	if (animId != 0) {
 		for (auto& it : m_frames) {
-			it.frameTransformMatrix = it.offset;
+			it.frameTransformMatrix = v2m(it.offset);
 		}
 	} else {
 		CalcAnimation(time);
@@ -585,7 +583,7 @@ void Bvh::LinkTo(const char* me, const char* linkTo)
 	f.siblingId = m_frames[linkToId].childId;
 	m_frames[linkToId].childId = id;
 
-	f.offset *= m_frames[linkToId].offset.Invert();
+	f.offset -= m_frames[linkToId].offset;
 
 	CalcCombinedOffsets();
 	for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++) {
