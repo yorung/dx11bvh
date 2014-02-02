@@ -324,6 +324,7 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 			frame.offset.x = _getF(child);
 			frame.offset.y = _getF(child);
 			frame.offset.z = -_getF(child);
+			frame.offset *= BVH_SCALE;
 			frame.offsetCombined = Vec3();
 
 			if (parentFrameId >= 0) {
@@ -460,7 +461,7 @@ void Bvh::CalcAnimation(double time)
 		Matrix transMat;
 		Quaternion q = pose.quats[i];
 		if (it.posIndies.x >= 0) {
-			transMat = Matrix::CreateTranslation(mot[it.posIndies.x], mot[it.posIndies.y], -mot[it.posIndies.z]);
+			transMat = Matrix::CreateTranslation(mot[it.posIndies.x] * BVH_SCALE, mot[it.posIndies.y] * BVH_SCALE, -mot[it.posIndies.z] * BVH_SCALE);
 		} else {
 			transMat = v2m(it.offset);
 		}

@@ -53,6 +53,7 @@ struct Vec3
 	Vec3 operator-() const { return Vec3(-x, -y, -z); }
 
 	Vec3 operator-=(const Vec3& r) { return *this = *this - r; }
+	Vec3 operator*=(affloat r) { return *this = *this * r; }
 };
 
 struct Quat

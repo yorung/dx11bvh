@@ -1,3 +1,5 @@
+const float BVH_SCALE = 2.5f;
+
 struct Pose
 {
 	std::vector<Quat> quats;
