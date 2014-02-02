@@ -460,7 +460,7 @@ void Bvh::CalcAnimation(double time)
 		Matrix transMat;
 		Quaternion q = pose.quats[i];
 		if (it.posIndies.x >= 0) {
-			transMat = q2m(rootAxisAlignQuat) * Matrix::CreateTranslation(mot[it.posIndies.x], mot[it.posIndies.y], -mot[it.posIndies.z]);
+			transMat = Matrix::CreateTranslation(mot[it.posIndies.x], mot[it.posIndies.y], -mot[it.posIndies.z]);
 		} else {
 			transMat = v2m(it.offset);
 		}
