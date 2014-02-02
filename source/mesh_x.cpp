@@ -1214,8 +1214,8 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 		Frame& f = m_frames[i];
 		BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
 		f.frameTransformMatrix = bvhBoneId < 0 ? f.initialMatrix : q2m(f.axisAlignQuat * rotAnim[bvhBoneId] * inv(f.axisAlignQuat)) * f.initialMatrix;
-		if (i == 0) {
-			f.frameTransformMatrix *= v2m(pos);
+		if (bvhBoneId == 0) {
+			f.frameTransformMatrix *= v2m(pos - (Vec3)f.frameTransformMatrix.Translation());
 		}
 	}
 
@@ -1243,7 +1243,8 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 
 void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 {
-	m_frames[0].initialMatrix *= XMMatrixRotationY(XM_PI);
+	BONE_ID idPelvis = _getFrameIdByName("Bip01_Pelvis");
+	m_frames[idPelvis].initialMatrix *= XMMatrixRotationY(XM_PI);
 
 	const char* xBoneNames[] = {
 		"Bip01_Pelvis",

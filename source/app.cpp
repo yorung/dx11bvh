@@ -242,7 +242,7 @@ void App::Draw()
 		Mesh* it = mesh[i];
 		MeshX* meshX = meshTiny[i];
 		if (it && meshX) {
-		//	it->Draw(animationNumber == 9 ? 0 : animationNumber, trackTime);
+			it->Draw(animationNumber == 9 ? 0 : animationNumber, trackTime);
 
 			Bvh* bvh = dynamic_cast<Bvh*>(it);
 
