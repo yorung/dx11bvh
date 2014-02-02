@@ -92,7 +92,7 @@ inline Quat m2q(const Matrix& m_)
 {
 	Matrix m = m_ * Matrix::CreateScale(1.0f / length(Vec3(m_._11, m_._12, m_._13)));	// kill scaling if needed
 
-	float x, y, z, w = afsqrt(m._11 + m._22 + m._33 + 1) / 2;
+	affloat x, y, z, w = afsqrt(m._11 + m._22 + m._33 + 1) / 2;
 	if (w > 0.5f) {							 // w is the largest
 		z = (m._12 - m._21) / (w * 4);
 		y = (m._31 - m._13) / (w * 4);
