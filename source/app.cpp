@@ -21,10 +21,11 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), lastX(-1), lastY(-1), sprite(nullptr), font(nullptr), meshTiny(nullptr), animationNumber(0), trackTime(0)
+App::App() : scale(1), lastX(-1), lastY(-1), sprite(nullptr), font(nullptr), animationNumber(0), trackTime(0)
 {
 	quat = XMQuaternionIdentity();
 	ZeroMemory(mesh, sizeof(mesh));
+	ZeroMemory(meshTiny, sizeof(meshTiny));
 	lastTime = GetTime();
 }
 
@@ -43,7 +44,9 @@ void App::Init(const char* fileName)
 	sprite = new SpriteBatch(deviceMan11.GetContext());
 	font = new SpriteFont(deviceMan11.GetDevice(), L"resource\\font.spritefont");
 
-	meshTiny = new MeshX("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\Media\\Tiny\\tiny.x");
+	for (auto& it : meshTiny) {
+		it = new MeshX("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\Media\\Tiny\\tiny.x");
+	}
 
 	if (fileName) {
 		const char* ext = strrchr(fileName, '.');
@@ -53,21 +56,23 @@ void App::Init(const char* fileName)
 			mesh[0] = new MeshX(fileName);
 		}
 	} else {
-		Bvh* bvh = new Bvh("D:\\github\\aachan.bvh");
-		mesh[0] = bvh;
-	//	mesh[0] = new Bvh("D:\\github\\aachan.bvh");
-	//	mesh[1] = new Bvh("D:\\github\\kashiyuka.bvh");
-	//	mesh[2] = new Bvh("D:\\github\\nocchi.bvh");
-
-		bvh->FixBones("Chest");
-		bvh->LinkTo("RightHip", "Chest");
-		bvh->LinkTo("LeftHip", "Chest");
-		bvh->FixBones("Neck");
-		bvh->LinkTo("RightCollar", "Neck");
-		bvh->LinkTo("LeftCollar", "Neck");
-
-		bvh->ResetAnim();
-		meshTiny->SyncLocalAxisWithBvh(bvh);
+		const char* bvhNames[] = {
+			"D:\\github\\aachan.bvh",
+			"D:\\github\\kashiyuka.bvh",
+			"D:\\github\\nocchi.bvh",
+		};
+		for (int i = 0; i < dimof(bvhNames); i++) {
+			Bvh* bvh = new Bvh(bvhNames[i]);
+			mesh[i] = bvh;
+			bvh->FixBones("Chest");
+			bvh->LinkTo("RightHip", "Chest");
+			bvh->LinkTo("LeftHip", "Chest");
+			bvh->FixBones("Neck");
+			bvh->LinkTo("RightCollar", "Neck");
+			bvh->LinkTo("LeftCollar", "Neck");
+			bvh->ResetAnim();
+			meshTiny[i]->SyncLocalAxisWithBvh(bvh);
+		}
 	}
 
 	float radius = CalcRadius(mesh[0]);
@@ -233,28 +238,28 @@ void App::Draw()
 
     sprite->Begin();
 
-	for (auto& it : mesh) {
-		if (it && meshTiny) {
-			it->Draw(animationNumber == 9 ? 0 : animationNumber, trackTime);
+	for (int i = 0; i < dimof(mesh); i++) {
+		Mesh* it = mesh[i];
+		MeshX* meshX = meshTiny[i];
+		if (it && meshX) {
+		//	it->Draw(animationNumber == 9 ? 0 : animationNumber, trackTime);
 
 			Bvh* bvh = dynamic_cast<Bvh*>(it);
 
 			if (bvh) {
 				if (animationNumber == 9) {
-					meshTiny->DrawBvh(bvh, trackTime);
+					meshX->DrawBvh(bvh, trackTime);
 				} else {
-					meshTiny->Draw(animationNumber, trackTime);
+					meshX->Draw(animationNumber, trackTime);
 				}
 				if (GetKeyState('T') & 0x01) {
 					DrawBoneNames(bvh);
 				}
 			}
 		}
-	}
-
-	MeshX* x = dynamic_cast<MeshX*>(meshTiny);
-	if (x && (GetKeyState('T') & 0x01)) {
-		DrawBoneNames(x);
+		if (meshX && (GetKeyState('T') & 0x01)) {
+			DrawBoneNames(meshX);
+		}
 	}
 
 	sprite->End();
@@ -262,10 +267,12 @@ void App::Draw()
 
 void App::Destroy()
 {
-	SAFE_DELETE(mesh[0]);
-	SAFE_DELETE(mesh[1]);
-	SAFE_DELETE(mesh[2]);
-	SAFE_DELETE(meshTiny);
+	for (auto& it : mesh) {
+		SAFE_DELETE(it);
+	}
+	for (auto& it : meshTiny) {
+		SAFE_DELETE(it);
+	}
 	SAFE_DELETE(font);
 	SAFE_DELETE(sprite);
 
