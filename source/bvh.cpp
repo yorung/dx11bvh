@@ -458,15 +458,15 @@ void Bvh::CalcAnimation(double time)
 
 	for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++) {
 		auto& it = m_frames[i];
-		Matrix transMat;
+		Vec3 translate;
 		Quaternion q = pose.quats[i];
 		if (it.posIndies.x >= 0) {
-			transMat = Matrix::CreateTranslation(mot[it.posIndies.x] * BVH_SCALE, mot[it.posIndies.y] * BVH_SCALE, -mot[it.posIndies.z] * BVH_SCALE);
+			translate = Vec3(mot[it.posIndies.x] * BVH_SCALE, mot[it.posIndies.y] * BVH_SCALE, -mot[it.posIndies.z] * BVH_SCALE);
 		} else {
-			transMat = v2m(it.offset);
+			translate = it.offset;
 		}
 		
-		it.frameTransformMatrix = q2m(q) * transMat;
+		it.frameTransformMatrix = q2m(q) * v2m(translate);
 	}
 }
 
