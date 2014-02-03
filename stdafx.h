@@ -33,9 +33,12 @@
 #include <DDSTextureLoader.h>
 #include <WICTextureLoader.h>
 #include <SpriteFont.h>
+#include <SimpleMath.h>
 using namespace DirectX;
+using namespace SimpleMath;
 
 // TODO: reference additional headers your program requires here
+#include "source/af_math.h"
 #include "source/device_man11.h"
 #include "source/tex_man11.h"
 #include "source/shader_man11.h"
