@@ -42,18 +42,16 @@ void App::Init(const char* fileName)
 	}
 
 	float radius = CalcRadius(mesh[0]);
-	scale = 1 / std::max(0.00001f, radius);
-
-	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, 0.1f, 1000.0f));
+	scale = std::max(0.00001f, radius);
 }
 
 void App::MouseWheel(float delta)
 {
 	if (delta > 0) {
-		scale *= 1.1f;
+		scale /= 1.1f;
 	}
 	if (delta < 0) {
-		scale /= 1.1f;
+		scale *= 1.1f;
 	}
 }
 
@@ -141,16 +139,14 @@ void App::Draw()
 	QueryPerformanceFrequency(&f);
 	double time = ((double)t.QuadPart / f.QuadPart);
 
-//	XMMATRIX mRot = XMMatrixRotationQuaternion(XMQuaternionRotationAxis(XMVectorSet(1, 0, 0, 0), time / 2 * XM_PI));
 	XMMATRIX mRot = XMMatrixRotationQuaternion(quat);
-	XMMATRIX mScale = XMMatrixScaling(scale, scale, scale);
 
-	matrixMan.Set(MatrixMan::WORLD, mScale * mRot);
+	matrixMan.Set(MatrixMan::WORLD, mRot);
 
-	float dist = 3;
-//	float rot = time / 5 * XM_PI;
+	float dist = 3 * scale;
 	float rot = XM_PI;
 	matrixMan.Set(MatrixMan::VIEW, XMMatrixLookAtLH(XMVectorSet(sin(rot) * dist, 0, cos(rot) * dist, 1), XMVectorSet(0, 0, 0, 0), XMVectorSet(0, 1, 0, 0)));
+	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, dist / 1000, dist * 1000));
 
     sprite->Begin();
 
