@@ -60,7 +60,7 @@ struct Quat
 {
 	Vec3 v;
 	affloat w;
-	Quat() : Quat(0, Vec3()) {}
+	Quat() : Quat(1, Vec3()) {}
 	Quat(affloat W, const Vec3& V) : w(W), v(V) {}
 	Quat(const Vec3& axis, affloat angle) { w = afcos(angle / 2); v = axis * afsin(angle / 2); }
 
