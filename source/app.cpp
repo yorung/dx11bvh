@@ -13,7 +13,6 @@ static float CalcRadius(const Mesh* m)
 
 App::App() : scale(1), lastX(-1), lastY(-1), sprite(nullptr), font(nullptr)
 {
-	quat = XMQuaternionIdentity();
 	ZeroMemory(mesh, sizeof(mesh));
 }
 
@@ -78,14 +77,13 @@ void App::MouseMove(float x, float y)
 	lastX = x;
 	lastY = y;
 
-	XMVECTOR axis = XMVectorSet(-dy, dx, 0, 0);
-	float len = XMVectorGetX(XMVector2Length(axis));
+	Vec3 axis(-dy, dx, 0);
+	float len = length(axis);
 	if (!len) {
 		return;
 	}
 
-	XMVECTOR q = XMQuaternionRotationAxis(axis, len * -2 * XM_PI);
-	quat = XMQuaternionMultiply(quat, q);
+	quat = quat * Quat(normalize(axis), len * -2 * XM_PI);
 }
 
 inline XMFLOAT2 GetScreenPos(const XMMATRIX& mLocal)
@@ -139,9 +137,7 @@ void App::Draw()
 	QueryPerformanceFrequency(&f);
 	double time = ((double)t.QuadPart / f.QuadPart);
 
-	XMMATRIX mRot = XMMatrixRotationQuaternion(quat);
-
-	matrixMan.Set(MatrixMan::WORLD, mRot);
+	matrixMan.Set(MatrixMan::WORLD, q2m(quat));
 
 	float dist = 3 * scale;
 	float rot = XM_PI;

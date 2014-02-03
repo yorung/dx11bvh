@@ -3,7 +3,7 @@ class App {
 	float scale;
 	float lastX;
 	float lastY;
-	XMVECTOR quat;
+	Quat quat;
 	SpriteBatch* sprite;
 	SpriteFont* font;
 public:
