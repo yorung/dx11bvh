@@ -72,10 +72,52 @@ struct Quat
 	Quat Conjugate() const { return Quat(w, -v); }
 };
 
-inline Matrix inv(const Matrix& m)
+struct Mat
 {
-	XMVECTOR dummy;
-	return XMMatrixInverse(&dummy, m);
+	union {
+		affloat m[16];
+		struct {
+			affloat _11, _12, _13, _14, _21, _22, _23, _24, _31, _32, _33, _34, _41, _42, _43, _44;
+		};
+	};
+
+	Mat() {
+		_11 = _22 = _33 = _44 = 1;
+		_12 = _13 = _14 = _21 = _23 = _24 = _31 = _32 = _34 = _41 = _42 = _43 = 0;
+	};
+
+	Mat(const Matrix& mtx) { assert(sizeof(float) == sizeof(affloat)); memcpy(m, mtx.m, sizeof(m)); }
+	operator Matrix() const { return Matrix(m); }
+};
+
+inline Matrix inv(const Matrix& mtx)
+{
+	Matrix l = mtx;
+	Matrix r;
+	for (int j = 0; j < 4; j++) {
+		int d = j;
+		affloat invDiag = 1 / l.m[j][d];
+		for (int i = 0; i < 4; i++) {
+			l.m[j][i] *= invDiag;
+			r.m[j][i] *= invDiag;
+		}
+
+		for (int jj = 0; jj < 4; jj++) {
+			if (jj == j) {
+				continue;
+			}
+			affloat mult = -l.m[jj][d];
+			for (int i = 0; i < 4; i++) {
+				l.m[jj][i] += l.m[j][i] * mult;
+				r.m[jj][i] += r.m[j][i] * mult;
+			}
+		}
+	}
+
+//	XMVECTOR dummy;
+//	Matrix rr =  XMMatrixInverse(&dummy, mtx);
+
+	return r;
 }
 
 inline Matrix q2m(const Quat& q)
