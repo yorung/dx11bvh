@@ -1017,16 +1017,16 @@ MeshX::~MeshX()
 	bonesRenderer.Destroy();
 }
 
-void MeshX::CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent)
+void MeshX::CalcFrameMatrices(BONE_ID frameId)
 {
 	Frame& f = m_frames[frameId];
-	XMMATRIX result = XMLoadFloat4x4(&f.frameTransformMatrix) * parent;
-	XMStoreFloat4x4(&f.result, result);
+	Matrix result = f.frameTransformMatrix * (f.parentId >= 0 ? m_frames[f.parentId].result : Matrix());
+	f.result = result;
 	if (f.siblingId >= 0) {
-		CalcFrameMatrices(f.siblingId, parent);
+		CalcFrameMatrices(f.siblingId);
 	}
 	if (f.childId >= 0) {
-		CalcFrameMatrices(f.childId, result);
+		CalcFrameMatrices(f.childId);
 	}
 }
 
@@ -1112,7 +1112,7 @@ void MeshX::Draw(int animId, double time)
 	assert(m_frames.size() <= dimof(BoneMatrices));
 
 	CalcAnimation(animId, time * m_animTicksPerSecond);
-	CalcFrameMatrices(0, XMMatrixIdentity());
+	CalcFrameMatrices(0);
 
 	if (g_type == "pivot") {
 		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
@@ -1189,7 +1189,7 @@ void MeshX::SyncLocalAxisWithBvh(Bvh* bvh)
 	for (auto& f : m_frames) {
 		f.frameTransformMatrix = f.initialMatrix;
 	}
-	CalcFrameMatrices(0, XMMatrixIdentity());
+	CalcFrameMatrices(0);
 	for (auto& f : m_frames) {
 		f.axisAlignQuat = m2q(f.result);
 	}
@@ -1205,7 +1205,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 
 	Matrix BonesForX[BONE_MAX];
 	for (auto& it : BonesForX) {
-		it = XMMatrixIdentity();
+		it = Matrix();
 	}
 
 	assert(m_frames.size() <= dimof(BonesForX));
@@ -1218,7 +1218,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 		}
 	}
 
-	CalcFrameMatrices(0, XMMatrixIdentity());
+	CalcFrameMatrices(0);
 
 	if (g_type == "pivot") {
 		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
@@ -1265,7 +1265,7 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		for (auto& f : m_frames) {
 			f.frameTransformMatrix = f.initialMatrix;
 		}
-		CalcFrameMatrices(0, XMMatrixIdentity());
+		CalcFrameMatrices(0);
 
 		const std::vector<BvhFrame>& bvhFrames = bvh->GetFrames();
 		BONE_ID bvhFrameId = GetBvhBoneIdByTinyBoneName(xBoneName, bvh);
