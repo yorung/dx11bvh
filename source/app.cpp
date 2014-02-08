@@ -43,6 +43,8 @@ void App::Init(const char* fileName)
 
 	float radius = CalcRadius(mesh[0]);
 	scale = std::max(0.00001f, radius);
+
+	height = radius / 2;
 }
 
 void App::MouseWheel(float delta)
@@ -72,19 +74,11 @@ void App::MouseMove(float x, float y)
 	if (lastX < 0 || lastY < 0) {
 		return;
 	}
-	float dx = x - lastX;
-	float dy = - (y - lastY);
+	rotX += (x - lastX) * XM_PI * 2.0f;
+	rotY += (y - lastY) * XM_PI * 2.0f;
 
 	lastX = x;
 	lastY = y;
-
-	Vec3 axis(-dy, dx, 0);
-	float len = length(axis);
-	if (!len) {
-		return;
-	}
-
-	quat = quat * Quat(normalize(axis), len * -2 * XM_PI);
 }
 
 inline XMFLOAT2 GetScreenPos(const XMMATRIX& mLocal)
@@ -138,14 +132,14 @@ void App::Draw()
 	QueryPerformanceFrequency(&f);
 	double time = ((double)t.QuadPart / f.QuadPart);
 
-	matrixMan.Set(MatrixMan::WORLD, q2m(quat));
+	matrixMan.Set(MatrixMan::WORLD, Matrix());
 
 	float dist = 3 * scale;
-	float rot = XM_PI;
-	matrixMan.Set(MatrixMan::VIEW, XMMatrixLookAtLH(XMVectorSet(sin(rot) * dist, 0, cos(rot) * dist, 1), XMVectorSet(0, 0, 0, 0), XMVectorSet(0, 1, 0, 0)));
+	Matrix cam = translate(0, height, -dist) * q2m(Quat(Vec3(1,0,0), rotY)) * q2m(Quat(Vec3(0,1,0), rotX));
+	matrixMan.Set(MatrixMan::VIEW, inv(cam));
 	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, dist / 1000, dist * 1000));
 
-    sprite->Begin();
+	sprite->Begin();
 
 	for (auto& it : mesh) {
 		if (it) {

@@ -3,7 +3,9 @@ class App {
 	float scale;
 	float lastX;
 	float lastY;
-	Quat quat;
+	float rotX;
+	float rotY;
+	float height;
 	SpriteBatch* sprite;
 	SpriteFont* font;
 	GridRenderer gridRenderer;
