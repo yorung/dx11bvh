@@ -46,7 +46,7 @@ void MeshRenderer11::Init(int sizeVertices, int sizeIndices, void* vertices, voi
 		{ "BLENDWEIGHTS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 36, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "BLENDINDICES", 0, DXGI_FORMAT_R8G8B8A8_UINT, 0, 48, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	shaderId = shaderMan.Create("dx11mesh.fx", layout, dimof(layout));
+	shaderId = shaderMan.Create("fx\\dx11mesh.fx", layout, dimof(layout));
 
 	D3D11_SUBRESOURCE_DATA subresData = { vertices, 0, 0 };
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeVertices, D3D11_BIND_VERTEX_BUFFER), &subresData, &pVertexBuffer);
