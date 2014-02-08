@@ -109,7 +109,7 @@ inline Matrix inv(const Matrix& mtx)
 			}
 		}
 		if (maxi < 0) {
-			return Matrix();
+			return Matrix();	// fail
 		}
 		if (maxi != d) {
 			for (int jj = 0; jj < 4; jj++) {
@@ -136,9 +136,6 @@ inline Matrix inv(const Matrix& mtx)
 			}
 		}
 	}
-
-	XMVECTOR dummy;
-	Matrix rr =  XMMatrixInverse(&dummy, mtx);
 
 	return r;
 }
