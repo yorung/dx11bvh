@@ -981,8 +981,7 @@ void MeshX::LoadSub(const char *fileName)
 
 	for (auto& f : m_frames) {
 		if (f.parentId >= 0) {
-			XMVECTOR dummy;
-			XMStoreFloat4x4(&f.initialMatrix, XMMatrixInverse(&dummy, XMLoadFloat4x4(&f.boneOffsetMatrix)) * XMLoadFloat4x4(&m_frames[f.parentId].boneOffsetMatrix));
+			f.initialMatrix = inv(f.boneOffsetMatrix) * m_frames[f.parentId].boneOffsetMatrix;
 			f.initialMatrix = Orthogonalization(f.initialMatrix);
 		}
 	}
