@@ -38,6 +38,7 @@ void App::Init(const char* fileName)
 	Destroy();
 
 	debugRenderer.Init();
+	gridRenderer.Init();
 
 	g_type = "mesh";
 
@@ -263,6 +264,8 @@ void App::Draw()
 	}
 
 	sprite->End();
+
+	gridRenderer.Draw();
 }
 
 void App::Destroy()
@@ -277,6 +280,7 @@ void App::Destroy()
 	SAFE_DELETE(sprite);
 
 	debugRenderer.Destroy();
+	gridRenderer.Destroy();
 }
 
 

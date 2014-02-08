@@ -89,6 +89,7 @@
     <ClInclude Include="source\bvh.h" />
     <ClInclude Include="source\debug_renderer.h" />
     <ClInclude Include="source\device_man11.h" />
+    <ClInclude Include="source\grid_renderer.h" />
     <ClInclude Include="source\matrix_man.h" />
     <ClInclude Include="source\mat_man.h" />
     <ClInclude Include="source\mesh_renderer11.h" />
@@ -104,6 +105,7 @@
     <ClCompile Include="source\bvh.cpp" />
     <ClCompile Include="source\debug_renderer.cpp" />
     <ClCompile Include="source\device_man11.cpp" />
+    <ClCompile Include="source\grid_renderer.cpp" />
     <ClCompile Include="source\matirx_man.cpp" />
     <ClCompile Include="source\mat_man.cpp" />
     <ClCompile Include="source\mesh_renderer11.cpp" />

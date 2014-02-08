@@ -10,6 +10,7 @@ class App {
 	int animationNumber;
 	double trackTime;
 	double lastTime;
+	GridRenderer gridRenderer;
 public:
 	App();
 	~App();
