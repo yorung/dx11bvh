@@ -47,6 +47,7 @@ using namespace SimpleMath;
 #include "source/mesh_renderer11.h"
 #include "source/mesh_x.h"
 #include "source/bvh.h"
+#include "source/grid_renderer.h"
 
 #include "source/app.h"
 

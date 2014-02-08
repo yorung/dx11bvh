@@ -24,6 +24,7 @@ void App::Init(const char* fileName)
 {
 	Destroy();
 
+	gridRenderer.Init();
 	sprite = new SpriteBatch(deviceMan11.GetContext());
 	font = new SpriteFont(deviceMan11.GetDevice(), L"resource\\font.spritefont");
 
@@ -158,6 +159,8 @@ void App::Draw()
 	}
 
 	sprite->End();
+
+	gridRenderer.Draw();
 }
 
 void App::Destroy()
@@ -167,4 +170,5 @@ void App::Destroy()
 	SAFE_DELETE(mesh[2]);
 	SAFE_DELETE(font);
 	SAFE_DELETE(sprite);
+	gridRenderer.Destroy();
 }

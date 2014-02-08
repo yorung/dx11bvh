@@ -6,6 +6,7 @@ class App {
 	Quat quat;
 	SpriteBatch* sprite;
 	SpriteFont* font;
+	GridRenderer gridRenderer;
 public:
 	App();
 	~App();
