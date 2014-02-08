@@ -77,7 +77,7 @@ struct Quat
 struct Mat
 {
 	union {
-		affloat m[16];
+		affloat m[4][4];
 		struct {
 			affloat _11, _12, _13, _14, _21, _22, _23, _24, _31, _32, _33, _34, _41, _42, _43, _44;
 		};
@@ -88,14 +88,20 @@ struct Mat
 		_12 = _13 = _14 = _21 = _23 = _24 = _31 = _32 = _34 = _41 = _42 = _43 = 0;
 	};
 
+	Mat(affloat m11, affloat m12, affloat m13, affloat m14, affloat m21, affloat m22, affloat m23, affloat m24, affloat m31, affloat m32, affloat m33, affloat m34, affloat m41, affloat m42, affloat m43, affloat m44) :
+		_11(m11), _12(m12), _13(m13), _14(m14),
+		_21(m21), _22(m22), _23(m23), _24(m24),
+		_31(m31), _32(m32), _33(m33), _34(m34),
+		_41(m41), _42(m42), _43(m43), _44(m44) {}
+
 	Mat(const Matrix& mtx) { assert(sizeof(float) == sizeof(affloat)); memcpy(m, mtx.m, sizeof(m)); }
-	operator Matrix() const { return Matrix(m); }
+	operator Matrix() const { return Matrix(_11, _12, _13, _14, _21, _22, _23, _24, _31, _32, _33, _34, _41, _42, _43, _44); }
 };
 
 inline Matrix inv(const Matrix& mtx)
 {
-	Matrix l = mtx;
-	Matrix r;
+	Mat l = mtx;
+	Mat r;
 	for (int j = 0; j < 4; j++) {
 		int d = j;
 
@@ -109,7 +115,7 @@ inline Matrix inv(const Matrix& mtx)
 			}
 		}
 		if (maxi < 0) {
-			return Matrix();	// fail
+			return Mat();	// fail
 		}
 		if (maxi != d) {
 			for (int jj = 0; jj < 4; jj++) {
@@ -140,12 +146,12 @@ inline Matrix inv(const Matrix& mtx)
 	return r;
 }
 
-inline Matrix q2m(const Quat& q)
+inline Mat q2m(const Quat& q)
 {
 #define D(a,b) (1 - 2 * (q.v.a * q.v.a + q.v.b * q.v.b)) // diagonal
 #define P(a,b,c) (2 * (q.v.a * q.v.b + q.v.c * q.w)) // positive
 #define N(a,b,c) (2 * (q.v.a * q.v.b - q.v.c * q.w)) // negative
-	return Matrix(D(y,z), P(x,y,z), N(x,z,y), 0,
+	return Mat(D(y,z), P(x,y,z), N(x,z,y), 0,
 		   N(x,y,z), D(x,z), P(y,z,x), 0,
 		   P(x,z,y), N(y,z,x), D(x,y), 0, 0,0,0,1);
 #undef D
@@ -155,7 +161,7 @@ inline Matrix q2m(const Quat& q)
 
 inline Quat m2q(const Matrix& m_)
 {
-	Matrix m = m_ * Matrix::CreateScale(1.0f / length(Vec3(m_._11, m_._12, m_._13)));	// kill scaling if needed
+	Mat m = m_ * Matrix::CreateScale(1.0f / length(Vec3(m_._11, m_._12, m_._13)));	// kill scaling if needed
 
 	affloat x, y, z, w = afsqrt(m._11 + m._22 + m._33 + 1) / 2;
 	if (w > 0.5f) {							 // w is the largest
@@ -188,9 +194,9 @@ inline Vec3 transform(const Vec3& v, const Matrix& m)
 #undef _
 }
 
-inline Matrix translate(affloat x, affloat y, affloat z)
+inline Mat translate(affloat x, affloat y, affloat z)
 {
-	Matrix m;
+	Mat m;
 	m._41 = x;
 	m._42 = y;
 	m._43 = z;
