@@ -811,16 +811,16 @@ MeshX::~MeshX()
 	m_meshRenderer.Destroy();
 }
 
-void MeshX::CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent)
+void MeshX::CalcFrameMatrices(BONE_ID frameId)
 {
 	Frame& f = m_frames[frameId];
-	XMMATRIX result = XMLoadFloat4x4(&f.frameTransformMatrix) * parent;
-	XMStoreFloat4x4(&f.result, result);
+	Matrix result = f.frameTransformMatrix * (f.parentId >= 0 ? m_frames[f.parentId].result : Matrix());
+	f.result = result;
 	if (f.siblingId >= 0) {
-		CalcFrameMatrices(f.siblingId, parent);
+		CalcFrameMatrices(f.siblingId);
 	}
 	if (f.childId >= 0) {
-		CalcFrameMatrices(f.childId, result);
+		CalcFrameMatrices(f.childId);
 	}
 }
 
@@ -901,7 +901,7 @@ void MeshX::Draw(int animId, double time)
 	assert(m_frames.size() <= dimof(BoneMatrices));
 
 	CalcAnimation(animId, time * m_animTicksPerSecond);
-	CalcFrameMatrices(0, XMMatrixIdentity());
+	CalcFrameMatrices(0);
 
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		Frame& f = m_frames[i];
