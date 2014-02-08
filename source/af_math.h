@@ -96,10 +96,14 @@ inline Matrix inv(const Matrix& mtx)
 	Matrix r;
 	for (int j = 0; j < 4; j++) {
 		int d = j;
-		affloat invDiag = 1 / l.m[j][d];
-		for (int i = 0; i < 4; i++) {
-			l.m[j][i] *= invDiag;
-			r.m[j][i] *= invDiag;
+
+		affloat diag = l.m[j][d];
+		if (!diag) {
+			continue;
+		}
+		for (int jj = 0; jj < 4; jj++) {
+			l.m[d][jj] /= diag;
+			r.m[d][jj] /= diag;
 		}
 
 		for (int jj = 0; jj < 4; jj++) {
@@ -114,8 +118,8 @@ inline Matrix inv(const Matrix& mtx)
 		}
 	}
 
-//	XMVECTOR dummy;
-//	Matrix rr =  XMMatrixInverse(&dummy, mtx);
+	XMVECTOR dummy;
+	Matrix rr =  XMMatrixInverse(&dummy, mtx);
 
 	return r;
 }
