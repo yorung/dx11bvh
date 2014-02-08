@@ -97,7 +97,7 @@ inline Matrix inv(const Matrix& mtx)
 	for (int j = 0; j < 4; j++) {
 		int d = j;
 
-		affloat diag = l.m[j][d];
+		affloat diag = l.m[d][j];
 		if (!diag) {
 			continue;
 		}
@@ -106,14 +106,14 @@ inline Matrix inv(const Matrix& mtx)
 			r.m[d][jj] /= diag;
 		}
 
-		for (int jj = 0; jj < 4; jj++) {
-			if (jj == j) {
+		for (int i = 0; i < 4; i++) {
+			if (i == j) {
 				continue;
 			}
-			affloat mult = -l.m[jj][d];
-			for (int i = 0; i < 4; i++) {
-				l.m[jj][i] += l.m[j][i] * mult;
-				r.m[jj][i] += r.m[j][i] * mult;
+			affloat mult = -l.m[i][j];
+			for (int jj = 0; jj < 4; jj++) {
+				l.m[i][jj] += l.m[d][jj] * mult;
+				r.m[i][jj] += r.m[d][jj] * mult;
 			}
 		}
 	}
