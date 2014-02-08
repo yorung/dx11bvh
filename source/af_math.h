@@ -19,6 +19,8 @@ inline double afsin(double s) { return sin(s); }
 inline float afcos(float s) { return cosf(s); }
 inline double afcos(double s) { return cos(s); }
 
+template <class T> inline void swap(T& a, T& b) { T t = a; a = b; b = t; }
+
 template <class VEC3> inline affloat length(const VEC3& v)
 {
 	return afsqrt(dot(v, v));
@@ -97,10 +99,27 @@ inline Matrix inv(const Matrix& mtx)
 	for (int j = 0; j < 4; j++) {
 		int d = j;
 
-		affloat diag = l.m[d][j];
-		if (!diag) {
-			continue;
+		affloat maxf = 0;
+		int maxi = -1;
+		for (int i = d; i < 4; i++) {
+			affloat v = abs(l.m[i][j]);
+			if (v > maxf) {
+				maxf = v;
+				maxi = i;
+			}
 		}
+		if (maxi < 0) {
+			return Matrix();
+		}
+		if (maxi != d) {
+			for (int jj = 0; jj < 4; jj++) {
+				swap(l.m[d][jj], l.m[maxi][jj]);
+				swap(r.m[d][jj], r.m[maxi][jj]);
+			}
+		}
+
+		affloat diag = l.m[d][j];
+		assert(diag);
 		for (int jj = 0; jj < 4; jj++) {
 			l.m[d][jj] /= diag;
 			r.m[d][jj] /= diag;
