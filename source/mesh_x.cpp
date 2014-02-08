@@ -393,7 +393,7 @@ struct SkinWeights {
 	std::vector<float> vertexWeight;
 	std::string frameName;
 	int frameId;
-	XMFLOAT4X4 mtx;
+	Matrix mtx;
 	const SkinWeights& operator=(const SkinWeights& r) {
 		vertexIndices = r.vertexIndices;
 		vertexWeight = r.vertexWeight;
@@ -858,7 +858,7 @@ void MeshX::CalcAnimation(int animId, double time)
 		}
 
 		bool stored = false;
-		XMMATRIX rotMat = XMMatrixIdentity(), scaleMat = XMMatrixIdentity(), transMat = XMMatrixIdentity();
+		Matrix rotMat, scaleMat, transMat;
 		for (auto itKey : anim.animationKeys) {
 
 			double maxTime = itKey.timedFloatKeys.rbegin()->time;
@@ -874,11 +874,9 @@ void MeshX::CalcAnimation(int animId, double time)
 				if (iTime < (int)t1.time || iTime >= (int)t2.time) {
 					continue;
 				}
-				XMMATRIX mat = Interpolate(XMLoadFloat4x4(&t1.mat), XMLoadFloat4x4(&t2.mat), (float)((timeMod - t1.time) / (t2.time - t1.time)));
-				XMFLOAT4X4 f4x4;
-				XMStoreFloat4x4(&f4x4, mat);
+				Matrix mat = Interpolate(t1.mat, t2.mat, (float)((timeMod - t1.time) / (t2.time - t1.time)));
 				switch (itKey.keyType) {
-				case 3: f.frameTransformMatrix = f4x4; stored = true; break;
+				case 3: f.frameTransformMatrix = mat; stored = true; break;
 				case 0: rotMat = mat; break;
 				case 1: scaleMat = mat; break;
 				case 2: transMat = mat; break;
@@ -887,7 +885,7 @@ void MeshX::CalcAnimation(int animId, double time)
 			}
 		}
 		if (!stored) {
-			XMStoreFloat4x4(&f.frameTransformMatrix, scaleMat * rotMat * transMat);
+			f.frameTransformMatrix = scaleMat * rotMat * transMat;
 		}
 	}
 }
