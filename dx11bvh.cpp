@@ -145,7 +145,7 @@ BOOL InitInstance(HINSTANCE hInstance)
 
    RECT r;
    SetRect(&r, 0, 0, SCR_W, SCR_H);
-   AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, FALSE);
+   AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, TRUE);
    hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
 	   CW_USEDEFAULT, CW_USEDEFAULT, r.right - r.left, r.bottom - r.top, NULL, NULL, hInstance, NULL);
 
