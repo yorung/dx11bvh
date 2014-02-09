@@ -213,9 +213,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 	case WM_LBUTTONDOWN:
+		SetCapture(hWnd);
 		app.LButtonDown(LOWORD(lParam) / (float)SCR_W, HIWORD(lParam) / (float)SCR_H);
 		break;
 	case WM_LBUTTONUP:
+		ReleaseCapture();
 		app.LButtonUp(LOWORD(lParam) / (float)SCR_W, HIWORD(lParam) / (float)SCR_H);
 		break;
 	case WM_MOUSEMOVE:
