@@ -191,6 +191,10 @@ Bvh::Bvh(const char *fileName)
 	
     SetCurrentDirectoryA(strCWD);
 
+	CalcCombinedOffsets();
+	for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++) {
+		CalcBoneOffsetMatrix(i);
+	}
 	CreateBoneMesh();
 }
 

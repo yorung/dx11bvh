@@ -65,12 +65,12 @@ void App::Init(const char* fileName)
 		for (int i = 0; i < dimof(bvhNames); i++) {
 			Bvh* bvh = new Bvh(bvhNames[i]);
 			mesh[i] = bvh;
-			bvh->FixBones("Chest");
-			bvh->LinkTo("RightHip", "Chest");
-			bvh->LinkTo("LeftHip", "Chest");
-			bvh->FixBones("Neck");
-			bvh->LinkTo("RightCollar", "Neck");
-			bvh->LinkTo("LeftCollar", "Neck");
+		//	bvh->FixBones("Chest");
+		//	bvh->LinkTo("RightHip", "Chest");
+		//	bvh->LinkTo("LeftHip", "Chest");
+		//	bvh->FixBones("Neck");
+		//	bvh->LinkTo("RightCollar", "Neck");
+		//	bvh->LinkTo("LeftCollar", "Neck");
 			bvh->ResetAnim();
 			meshTiny[i]->SyncLocalAxisWithBvh(bvh);
 		}
