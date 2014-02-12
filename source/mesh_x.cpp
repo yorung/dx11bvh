@@ -1229,8 +1229,9 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 	}
 
 	assert(m_frames.size() <= dimof(BonesForX));
-	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-		Frame& f = m_frames[i];
+
+	for (FrameIterator it(m_frames); it.GetCurrent() >= 0; ++it) {
+		Frame& f = m_frames[it.GetCurrent()];
 		BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
 		f.frameTransformMatrix = bvhBoneId < 0 ? f.initialMatrix : q2m(f.axisAlignQuat * rotAnim[bvhBoneId] * inv(f.axisAlignQuat)) * f.initialMatrix;
 		if (bvhBoneId == 0) {
