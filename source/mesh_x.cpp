@@ -353,10 +353,11 @@ public:
 		}
 	}
 };
-int MeshX::GetDepth(BONE_ID id)
+
+int MeshX::GetDepth(BONE_ID id) const
 {
 	int depth = 0;
-	Frame* f = &m_frames[id];
+	const Frame* f = &m_frames[id];
 	for (; f->parentId >= 0; depth++) {
 		f = &m_frames[f->parentId];
 	}
@@ -868,31 +869,28 @@ void MeshX::DeleteDummyFrames()
 	}
 }
 
-void MeshX::DumpFrames(BONE_ID frameId, int depth) const
+void MeshX::DumpFrames() const
 {
-	const Frame& f = m_frames[frameId];
-	for (int i = 0; i < depth; i++) {
-		printf(" ");
-	}
-//	printf("%s(%d) p=%d s=%d c=%d\n", f.name, frameId, f.parentId, f.siblingId, f.childId);
-	printf("%s: ", f.name);
-	for (int r = 0; r < 4; r++) {
-		for (int c = 0; c < 4; c++) {
-			float m = f.initialMatrix.m[r][c];
-			if (m - int(m)) {
-				printf("%.2f,", m);
-			}else{
-				printf("%d,", (int)m);
-			}
+	for (FrameIterator it(m_frames); it.GetCurrent() >= 0; ++it) {
+		const Frame& f = m_frames[it.GetCurrent()];
+
+		for (int i = 0; i < GetDepth(it.GetCurrent()); i++) {
+			printf(" ");
 		}
-		printf(" ");
-	}
-	printf("\n");
-	if (f.siblingId >= 0) {
-		DumpFrames(f.siblingId, depth);
-	}
-	if (f.childId >= 0) {
-		DumpFrames(f.childId, depth + 1);
+	//	printf("%s(%d) p=%d s=%d c=%d\n", f.name, frameId, f.parentId, f.siblingId, f.childId);
+		printf("%s: ", f.name);
+		for (int r = 0; r < 4; r++) {
+			for (int c = 0; c < 4; c++) {
+				float m = f.initialMatrix.m[r][c];
+				if (m - int(m)) {
+					printf("%.2f,", m);
+				}else{
+					printf("%d,", (int)m);
+				}
+			}
+			printf(" ");
+		}
+		printf("\n");
 	}
 }
 
@@ -1029,7 +1027,7 @@ void MeshX::LoadSub(const char *fileName)
 	}
 
 	printf("===============DumpFrames begin\n");
-	DumpFrames(0, 0);
+	DumpFrames();
 	printf("===============DumpFrames end\n");
 
 	printf("===============DumpStatistics begin\n");
@@ -1043,16 +1041,12 @@ MeshX::~MeshX()
 	bonesRenderer.Destroy();
 }
 
-void MeshX::CalcFrameMatrices(BONE_ID frameId)
+void MeshX::CalcFrameMatrices()
 {
-	Frame& f = m_frames[frameId];
-	Matrix result = f.frameTransformMatrix * (f.parentId >= 0 ? m_frames[f.parentId].result : Matrix());
-	f.result = result;
-	if (f.siblingId >= 0) {
-		CalcFrameMatrices(f.siblingId);
-	}
-	if (f.childId >= 0) {
-		CalcFrameMatrices(f.childId);
+	for (FrameIterator it(m_frames); it.GetCurrent() >= 0; ++it) {
+		Frame& f = m_frames[it.GetCurrent()];
+		Matrix result = f.frameTransformMatrix * (f.parentId >= 0 ? m_frames[f.parentId].result : Matrix());
+		f.result = result;
 	}
 }
 
@@ -1138,7 +1132,7 @@ void MeshX::Draw(int animId, double time)
 	assert(m_frames.size() <= dimof(BoneMatrices));
 
 	CalcAnimation(animId, time * m_animTicksPerSecond);
-	CalcFrameMatrices(0);
+	CalcFrameMatrices();
 
 	if (g_type == "pivot") {
 		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
@@ -1215,7 +1209,7 @@ void MeshX::SyncLocalAxisWithBvh(Bvh* bvh)
 	for (auto& f : m_frames) {
 		f.frameTransformMatrix = f.initialMatrix;
 	}
-	CalcFrameMatrices(0);
+	CalcFrameMatrices();
 	for (auto& f : m_frames) {
 		f.axisAlignQuat = m2q(f.result);
 	}
@@ -1244,7 +1238,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 		}
 	}
 
-	CalcFrameMatrices(0);
+	CalcFrameMatrices();
 
 	if (g_type == "pivot") {
 		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
@@ -1291,7 +1285,7 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		for (auto& f : m_frames) {
 			f.frameTransformMatrix = f.initialMatrix;
 		}
-		CalcFrameMatrices(0);
+		CalcFrameMatrices();
 
 		const std::vector<BvhFrame>& bvhFrames = bvh->GetFrames();
 		BONE_ID bvhFrameId = GetBvhBoneIdByTinyBoneName(xBoneName, bvh);

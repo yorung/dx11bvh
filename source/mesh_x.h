@@ -134,10 +134,10 @@ private:
 	void _linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId);
 	void _storeWeight(MeshVertex& v, int frameId, float weight);
 	void CalcAnimation(int animId, double time);
-	void CalcFrameMatrices(BONE_ID frameId);
-	void DumpFrames(BONE_ID frameId, int depth) const;
+	void CalcFrameMatrices();
+	void DumpFrames() const;
 	void CreateBoneMesh();
-	int GetDepth(BONE_ID id);
+	int GetDepth(BONE_ID id) const;
 	void PrintStatistics() const;
 	void GetVertStatistics(std::vector<int>& cnts) const;
 	void GetAnimStatistics(std::vector<int>& animCnts) const;
