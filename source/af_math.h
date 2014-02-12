@@ -166,10 +166,10 @@ inline Mat q2m(const Quat& q)
 
 inline Quat m2q(const Matrix& m_)
 {
-#ifdef USE_DXMATH
-	return Quaternion::CreateFromRotationMatrix(m_);
-#else
 	Mat m = m_ * Matrix::CreateScale(1.0f / length(Vec3(m_._11, m_._12, m_._13)));	// kill scaling if needed
+#ifdef USE_DXMATH
+	return Quaternion::CreateFromRotationMatrix(m);
+#else
 
 	affloat x, y, z, w = afsqrt(m._11 + m._22 + m._33 + 1) / 2;
 	if (w > 0.5f) {							 // w is the largest
