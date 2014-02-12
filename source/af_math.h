@@ -1,3 +1,5 @@
+#define USE_DXMATH
+
 typedef float affloat;
 
 template <class VEC3> inline affloat dot(const VEC3& l, const VEC3& r)
@@ -100,6 +102,9 @@ struct Mat
 
 inline Matrix inv(const Matrix& mtx)
 {
+#ifdef USE_DXMATH
+	return mtx.Invert();
+#else
 	Mat l = mtx;
 	Mat r;
 	for (int j = 0; j < 4; j++) {
@@ -142,8 +147,8 @@ inline Matrix inv(const Matrix& mtx)
 			}
 		}
 	}
-
 	return r;
+#endif
 }
 
 inline Mat q2m(const Quat& q)
@@ -161,6 +166,9 @@ inline Mat q2m(const Quat& q)
 
 inline Quat m2q(const Matrix& m_)
 {
+#ifdef USE_DXMATH
+	return Quaternion::CreateFromRotationMatrix(m_);
+#else
 	Mat m = m_ * Matrix::CreateScale(1.0f / length(Vec3(m_._11, m_._12, m_._13)));	// kill scaling if needed
 
 	affloat x, y, z, w = afsqrt(m._11 + m._22 + m._33 + 1) / 2;
@@ -185,6 +193,7 @@ inline Quat m2q(const Matrix& m_)
 		y = (m._23 + m._32) / (z * 4);
 	}
 	return Quat(w, Vec3(x,y,z));
+#endif
 }
 
 inline Vec3 transform(const Vec3& v, const Matrix& m)
