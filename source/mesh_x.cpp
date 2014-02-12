@@ -1230,13 +1230,25 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 
 	assert(m_frames.size() <= dimof(BonesForX));
 
+	Matrix appliedRot[BONE_MAX];
 	for (FrameIterator it(m_frames); it.GetCurrent() >= 0; ++it) {
 		Frame& f = m_frames[it.GetCurrent()];
+
+		Matrix applied = f.parentId < 0 ? Matrix() : appliedRot[f.parentId];
+
 		BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
-		f.frameTransformMatrix = bvhBoneId < 0 ? f.initialMatrix : q2m(f.axisAlignQuat * rotAnim[bvhBoneId] * inv(f.axisAlignQuat)) * f.initialMatrix;
+		Matrix toApply = bvhBoneId < 0 ? Matrix() : q2m(m2q(bvh->GetFrames()[bvhBoneId].result));
+
+		Matrix diff = toApply * inv(applied);
+
+		Matrix right = bvhBoneId < 0 ? Matrix() : q2m(rotAnim[bvhBoneId]);
+
+		f.frameTransformMatrix = q2m(f.axisAlignQuat) * diff * q2m(inv(f.axisAlignQuat)) * f.initialMatrix;
 		if (bvhBoneId == 0) {
 			f.frameTransformMatrix *= v2m(pos - (Vec3)f.frameTransformMatrix.Translation());
 		}
+
+		appliedRot[it.GetCurrent()] = toApply;
 	}
 
 	CalcFrameMatrices();
