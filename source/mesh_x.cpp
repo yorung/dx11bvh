@@ -327,6 +327,32 @@ static MatMan::MMID _getMaterial(char*& p)
 	return matMan.Create(mat);
 }
 
+class FrameIterator
+{
+	const std::vector<Frame>& frames;
+	BONE_ID cur;
+public:
+	FrameIterator(const std::vector<Frame>& f) : cur(0), frames(f) {}
+	BONE_ID GetCurrent() { return cur; }
+	void operator++() {
+		if (frames[cur].childId >= 0) {
+			cur = frames[cur].childId;
+			return;
+		}
+		for(;;) {
+			if (frames[cur].siblingId >= 0) {
+				cur = frames[cur].siblingId;
+				return;
+			}
+			if (frames[cur].parentId >= 0) {
+				cur = frames[cur].parentId;
+			} else {
+				cur = -1;
+				return;
+			}
+		}
+	}
+};
 int MeshX::GetDepth(BONE_ID id)
 {
 	int depth = 0;
