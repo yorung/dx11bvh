@@ -1,4 +1,4 @@
-#define USE_DXMATH
+//#define USE_DXMATH
 
 typedef float affloat;
 
@@ -184,8 +184,8 @@ inline Quat m2q(const Matrix& m_)
 	} else if (m._22 > m._33) {					// y is the largest
 		y = afsqrt((m._11 - m._22 + m._33 - 1) / -4);
 		x = (m._12 + m._21) / (y * 4);
-		z = (m._31 - m._13) / (y * 4);
-		w = (m._23 + m._32) / (y * 4);
+		w = (m._31 - m._13) / (y * 4);
+		z = (m._23 + m._32) / (y * 4);
 	} else {									// z is the largest
 		z = afsqrt((m._11 + m._22 - m._33 - 1) / -4);
 		w = (m._12 - m._21) / (z * 4);
