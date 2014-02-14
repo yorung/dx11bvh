@@ -96,11 +96,18 @@ struct Mat
 		_31(m31), _32(m32), _33(m33), _34(m34),
 		_41(m41), _42(m42), _43(m43), _44(m44) {}
 
+	Mat operator*(const Mat& r) const {
+#define m(i,j) (_##i####1## * r._##1####j## + _##i####2## * r._##2####j## + _##i####3## * r._##3####j## +_##i####4## * r._##4####j##)
+		return Mat(m(1,1), m(1,2), m(1,3), m(1,4), m(2,1), m(2,2), m(2,3), m(2,4), m(3,1), m(3,2), m(3,3), m(3,4), m(4,1), m(4,2), m(4,3), m(4,4));
+#undef m
+	}
+	const Mat& operator*=(const Mat& r) { *this = *this * r; return *this; }
+
 	Mat(const Matrix& mtx) { assert(sizeof(float) == sizeof(affloat)); memcpy(m, mtx.m, sizeof(m)); }
 	operator Matrix() const { return Matrix(_11, _12, _13, _14, _21, _22, _23, _24, _31, _32, _33, _34, _41, _42, _43, _44); }
 };
 
-inline Matrix inv(const Matrix& mtx)
+inline Mat inv(const Matrix& mtx)
 {
 #ifdef USE_DXMATH
 	return mtx.Invert();
@@ -212,7 +219,7 @@ inline Mat translate(affloat x, affloat y, affloat z)
 	return m;
 }
 
-inline Matrix v2m(const Vec3& v)
+inline Mat v2m(const Vec3& v)
 {
 	return translate(v.x, v.y, v.z);
 }

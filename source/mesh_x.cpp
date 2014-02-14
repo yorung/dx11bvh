@@ -393,8 +393,8 @@ void MeshX::CreateBoneMesh()
 			0xff0000ff,
 			0xff000000,
 		};
-		Vector3 v1 = inv(f1.boneOffsetMatrix).Translation();
-		Vector3 v2 = inv(f2.boneOffsetMatrix).Translation();
+		Vector3 v1 = Matrix(inv(f1.boneOffsetMatrix)).Translation();
+		Vector3 v2 = Matrix(inv(f2.boneOffsetMatrix)).Translation();
 		CreateCone(bones, v1, v2, pId, depthToColor[depth % dimof(depthToColor)]);
 	}
 
@@ -1005,7 +1005,7 @@ void MeshX::LoadSub(const char *fileName)
 
 	for (auto& f : m_frames) {
 		if (f.parentId >= 0) {
-			f.initialMatrix = inv(f.boneOffsetMatrix) * m_frames[f.parentId].boneOffsetMatrix;
+			f.initialMatrix = inv(f.boneOffsetMatrix) * (Mat)m_frames[f.parentId].boneOffsetMatrix;
 			f.initialMatrix = Orthogonalization(f.initialMatrix);
 		}
 	}
@@ -1243,7 +1243,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 
 	//	Quat diff = bvhBoneId < 0 ? Quat() : rotAnim[bvhBoneId];
 
-		f.frameTransformMatrix = q2m(f.axisAlignQuat * diff * inv(f.axisAlignQuat)) * f.initialMatrix;
+		f.frameTransformMatrix = q2m(f.axisAlignQuat * diff * inv(f.axisAlignQuat)) * (Mat)f.initialMatrix;
 		if (bvhBoneId == 0) {
 			f.frameTransformMatrix *= v2m(pos - (Vec3)f.frameTransformMatrix.Translation());
 		}
