@@ -1330,8 +1330,4 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 
 		f->initialMatrix = Matrix::CreateFromAxisAngle(rotAxisLocal, rotRad) * f->initialMatrix;
 	}
-
-	for (auto& it : m_frames) {
-		it.initialMatrix = Orthogonalization(it.initialMatrix);
-	}
 }
