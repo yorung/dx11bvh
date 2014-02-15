@@ -18,8 +18,8 @@ struct BvhFrame
 	BONE_ID parentId;
 	BONE_ID childId;
 	BONE_ID siblingId;
-	XMINT3 rotIndies;
-	XMINT3 posIndies;
+	XMINT3 rotIndices;
+	XMINT3 posIndices;
 	Matrix frameTransformMatrix;
 	Matrix boneOffsetMatrix;
 	Matrix result;
