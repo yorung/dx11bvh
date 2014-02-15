@@ -1276,7 +1276,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 {
 	BONE_ID idPelvis = _getFrameIdByName("Bip01_Pelvis");
-	m_frames[idPelvis].initialMatrix *= (Mat)(Matrix)XMMatrixRotationY(XM_PI);
+	m_frames[idPelvis].boneAlignQuat = Quat(Vec3(0,1,0), XM_PI);
 
 	const char* xBoneNames[] = {
 		"Bip01_Pelvis",
@@ -1295,6 +1295,7 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 	};
 
 	for(const char* xBoneName : xBoneNames) {
+
 		for (auto& f : m_frames) {
 			f.frameTransformMatrix = q2m(f.boneAlignQuat) * f.initialMatrix;
 		}
@@ -1327,6 +1328,6 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		Matrix rotMat = f->result;
 		rotMat._41 = rotMat._42 = rotMat._43 = 0;
 		Vec3 rotAxisLocal = transform(rotAxis, inv(rotMat));
-		f->boneAlignQuat = Quat(rotAxisLocal, rotRad);
+		f->boneAlignQuat *= Quat(rotAxisLocal, rotRad);
 	}
 }
