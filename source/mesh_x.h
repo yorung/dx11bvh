@@ -97,8 +97,6 @@ struct Frame
 	BONE_ID parentId;
 	BONE_ID childId;
 	BONE_ID siblingId;
-	Quat axisAlignQuat;
-	Quat boneAlignQuat;
 };
 
 struct Block
@@ -119,6 +117,12 @@ struct MeshXAnimResult
 	Mat boneMat[BONE_MAX];
 };
 
+struct MeshXBvhBinding
+{
+	Quat axisAlignQuats[BONE_MAX];
+	Quat boneAlignQuats[BONE_MAX];
+};
+
 class MeshX : public Mesh
 {
 private:
@@ -132,7 +136,8 @@ private:
 	void LoadSub(const char* fileName);
 	void _pushMaterialMap(Block& block, const MaterialMap& map);
 	void _mergeBlocks(Block& d, const Block& s);
-	BONE_ID _getFrameIdByName(const char* name);
+	BONE_ID GetOrCreateFrameIdByName(const char* name);
+	BONE_ID GetFrameIdByName(const char* name) const;
 	void _linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId);
 	void _storeWeight(MeshVertex& v, int frameId, float weight);
 	void CalcFrameMatrices(MeshXAnimResult& animResult, const Mat localMats[BONE_MAX]) const;
@@ -144,7 +149,7 @@ private:
 	void GetAnimStatistics(std::vector<int>& animCnts) const;
 	void DeleteDummyFrames();
 	bool UnlinkFrame(BONE_ID id);
-	void ApplyBvhInitialStance(const Bvh* bvh);
+	void ApplyBvhInitialStance(const Bvh* bvh, MeshXBvhBinding& bind) const;
 
 	std::vector<Frame> m_frames;
 	std::vector<AnimationSet> m_animationSets;
@@ -159,8 +164,8 @@ public:
 	MeshX(const char *fileName);
 	~MeshX();
 	void CalcAnimation(int animId, double time, MeshXAnimResult& result) const;
-	void CalcAnimationFromBvh(class Bvh* bvh, double time, MeshXAnimResult& animResult) const;
+	void CalcAnimationFromBvh(class Bvh* bvh, const MeshXBvhBinding& bind, double time, MeshXAnimResult& animResult) const;
 	void Draw(const MeshXAnimResult& animResult) const;
-	void SyncLocalAxisWithBvh(Bvh* bvh);
+	void SyncLocalAxisWithBvh(Bvh* bvh, MeshXBvhBinding& bind) const;
 };
 

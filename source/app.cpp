@@ -21,11 +21,10 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), lastX(-1), lastY(-1), sprite(nullptr), font(nullptr), animationNumber(0), trackTime(0)
+App::App() : scale(1), lastX(-1), lastY(-1), sprite(nullptr), font(nullptr), animationNumber(0), trackTime(0), meshTiny(nullptr)
 {
 	quat = XMQuaternionIdentity();
 	ZeroMemory(mesh, sizeof(mesh));
-	ZeroMemory(meshTiny, sizeof(meshTiny));
 	lastTime = GetTime();
 }
 
@@ -44,10 +43,7 @@ void App::Init(const char* fileName)
 
 	sprite = new SpriteBatch(deviceMan11.GetContext());
 	font = new SpriteFont(deviceMan11.GetDevice(), L"resource\\font.spritefont");
-
-	for (auto& it : meshTiny) {
-		it = new MeshX("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\Media\\Tiny\\tiny.x");
-	}
+	meshTiny = new MeshX("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\Media\\Tiny\\tiny.x");
 
 	if (fileName) {
 		const char* ext = strrchr(fileName, '.');
@@ -72,7 +68,7 @@ void App::Init(const char* fileName)
 		//	bvh->LinkTo("RightCollar", "Neck");
 		//	bvh->LinkTo("LeftCollar", "Neck");
 			bvh->ResetAnim();
-			meshTiny[i]->SyncLocalAxisWithBvh(bvh);
+			meshTiny->SyncLocalAxisWithBvh(bvh, bind[i]);
 		}
 	}
 
@@ -241,7 +237,7 @@ void App::Draw()
 
 	for (int i = 0; i < dimof(mesh); i++) {
 		Mesh* it = mesh[i];
-		MeshX* meshX = meshTiny[i];
+		MeshX* meshX = meshTiny;
 		MeshXAnimResult meshXAnimResult;
 		if (it && meshX) {
 
@@ -250,7 +246,7 @@ void App::Draw()
 			if (bvh) {
 				bvh->Draw(animationNumber == 9 ? 0 : animationNumber, trackTime);
 				if (animationNumber == 9) {
-					meshX->CalcAnimationFromBvh(bvh, trackTime, meshXAnimResult);
+					meshX->CalcAnimationFromBvh(bvh, bind[i], trackTime, meshXAnimResult);
 				} else {
 					meshX->CalcAnimation(animationNumber, trackTime, meshXAnimResult);
 				}
@@ -275,9 +271,7 @@ void App::Destroy()
 	for (auto& it : mesh) {
 		SAFE_DELETE(it);
 	}
-	for (auto& it : meshTiny) {
-		SAFE_DELETE(it);
-	}
+	SAFE_DELETE(meshTiny);
 	SAFE_DELETE(font);
 	SAFE_DELETE(sprite);
 

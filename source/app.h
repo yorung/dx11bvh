@@ -1,5 +1,6 @@
 class App {
-	MeshX* meshTiny[3];
+	MeshX* meshTiny;
+	MeshXBvhBinding bind[3];
 	Mesh* mesh[3];
 	float scale;
 	float lastX;

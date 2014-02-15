@@ -473,12 +473,21 @@ void MeshX::_pushMaterialMap(Block& block, const MaterialMap& map)
 	}
 }
 
-BONE_ID MeshX::_getFrameIdByName(const char* name)
+BONE_ID MeshX::GetFrameIdByName(const char* name) const
 {
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++) {
 		if (!strcmp(m_frames[i].name, name)) {
 			return i;
 		}
+	}
+	return -1;
+}
+
+BONE_ID MeshX::GetOrCreateFrameIdByName(const char* name)
+{
+	BONE_ID id = GetFrameIdByName(name);
+	if (id >= 0) {
+		return id;
 	}
 	Frame f;
 	strncpy(f.name, name, sizeof(f.name));
@@ -612,7 +621,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 			skin.vertexWeight.push_back(_getF(p));
 		}
 		_getMatrix(p, skin.mtx);
-		skin.frameId = _getFrameIdByName(skin.frameName.c_str());
+		skin.frameId = GetOrCreateFrameIdByName(skin.frameName.c_str());
 		p = _leaveBrace(p);
 		skinWeights.push_back(skin);
 
@@ -735,7 +744,7 @@ void MeshX::ParseFrame(char* p, BONE_ID parentFrameId)
 		char* child = _searchChildTag(p, "Frame", &name);
 		if (child) {
 			char* frameMat = _searchChildTag(child, "FrameTransformMatrix");
-			BONE_ID frameId = _getFrameIdByName(name.c_str());
+			BONE_ID frameId = GetOrCreateFrameIdByName(name.c_str());
 			Frame& frame = m_frames[frameId];
 			Mat frameTransformMatrix;
 			_getMatrix(frameMat, frameTransformMatrix);
@@ -959,7 +968,7 @@ void MeshX::ParseAnimations(char* p, AnimationSet& animationSet)
 		if (animation.animationKeys.size()) {
 			char *frameName = _searchChildTag(anim, "");
 			animation.frameName = _getToken(frameName);
-			BONE_ID frameId = _getFrameIdByName(animation.frameName.c_str());
+			BONE_ID frameId = GetOrCreateFrameIdByName(animation.frameName.c_str());
 
 			animationSet.animations[frameId] = animation;
 		}
@@ -991,7 +1000,7 @@ void MeshX::LoadSub(const char *fileName)
 		return;
 	}
 
-	BONE_ID frameId = _getFrameIdByName("@myroot");
+	BONE_ID frameId = GetOrCreateFrameIdByName("@myroot");
 
 	Block b;
 	char* body = (char*)img + 16;
@@ -1192,24 +1201,24 @@ static BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, const Bvh* b
 	return bvhBoneId;
 }
 
-void MeshX::SyncLocalAxisWithBvh(Bvh* bvh)
+void MeshX::SyncLocalAxisWithBvh(Bvh* bvh, MeshXBvhBinding& bind) const
 {
-	ApplyBvhInitialStance(bvh);
+	ApplyBvhInitialStance(bvh, bind);
 
 	Mat localMats[BONE_MAX];
 	for (BONE_ID id = 0; id < (BONE_ID)m_frames.size(); id++) {
-		Frame& f = m_frames[id];
-		localMats[id] = q2m(f.boneAlignQuat) * f.initialMatrix;
+		const Frame& f = m_frames[id];
+		localMats[id] = q2m(bind.boneAlignQuats[id]) * f.initialMatrix;
 	}
 	MeshXAnimResult r;
 	CalcFrameMatrices(r, localMats);
 	for (BONE_ID id = 0; id < (BONE_ID)m_frames.size(); id++) {
-		Frame& f = m_frames[id];
-		f.axisAlignQuat = m2q(r.boneMat[id]);
+		const Frame& f = m_frames[id];
+		bind.axisAlignQuats[id] = m2q(r.boneMat[id]);
 	}
 }
 
-void MeshX::CalcAnimationFromBvh(Bvh* bvh, double time, MeshXAnimResult& animResult) const
+void MeshX::CalcAnimationFromBvh(Bvh* bvh, const MeshXBvhBinding& bind, double time, MeshXAnimResult& animResult) const
 {
 	Quat rotAnim[BONE_MAX];
 	bvh->GetRotAnim(rotAnim, time);
@@ -1232,7 +1241,7 @@ void MeshX::CalcAnimationFromBvh(Bvh* bvh, double time, MeshXAnimResult& animRes
 
 		Quat diff = toApply * inv(applied);
 
-		localMats[id] = q2m(f.axisAlignQuat * diff * inv(f.axisAlignQuat) * f.boneAlignQuat) * f.initialMatrix;
+		localMats[id] = q2m(bind.axisAlignQuats[id] * diff * inv(bind.axisAlignQuats[id]) * bind.boneAlignQuats[id]) * f.initialMatrix;
 		if (bvhBoneId == 0) {
 			localMats[id] *= v2m(pos - (Vec3)localMats[id].GetRow(3));
 		}
@@ -1243,10 +1252,12 @@ void MeshX::CalcAnimationFromBvh(Bvh* bvh, double time, MeshXAnimResult& animRes
 	CalcFrameMatrices(animResult, localMats);
 }
 
-void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
+void MeshX::ApplyBvhInitialStance(const Bvh* bvh, MeshXBvhBinding& bind) const
 {
-	BONE_ID idPelvis = _getFrameIdByName("Bip01_Pelvis");
-	m_frames[idPelvis].boneAlignQuat = Quat(Vec3(0,1,0), XM_PI);
+	BONE_ID idPelvis = GetFrameIdByName("Bip01_Pelvis");
+	if (idPelvis >= 0) {
+		bind.boneAlignQuats[idPelvis] = Quat(Vec3(0,1,0), XM_PI);
+	}
 
 	const char* xBoneNames[] = {
 		"Bip01_Pelvis",
@@ -1267,8 +1278,8 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 	for(const char* xBoneName : xBoneNames) {
 		Mat localMats[BONE_MAX];
 		for (BONE_ID id = 0; id < (BONE_ID)m_frames.size(); id++) {
-			Frame& f = m_frames[id];
-			localMats[id] = q2m(f.boneAlignQuat) * f.initialMatrix;
+			const Frame& f = m_frames[id];
+			localMats[id] = q2m(bind.boneAlignQuats[id]) * f.initialMatrix;
 		}
 		MeshXAnimResult r;
 		CalcFrameMatrices(r, localMats);
@@ -1278,10 +1289,13 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		assert(bvhFrameId >= 0);
 		const BvhFrame& bvhF = bvhFrames[bvhFrameId];
 
-		BONE_ID myId = _getFrameIdByName(xBoneName);
-		Frame* f = &m_frames[myId];
+		BONE_ID myId = GetFrameIdByName(xBoneName);
+		if (myId < 0) {
+			continue;
+		}
+		const Frame* f = &m_frames[myId];
 		assert(f->parentId >= 0);
-		Frame* parent = &m_frames[f->parentId];
+		const Frame* parent = &m_frames[f->parentId];
 
 		assert(bvhF.childId >= 0);
 		assert(f->childId >= 0);
@@ -1302,6 +1316,6 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		Matrix rotMat = r.boneMat[myId];
 		rotMat._41 = rotMat._42 = rotMat._43 = 0;
 		Vec3 rotAxisLocal = transform(rotAxis, inv(rotMat));
-		f->boneAlignQuat *= Quat(rotAxisLocal, rotRad);
+		bind.boneAlignQuats[myId] *= Quat(rotAxisLocal, rotRad);
 	}
 }
