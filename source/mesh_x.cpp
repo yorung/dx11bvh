@@ -1207,7 +1207,7 @@ void MeshX::SyncLocalAxisWithBvh(Bvh* bvh)
 {
 	ApplyBvhInitialStance(bvh);
 	for (auto& f : m_frames) {
-		f.frameTransformMatrix = f.initialMatrix;
+		f.frameTransformMatrix = q2m(f.boneAlignQuat) * f.initialMatrix;
 	}
 	CalcFrameMatrices();
 	for (auto& f : m_frames) {
@@ -1243,7 +1243,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 
 	//	Quat diff = bvhBoneId < 0 ? Quat() : rotAnim[bvhBoneId];
 
-		f.frameTransformMatrix = q2m(f.axisAlignQuat * diff * inv(f.axisAlignQuat)) * (Mat)f.initialMatrix;
+		f.frameTransformMatrix = q2m(f.axisAlignQuat * diff * inv(f.axisAlignQuat) * f.boneAlignQuat) * f.initialMatrix;
 		if (bvhBoneId == 0) {
 			f.frameTransformMatrix *= v2m(pos - (Vec3)f.frameTransformMatrix.Translation());
 		}
@@ -1276,7 +1276,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 {
 	BONE_ID idPelvis = _getFrameIdByName("Bip01_Pelvis");
-	m_frames[idPelvis].initialMatrix *= XMMatrixRotationY(XM_PI);
+	m_frames[idPelvis].initialMatrix *= (Mat)(Matrix)XMMatrixRotationY(XM_PI);
 
 	const char* xBoneNames[] = {
 		"Bip01_Pelvis",
@@ -1296,7 +1296,7 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 
 	for(const char* xBoneName : xBoneNames) {
 		for (auto& f : m_frames) {
-			f.frameTransformMatrix = f.initialMatrix;
+			f.frameTransformMatrix = q2m(f.boneAlignQuat) * f.initialMatrix;
 		}
 		CalcFrameMatrices();
 
@@ -1327,9 +1327,6 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		Matrix rotMat = f->result;
 		rotMat._41 = rotMat._42 = rotMat._43 = 0;
 		Vec3 rotAxisLocal = transform(rotAxis, inv(rotMat));
-
-		f->initialMatrix = q2m(Quat(rotAxisLocal, rotRad)) * (Mat)f->initialMatrix;
-//		f->initialMatrix = q2m(Quaternion::CreateFromAxisAngle(rotAxisLocal, rotRad)) * (Mat)f->initialMatrix;
-//		f->initialMatrix = Matrix::CreateFromQuaternion(Quaternion::CreateFromAxisAngle(rotAxisLocal, rotRad)) * f->initialMatrix;
+		f->boneAlignQuat = Quat(rotAxisLocal, rotRad);
 	}
 }

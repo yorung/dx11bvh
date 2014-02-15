@@ -93,7 +93,7 @@ struct MaterialMap
 struct Frame
 {
 	char name[32];
-	Matrix initialMatrix;
+	Mat initialMatrix;
 	Matrix frameTransformMatrixOrg;
 	Matrix frameTransformMatrix;
 	Matrix boneOffsetMatrix;
@@ -102,6 +102,7 @@ struct Frame
 	BONE_ID childId;
 	BONE_ID siblingId;
 	Quat axisAlignQuat;
+	Quat boneAlignQuat;
 };
 
 struct Block
