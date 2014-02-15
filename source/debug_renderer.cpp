@@ -98,32 +98,33 @@ void DebugRenderer::Init()
 }
 
 // http://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process
-Vector3 Proj(Vector3 u, Vector3 v)
+Vec3 Proj(Vec3 u, Vec3 v)
 {
-	return (u.Dot(v) / u.Dot(u)) * u;
+	return (dot(u, v) / dot(u, u)) * u;
 }
 
-Matrix Orthogonalization(Matrix	v)
+Mat Orthogonalization(Mat v)
 {
-	Vector3 vx = v.Right();
-	Vector3 vy = v.Up();
-	Vector3 vz = v.Backward();
+	Vec3 vx = v.GetRow(0);
+	Vec3 vy = v.GetRow(1);
+	Vec3 vz = v.GetRow(2);
 
-	Vector3 ux = vx;
-	Vector3 uy = vy - Proj(ux, vy);
-	Vector3 uz = vz - Proj(ux, vz) - Proj(uy, vz);
+	Vec3 ux = vx;
+	Vec3 uy = vy - Proj(ux, vy);
+	Vec3 uz = vz - Proj(ux, vz) - Proj(uy, vz);
 
-	ux.Normalize();
-	uy.Normalize();
-	uz.Normalize();
-	ux *= vx.Length();
-	uy *= vx.Length();
-	uz *= vx.Length();
+	ux = normalize(ux);
+	uy = normalize(uy);
+	uz = normalize(uz);
+	ux *= length(vx);
+	uy *= length(vx);
+	uz *= length(vx);
 
-	Matrix u = Matrix(ux, uy, uz);
-	u._41 = v._41;
-	u._42 = v._42;
-	u._43 = v._43;
+	Mat u;
+	u.SetRow(0, ux);
+	u.SetRow(1, uy);
+	u.SetRow(2, uz);
+	u.SetRow(3, v.GetRow(3));
 	return u;
 }
 

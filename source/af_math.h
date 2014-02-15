@@ -101,6 +101,7 @@ struct Mat
 	operator Matrix() const { return Matrix(_11, _12, _13, _14, _21, _22, _23, _24, _31, _32, _33, _34, _41, _42, _43, _44); }
 
 	Vec3 GetRow(int i) const { return Vec3(m[i][0], m[i][1], m[i][2]); }
+	void SetRow(int i, const Vec3& v) { m[i][0] = v.x; m[i][1] = v.y; m[i][2] = v.z; }
 };
 
 inline Quat inv(const Quat& q)

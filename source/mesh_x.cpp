@@ -984,8 +984,6 @@ void MeshX::ParseAnimationSets(char* p)
 	}
 }
 
-Matrix Orthogonalization(Matrix	v);
-
 void MeshX::LoadSub(const char *fileName)
 {
 	void *img = LoadFile(fileName);
@@ -1005,7 +1003,7 @@ void MeshX::LoadSub(const char *fileName)
 
 	for (auto& f : m_frames) {
 		if (f.parentId >= 0) {
-			f.initialMatrix = inv(f.boneOffsetMatrix) * (Mat)m_frames[f.parentId].boneOffsetMatrix;
+			f.initialMatrix = inv(f.boneOffsetMatrix) * m_frames[f.parentId].boneOffsetMatrix;
 			f.initialMatrix = Orthogonalization(f.initialMatrix);
 		}
 	}
