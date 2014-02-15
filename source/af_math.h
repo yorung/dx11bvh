@@ -66,7 +66,7 @@ struct Quat
 	affloat w;
 	Quat() : Quat(1, Vec3()) {}
 	Quat(affloat W, const Vec3& V) : w(W), v(V) {}
-	Quat(const Vec3& axis, affloat angle) { w = afcos(angle / 2); v = axis * afsin(angle / 2); }
+	Quat(const Vec3& axis, affloat angle) { w = afcos(angle / 2); v = normalize(axis) * afsin(angle / 2); }
 
 	Quat(const Quaternion& q) : Quat(q.w, Vec3(q.x, q.y, q.z)) {}
 	operator Quaternion() const { return Quaternion(v.x, v.y, v.z, w); }
@@ -160,6 +160,9 @@ inline Mat inv(const Matrix& mtx)
 
 inline Mat q2m(const Quat& q)
 {
+#ifdef USE_DXMATH
+	return Matrix::CreateFromQuaternion(q);
+#else
 #define D(a,b) (1 - 2 * (q.v.a * q.v.a + q.v.b * q.v.b)) // diagonal
 #define P(a,b,c) (2 * (q.v.a * q.v.b + q.v.c * q.w)) // positive
 #define N(a,b,c) (2 * (q.v.a * q.v.b - q.v.c * q.w)) // negative
@@ -169,6 +172,7 @@ inline Mat q2m(const Quat& q)
 #undef D
 #undef P
 #undef N
+#endif
 }
 
 inline Quat m2q(const Matrix& m_)

@@ -1329,5 +1329,7 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		Vec3 rotAxisLocal = transform(rotAxis, inv(rotMat));
 
 		f->initialMatrix = q2m(Quat(rotAxisLocal, rotRad)) * (Mat)f->initialMatrix;
+//		f->initialMatrix = q2m(Quaternion::CreateFromAxisAngle(rotAxisLocal, rotRad)) * (Mat)f->initialMatrix;
+//		f->initialMatrix = Matrix::CreateFromQuaternion(Quaternion::CreateFromAxisAngle(rotAxisLocal, rotRad)) * f->initialMatrix;
 	}
 }
