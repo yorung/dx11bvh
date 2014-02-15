@@ -147,10 +147,10 @@ static void _getVertexColors(char*& p, std::vector<Vector4>& vertices, int nVert
 	}
 }
 
-static void _getMatrix(char*& p, Matrix& m)
+static void _getMatrix(char*& p, Mat& m)
 {
 	if (!p) {
-		m = Matrix();
+		m = Mat();
 		return;
 	}
 	m._11 = _getF(p);
@@ -375,11 +375,11 @@ void MeshX::CreateBoneMesh()
 		int depth = GetDepth(pId);
 		Frame& f1 = m_frames[pId];
 
-		if (Matrix() == f1.boneOffsetMatrix) {
+		if (Mat() == f1.boneOffsetMatrix) {
 			continue;
 		}
 
-		if (Matrix() == f2.boneOffsetMatrix) {
+		if (Mat() == f2.boneOffsetMatrix) {
 			continue;
 		}
 
@@ -494,7 +494,7 @@ struct SkinWeights {
 	std::vector<float> vertexWeight;
 	std::string frameName;
 	int frameId;
-	Matrix mtx;
+	Mat mtx;
 	const SkinWeights& operator=(const SkinWeights& r) {
 		vertexIndices = r.vertexIndices;
 		vertexWeight = r.vertexWeight;
@@ -1050,18 +1050,13 @@ void MeshX::CalcFrameMatrices()
 	}
 }
 
-static XMMATRIX Interpolate(const XMMATRIX& m1, const XMMATRIX& m2, float ratio)
+static Mat Interpolate(const Mat& m1, const Mat& m2, float ratio)
 {
-	XMVECTOR q1 = XMQuaternionRotationMatrix(m1);
-	XMVECTOR q2 = XMQuaternionRotationMatrix(m2);
-	XMVECTOR q3 = XMQuaternionSlerp(q1, q2, ratio);
-
-	XMVECTOR t1 = m1.r[3];
-	XMVECTOR t2 = m2.r[3];
-	XMVECTOR t3 = XMVectorLerp(t1, t2, ratio);
-
-	XMMATRIX m3 = XMMatrixRotationQuaternion(q3);
-	m3.r[3] = t3;
+	Vec3 t = m1.GetRow(3) * (1 - ratio) + m2.GetRow(3) * ratio;
+	Mat m3 = q2m(Quaternion::Slerp(m2q(m1), m2q(m2), ratio));
+	m3.m[3][0] = t.x;
+	m3.m[3][1] = t.y;
+	m3.m[3][2] = t.z;
 	return m3;
 }
 
@@ -1087,7 +1082,7 @@ void MeshX::CalcAnimation(int animId, double time)
 		}
 
 		bool stored = false;
-		XMMATRIX rotMat = XMMatrixIdentity(), scaleMat = XMMatrixIdentity(), transMat = XMMatrixIdentity();
+		Mat rotMat, scaleMat, transMat;
 		for (auto itKey : anim.animationKeys) {
 
 			double maxTime = itKey.timedFloatKeys.rbegin()->time;
@@ -1103,11 +1098,9 @@ void MeshX::CalcAnimation(int animId, double time)
 				if (iTime < (int)t1.time || iTime >= (int)t2.time) {
 					continue;
 				}
-				XMMATRIX mat = Interpolate(XMLoadFloat4x4(&t1.mat), XMLoadFloat4x4(&t2.mat), (float)((timeMod - t1.time) / (t2.time - t1.time)));
-				Matrix f4x4;
-				XMStoreFloat4x4(&f4x4, mat);
+				Mat mat = Interpolate(t1.mat, t2.mat, (float)((timeMod - t1.time) / (t2.time - t1.time)));
 				switch (itKey.keyType) {
-				case 3: f.frameTransformMatrix = f4x4; stored = true; break;
+				case 3: f.frameTransformMatrix = mat; stored = true; break;
 				case 0: rotMat = mat; break;
 				case 1: scaleMat = mat; break;
 				case 2: transMat = mat; break;
@@ -1116,7 +1109,7 @@ void MeshX::CalcAnimation(int animId, double time)
 			}
 		}
 		if (!stored) {
-			XMStoreFloat4x4(&f.frameTransformMatrix, scaleMat * rotMat * transMat);
+			f.frameTransformMatrix = scaleMat * rotMat * transMat;
 		}
 	}
 }
@@ -1245,7 +1238,7 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 
 		f.frameTransformMatrix = q2m(f.axisAlignQuat * diff * inv(f.axisAlignQuat) * f.boneAlignQuat) * f.initialMatrix;
 		if (bvhBoneId == 0) {
-			f.frameTransformMatrix *= v2m(pos - (Vec3)f.frameTransformMatrix.Translation());
+			f.frameTransformMatrix *= v2m(pos - (Vec3)f.frameTransformMatrix.GetRow(3));
 		}
 
 		appliedRot[it.GetCurrent()] = toApply;
@@ -1320,7 +1313,7 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 			xChild = &m_frames[xChild->siblingId];
 		}
 		Vec3 worldBvh = normalize(bvhChild->offsetCombined - bvhF.offsetCombined);
-		Vec3 worldTiny = normalize(xChild->result.Translation() - f->result.Translation());
+		Vec3 worldTiny = normalize(xChild->result.GetRow(3) - f->result.GetRow(3));
 
 		Vec3 rotAxis = cross(worldTiny, worldBvh);
 		float rotRad = acosf(dot(worldTiny, worldBvh));

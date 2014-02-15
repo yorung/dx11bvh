@@ -11,7 +11,7 @@ public:
 struct TimedFloatKeys
 {
 	DWORD time;
-	Matrix mat;
+	Mat mat;
 };
 
 typedef int BONE_ID;
@@ -94,10 +94,10 @@ struct Frame
 {
 	char name[32];
 	Mat initialMatrix;
-	Matrix frameTransformMatrixOrg;
-	Matrix frameTransformMatrix;
-	Matrix boneOffsetMatrix;
-	Matrix result;
+	Mat frameTransformMatrixOrg;
+	Mat frameTransformMatrix;
+	Mat boneOffsetMatrix;
+	Mat result;
 	BONE_ID parentId;
 	BONE_ID childId;
 	BONE_ID siblingId;

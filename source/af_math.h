@@ -95,9 +95,12 @@ struct Mat
 #undef m
 	}
 	const Mat& operator*=(const Mat& r) { *this = *this * r; return *this; }
+	const bool operator==(const Mat& r) { return !memcmp(m, r.m, sizeof(m)); }
 
 	Mat(const Matrix& mtx) { assert(sizeof(float) == sizeof(affloat)); memcpy(m, mtx.m, sizeof(m)); }
 	operator Matrix() const { return Matrix(_11, _12, _13, _14, _21, _22, _23, _24, _31, _32, _33, _34, _41, _42, _43, _44); }
+
+	Vec3 GetRow(int i) const { return Vec3(m[i][0], m[i][1], m[i][2]); }
 };
 
 inline Quat inv(const Quat& q)
