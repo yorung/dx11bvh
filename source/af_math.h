@@ -33,13 +33,6 @@ template <class VEC3> inline VEC3 normalize(const VEC3& v)
 	return v / length(v);
 }
 
-template <class QUAT> inline QUAT inv(const QUAT& q)
-{
-	QUAT c = q.Conjugate();
-	affloat lenSq = q.w * q.w + dot(q.v, q.v);
-	return QUAT(c.w / lenSq, c.v / lenSq);
-}
-
 struct Vec3
 {
 	affloat x, y, z;
@@ -106,6 +99,13 @@ struct Mat
 	Mat(const Matrix& mtx) { assert(sizeof(float) == sizeof(affloat)); memcpy(m, mtx.m, sizeof(m)); }
 	operator Matrix() const { return Matrix(_11, _12, _13, _14, _21, _22, _23, _24, _31, _32, _33, _34, _41, _42, _43, _44); }
 };
+
+inline Quat inv(const Quat& q)
+{
+	Quat c = q.Conjugate();
+	affloat lenSq = q.w * q.w + dot(q.v, q.v);
+	return Quat(c.w / lenSq, c.v / lenSq);
+}
 
 inline Mat inv(const Matrix& mtx)
 {
