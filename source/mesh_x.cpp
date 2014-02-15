@@ -1217,7 +1217,7 @@ void MeshX::CalcAnimationFromBvh(Bvh* bvh, double time, MeshXAnimResult& animRes
 	bvh->CalcAnimation(time);
 	Vec3 pos = bvh->GetFrames()[0].result.Translation();
 
-	assert(m_frames.size() <= dimof(BonesForX));
+	assert(m_frames.size() <= BONE_MAX);
 
 	Quat appliedRot[BONE_MAX];
 	Mat localMats[BONE_MAX];
