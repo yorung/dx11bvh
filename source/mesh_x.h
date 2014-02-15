@@ -4,7 +4,6 @@ class Mesh
 {
 public:
 	virtual ~Mesh() {}
-	virtual void Draw(int animId, double time) = 0;
 	virtual const struct Block& GetRawDatas() const = 0;
 };
 
@@ -97,7 +96,6 @@ struct Frame
 	Mat frameTransformMatrixOrg;
 	Mat frameTransformMatrix;
 	Mat boneOffsetMatrix;
-	Mat result;
 	BONE_ID parentId;
 	BONE_ID childId;
 	BONE_ID siblingId;
@@ -118,6 +116,11 @@ struct Block
 	}
 };
 
+struct MeshXAnimResult
+{
+	Mat boneMat[BONE_MAX];
+};
+
 class MeshX : public Mesh
 {
 private:
@@ -135,7 +138,7 @@ private:
 	void _linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId);
 	void _storeWeight(MeshVertex& v, int frameId, float weight);
 	void CalcAnimation(int animId, double time);
-	void CalcFrameMatrices();
+	void CalcFrameMatrices(MeshXAnimResult& animResult) const;
 	void DumpFrames() const;
 	void CreateBoneMesh();
 	int GetDepth(BONE_ID id) const;
@@ -158,8 +161,8 @@ public:
 	const std::vector<Frame>& GetFrames() const { return m_frames; }
 	MeshX(const char *fileName);
 	~MeshX();
-	void Draw(int animId, double time);
-	void DrawBvh(class Bvh* bvh, double time);
+	void Draw(int animId, double time, MeshXAnimResult& animResult);
+	void DrawBvh(class Bvh* bvh, double time, MeshXAnimResult& animResult);
 	void SyncLocalAxisWithBvh(Bvh* bvh);
 };
 

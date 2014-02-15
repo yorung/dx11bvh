@@ -489,7 +489,7 @@ void Bvh::Draw(int animId, double time)
 		return;
 	}
 
-	Matrix BoneMatrices[BONE_MAX];
+	Mat BoneMatrices[BONE_MAX];
 	assert(m_frames.size() <= dimof(BoneMatrices));
 
 	if (animId != 0) {

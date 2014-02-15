@@ -18,7 +18,7 @@ public:
 	void Update();
 	void Draw();
 	void DrawBoneNames(Bvh* bvh);
-	void DrawBoneNames(MeshX* meshX);
+	void DrawBoneNames(const MeshX* meshX, const MeshXAnimResult& result);
 	void MouseWheel(float delta);
 	void LButtonDown(float x, float y);
 	void LButtonUp(float x, float y);

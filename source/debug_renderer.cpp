@@ -97,11 +97,11 @@ void DebugRenderer::Init()
 	CreatePivotMesh();
 }
 
-void DebugRenderer::DrawPivots(const Matrix mat[BONE_MAX], int num)
+void DebugRenderer::DrawPivots(const Mat mat[BONE_MAX], int num)
 {
-	Matrix mat2[BONE_MAX];
+	Mat mat2[BONE_MAX];
 	for (int i = 0; i < BONE_MAX; i++) {
-		mat2[i] = i < num ? mat[i] : Matrix();
+		mat2[i] = i < num ? mat[i] : Mat();
 	}
 
 	pivotsRenderer.Draw(mat2, BONE_MAX, pivots);

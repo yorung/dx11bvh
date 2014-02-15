@@ -1039,12 +1039,11 @@ MeshX::~MeshX()
 	bonesRenderer.Destroy();
 }
 
-void MeshX::CalcFrameMatrices()
+void MeshX::CalcFrameMatrices(MeshXAnimResult& animResult) const
 {
 	for (FrameIterator it(m_frames); it.GetCurrent() >= 0; ++it) {
-		Frame& f = m_frames[it.GetCurrent()];
-		Matrix result = f.frameTransformMatrix * (f.parentId >= 0 ? m_frames[f.parentId].result : Matrix());
-		f.result = result;
+		const Frame& f = m_frames[it.GetCurrent()];
+		animResult.boneMat[it.GetCurrent()] = f.frameTransformMatrix * (f.parentId >= 0 ? animResult.boneMat[f.parentId] : Mat());
 	}
 }
 
@@ -1113,36 +1112,31 @@ void MeshX::CalcAnimation(int animId, double time)
 }
 
 
-void MeshX::Draw(int animId, double time)
+void MeshX::Draw(int animId, double time, MeshXAnimResult& animResult)
 {
 	if (!m_block.indices.size()) {
 		return;
 	}
 
-	Matrix BoneMatrices[BONE_MAX];
-	assert(m_frames.size() <= dimof(BoneMatrices));
+	assert(m_frames.size() <= dimof(animResult.boneMat));
 
 	CalcAnimation(animId, time * m_animTicksPerSecond);
-	CalcFrameMatrices();
+	CalcFrameMatrices(animResult);
 
 	if (g_type == "pivot") {
-		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-			Frame& f = m_frames[i];
-			BoneMatrices[i] = f.result;
-		}
-
-		debugRenderer.DrawPivots(BoneMatrices, m_frames.size());
+		debugRenderer.DrawPivots(animResult.boneMat, m_frames.size());
 	} else {
+		Mat vertexTransformMat[BONE_MAX];
 		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 			Frame& f = m_frames[i];
-			BoneMatrices[i] = f.boneOffsetMatrix * f.result;
+			vertexTransformMat[i] = f.boneOffsetMatrix * animResult.boneMat[i];
 		}
 
 		if (g_type == "mesh") {
-			m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
+			m_meshRenderer.Draw(vertexTransformMat, dimof(vertexTransformMat), m_block);
 		}
 		if (g_type == "bone") {
-			bonesRenderer.Draw(BoneMatrices, dimof(BoneMatrices), bones);
+			bonesRenderer.Draw(vertexTransformMat, dimof(vertexTransformMat), bones);
 		}
 	}
 }
@@ -1200,24 +1194,21 @@ void MeshX::SyncLocalAxisWithBvh(Bvh* bvh)
 	for (auto& f : m_frames) {
 		f.frameTransformMatrix = q2m(f.boneAlignQuat) * f.initialMatrix;
 	}
-	CalcFrameMatrices();
-	for (auto& f : m_frames) {
-		f.axisAlignQuat = m2q(f.result);
+	MeshXAnimResult r;
+	CalcFrameMatrices(r);
+	for (BONE_ID id = 0; id < (BONE_ID)m_frames.size(); id++) {
+		Frame& f = m_frames[id];
+		f.axisAlignQuat = m2q(r.boneMat[id]);
 	}
 }
 
-void MeshX::DrawBvh(Bvh* bvh, double time)
+void MeshX::DrawBvh(Bvh* bvh, double time, MeshXAnimResult& animResult)
 {
 	Quat rotAnim[BONE_MAX];
 	bvh->GetRotAnim(rotAnim, time);
 
 	bvh->CalcAnimation(time);
 	Vec3 pos = bvh->GetFrames()[0].result.Translation();
-
-	Matrix BonesForX[BONE_MAX];
-	for (auto& it : BonesForX) {
-		it = Matrix();
-	}
 
 	assert(m_frames.size() <= dimof(BonesForX));
 
@@ -1242,18 +1233,15 @@ void MeshX::DrawBvh(Bvh* bvh, double time)
 		appliedRot[it.GetCurrent()] = toApply;
 	}
 
-	CalcFrameMatrices();
+	CalcFrameMatrices(animResult);
 
 	if (g_type == "pivot") {
-		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-			Frame& f = m_frames[i];
-			BonesForX[i] = f.result;
-		}
-		debugRenderer.DrawPivots(BonesForX, dimof(BonesForX));
+		debugRenderer.DrawPivots(animResult.boneMat, dimof(animResult.boneMat));
 	} else {
+		Mat BonesForX[BONE_MAX];
 		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 			Frame& f = m_frames[i];
-			BonesForX[i] = f.boneOffsetMatrix * f.result;
+			BonesForX[i] = f.boneOffsetMatrix * animResult.boneMat[i];
 		}
 		if (g_type == "mesh") {
 			m_meshRenderer.Draw(BonesForX, dimof(BonesForX), m_block);
@@ -1290,13 +1278,16 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		for (auto& f : m_frames) {
 			f.frameTransformMatrix = q2m(f.boneAlignQuat) * f.initialMatrix;
 		}
-		CalcFrameMatrices();
+		MeshXAnimResult r;
+		CalcFrameMatrices(r);
 
 		const std::vector<BvhFrame>& bvhFrames = bvh->GetFrames();
 		BONE_ID bvhFrameId = GetBvhBoneIdByTinyBoneName(xBoneName, bvh);
 		assert(bvhFrameId >= 0);
 		const BvhFrame& bvhF = bvhFrames[bvhFrameId];
-		Frame* f = &m_frames[_getFrameIdByName(xBoneName)];
+
+		BONE_ID myId = _getFrameIdByName(xBoneName);
+		Frame* f = &m_frames[myId];
 		assert(f->parentId >= 0);
 		Frame* parent = &m_frames[f->parentId];
 
@@ -1306,17 +1297,17 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 		while (bvhChild->siblingId >= 0 && (strstr(bvhChild->name, "Left") || strstr(bvhChild->name, "Right"))) {
 			bvhChild = &bvhFrames[bvhChild->siblingId];
 		}
-		const Frame* xChild = &m_frames[f->childId]; 
-		while (xChild->siblingId >= 0 && (strstr(xChild->name, "_L_") || strstr(xChild->name, "_R_"))) {
-			xChild = &m_frames[xChild->siblingId];
+		BONE_ID childId = f->childId; 
+		while (m_frames[childId].siblingId >= 0 && (strstr(m_frames[childId].name, "_L_") || strstr(m_frames[childId].name, "_R_"))) {
+			childId = m_frames[childId].siblingId;
 		}
 		Vec3 worldBvh = normalize(bvhChild->offsetCombined - bvhF.offsetCombined);
-		Vec3 worldTiny = normalize(xChild->result.GetRow(3) - f->result.GetRow(3));
+		Vec3 worldTiny = normalize(r.boneMat[childId].GetRow(3) - r.boneMat[myId].GetRow(3));
 
 		Vec3 rotAxis = cross(worldTiny, worldBvh);
 		float rotRad = acosf(dot(worldTiny, worldBvh));
 
-		Matrix rotMat = f->result;
+		Matrix rotMat = r.boneMat[myId];
 		rotMat._41 = rotMat._42 = rotMat._43 = 0;
 		Vec3 rotAxisLocal = transform(rotAxis, inv(rotMat));
 		f->boneAlignQuat *= Quat(rotAxisLocal, rotRad);

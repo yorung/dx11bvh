@@ -13,7 +13,7 @@ public:
 	~MeshRenderer11();
 	void Destroy();
 	void Init(int sizeVertices, int sizeIndices, void* vertices, void* indices);
-	void Draw(const Matrix BoneMatrices[], int nBones, const Block& block);
+	void Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Block& block);
 };
 
 typedef MeshRenderer11 MeshRenderer;

@@ -173,14 +173,15 @@ void App::DrawBoneNames(Bvh* bvh)
 	}
 }
 
-void App::DrawBoneNames(MeshX* meshX)
+void App::DrawBoneNames(const MeshX* meshX, const MeshXAnimResult& result)
 {
 	const std::vector<Frame>& frames = meshX->GetFrames();
-	for (auto& it : frames) {
-		XMFLOAT2 pos = GetScreenPos(it.result);
+	for (BONE_ID id = 0; id < frames.size(); id++) {
+		const Frame& f = frames[id];
+		XMFLOAT2 pos = GetScreenPos(result.boneMat[id]);
 
 		WCHAR wname[MAX_PATH];
-		MultiByteToWideChar(CP_ACP, 0, it.name, -1, wname, dimof(wname));
+		MultiByteToWideChar(CP_ACP, 0, f.name, -1, wname, dimof(wname));
 		if (wname[0] == '\0') {
 			wcscpy(wname, L"[NO NAME]");
 		}
@@ -241,16 +242,17 @@ void App::Draw()
 	for (int i = 0; i < dimof(mesh); i++) {
 		Mesh* it = mesh[i];
 		MeshX* meshX = meshTiny[i];
+		MeshXAnimResult meshXAnimResult;
 		if (it && meshX) {
-			it->Draw(animationNumber == 9 ? 0 : animationNumber, trackTime);
 
 			Bvh* bvh = dynamic_cast<Bvh*>(it);
 
 			if (bvh) {
+				bvh->Draw(animationNumber == 9 ? 0 : animationNumber, trackTime);
 				if (animationNumber == 9) {
-					meshX->DrawBvh(bvh, trackTime);
+					meshX->DrawBvh(bvh, trackTime, meshXAnimResult);
 				} else {
-					meshX->Draw(animationNumber, trackTime);
+					meshX->Draw(animationNumber, trackTime, meshXAnimResult);
 				}
 				if (GetKeyState('T') & 0x01) {
 					DrawBoneNames(bvh);
@@ -258,7 +260,7 @@ void App::Draw()
 			}
 		}
 		if (meshX && (GetKeyState('T') & 0x01)) {
-			DrawBoneNames(meshX);
+			DrawBoneNames(meshX, meshXAnimResult);
 		}
 	}
 
