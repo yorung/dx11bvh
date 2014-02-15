@@ -737,8 +737,8 @@ void MeshX::ParseFrame(char* p, BONE_ID parentFrameId)
 			char* frameMat = _searchChildTag(child, "FrameTransformMatrix");
 			BONE_ID frameId = _getFrameIdByName(name.c_str());
 			Frame& frame = m_frames[frameId];
-			_getMatrix(frameMat, frame.frameTransformMatrix);
-			frame.frameTransformMatrixOrg = frame.frameTransformMatrix;
+			Mat frameTransformMatrix;
+			_getMatrix(frameMat, frameTransformMatrix);
 			_linkFrame(parentFrameId, frameId);
 
 			Block b;
@@ -1039,11 +1039,12 @@ MeshX::~MeshX()
 	bonesRenderer.Destroy();
 }
 
-void MeshX::CalcFrameMatrices(MeshXAnimResult& animResult) const
+void MeshX::CalcFrameMatrices(MeshXAnimResult& animResult, const Mat localMats[BONE_MAX]) const
 {
 	for (FrameIterator it(m_frames); it.GetCurrent() >= 0; ++it) {
-		const Frame& f = m_frames[it.GetCurrent()];
-		animResult.boneMat[it.GetCurrent()] = f.frameTransformMatrix * (f.parentId >= 0 ? animResult.boneMat[f.parentId] : Mat());
+		BONE_ID id = it.GetCurrent();
+		const Frame& f = m_frames[id];
+		animResult.boneMat[id] = localMats[id] * (f.parentId >= 0 ? animResult.boneMat[f.parentId] : Mat());
 	}
 }
 
@@ -1057,11 +1058,11 @@ static Mat Interpolate(const Mat& m1, const Mat& m2, float ratio)
 	return m3;
 }
 
-void MeshX::CalcAnimation(int animId, double time)
+void MeshX::CalcAnimation(int animId, double time, Mat localMats[BONE_MAX]) const
 {
 	if (animId < 0 || animId >= (int)m_animationSets.size()) {
-		for (auto& f : m_frames) {
-			f.frameTransformMatrix = f.initialMatrix;
+		for (BONE_ID id = 0; id < (BONE_ID)m_frames.size(); id++) {
+			localMats[id] = m_frames[id].initialMatrix;
 		}
 		return;
 	}
@@ -1069,7 +1070,8 @@ void MeshX::CalcAnimation(int animId, double time)
 
 	for (auto itAnimation : m_animationSets[revAnimId].animations)
 	{
-		Frame& f = m_frames[itAnimation.first];
+		BONE_ID id = itAnimation.first;
+		const Frame& f = m_frames[id];
 		Animation& anim = itAnimation.second;
 		if (anim.animationKeys.size() == 0) {
 			continue;
@@ -1097,7 +1099,7 @@ void MeshX::CalcAnimation(int animId, double time)
 				}
 				Mat mat = Interpolate(t1.mat, t2.mat, (float)((timeMod - t1.time) / (t2.time - t1.time)));
 				switch (itKey.keyType) {
-				case 3: f.frameTransformMatrix = mat; stored = true; break;
+				case 3: localMats[id] = mat; stored = true; break;
 				case 0: rotMat = mat; break;
 				case 1: scaleMat = mat; break;
 				case 2: transMat = mat; break;
@@ -1106,11 +1108,10 @@ void MeshX::CalcAnimation(int animId, double time)
 			}
 		}
 		if (!stored) {
-			f.frameTransformMatrix = scaleMat * rotMat * transMat;
+			localMats[id] = scaleMat * rotMat * transMat;
 		}
 	}
 }
-
 
 void MeshX::Draw(int animId, double time, MeshXAnimResult& animResult)
 {
@@ -1120,8 +1121,9 @@ void MeshX::Draw(int animId, double time, MeshXAnimResult& animResult)
 
 	assert(m_frames.size() <= dimof(animResult.boneMat));
 
-	CalcAnimation(animId, time * m_animTicksPerSecond);
-	CalcFrameMatrices(animResult);
+	Mat localMats[BONE_MAX];
+	CalcAnimation(animId, time * m_animTicksPerSecond, localMats);
+	CalcFrameMatrices(animResult, localMats);
 
 	if (g_type == "pivot") {
 		debugRenderer.DrawPivots(animResult.boneMat, m_frames.size());
@@ -1191,11 +1193,14 @@ static BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, const Bvh* b
 void MeshX::SyncLocalAxisWithBvh(Bvh* bvh)
 {
 	ApplyBvhInitialStance(bvh);
-	for (auto& f : m_frames) {
-		f.frameTransformMatrix = q2m(f.boneAlignQuat) * f.initialMatrix;
+
+	Mat localMats[BONE_MAX];
+	for (BONE_ID id = 0; id < (BONE_ID)m_frames.size(); id++) {
+		Frame& f = m_frames[id];
+		localMats[id] = q2m(f.boneAlignQuat) * f.initialMatrix;
 	}
 	MeshXAnimResult r;
-	CalcFrameMatrices(r);
+	CalcFrameMatrices(r, localMats);
 	for (BONE_ID id = 0; id < (BONE_ID)m_frames.size(); id++) {
 		Frame& f = m_frames[id];
 		f.axisAlignQuat = m2q(r.boneMat[id]);
@@ -1213,8 +1218,10 @@ void MeshX::DrawBvh(Bvh* bvh, double time, MeshXAnimResult& animResult)
 	assert(m_frames.size() <= dimof(BonesForX));
 
 	Quat appliedRot[BONE_MAX];
+	Mat localMats[BONE_MAX];
 	for (FrameIterator it(m_frames); it.GetCurrent() >= 0; ++it) {
-		Frame& f = m_frames[it.GetCurrent()];
+		BONE_ID id = it.GetCurrent();
+		Frame& f = m_frames[id];
 
 		Quat applied = f.parentId < 0 ? Quat() : appliedRot[f.parentId];
 
@@ -1223,17 +1230,15 @@ void MeshX::DrawBvh(Bvh* bvh, double time, MeshXAnimResult& animResult)
 
 		Quat diff = toApply * inv(applied);
 
-	//	Quat diff = bvhBoneId < 0 ? Quat() : rotAnim[bvhBoneId];
-
-		f.frameTransformMatrix = q2m(f.axisAlignQuat * diff * inv(f.axisAlignQuat) * f.boneAlignQuat) * f.initialMatrix;
+		localMats[id] = q2m(f.axisAlignQuat * diff * inv(f.axisAlignQuat) * f.boneAlignQuat) * f.initialMatrix;
 		if (bvhBoneId == 0) {
-			f.frameTransformMatrix *= v2m(pos - (Vec3)f.frameTransformMatrix.GetRow(3));
+			localMats[id] *= v2m(pos - (Vec3)localMats[id].GetRow(3));
 		}
 
 		appliedRot[it.GetCurrent()] = toApply;
 	}
 
-	CalcFrameMatrices(animResult);
+	CalcFrameMatrices(animResult, localMats);
 
 	if (g_type == "pivot") {
 		debugRenderer.DrawPivots(animResult.boneMat, dimof(animResult.boneMat));
@@ -1274,12 +1279,13 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh)
 	};
 
 	for(const char* xBoneName : xBoneNames) {
-
-		for (auto& f : m_frames) {
-			f.frameTransformMatrix = q2m(f.boneAlignQuat) * f.initialMatrix;
+		Mat localMats[BONE_MAX];
+		for (BONE_ID id = 0; id < (BONE_ID)m_frames.size(); id++) {
+			Frame& f = m_frames[id];
+			localMats[id] = q2m(f.boneAlignQuat) * f.initialMatrix;
 		}
 		MeshXAnimResult r;
-		CalcFrameMatrices(r);
+		CalcFrameMatrices(r, localMats);
 
 		const std::vector<BvhFrame>& bvhFrames = bvh->GetFrames();
 		BONE_ID bvhFrameId = GetBvhBoneIdByTinyBoneName(xBoneName, bvh);

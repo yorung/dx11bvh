@@ -93,8 +93,6 @@ struct Frame
 {
 	char name[32];
 	Mat initialMatrix;
-	Mat frameTransformMatrixOrg;
-	Mat frameTransformMatrix;
 	Mat boneOffsetMatrix;
 	BONE_ID parentId;
 	BONE_ID childId;
@@ -137,8 +135,8 @@ private:
 	BONE_ID _getFrameIdByName(const char* name);
 	void _linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId);
 	void _storeWeight(MeshVertex& v, int frameId, float weight);
-	void CalcAnimation(int animId, double time);
-	void CalcFrameMatrices(MeshXAnimResult& animResult) const;
+	void CalcAnimation(int animId, double time, Mat localMats[BONE_MAX]) const;
+	void CalcFrameMatrices(MeshXAnimResult& animResult, const Mat localMats[BONE_MAX]) const;
 	void DumpFrames() const;
 	void CreateBoneMesh();
 	int GetDepth(BONE_ID id) const;
