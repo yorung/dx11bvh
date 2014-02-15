@@ -104,6 +104,38 @@ struct Mat
 	void SetRow(int i, const Vec3& v) { m[i][0] = v.x; m[i][1] = v.y; m[i][2] = v.z; }
 };
 
+
+// http://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process
+inline Vec3 proj(Vec3 u, Vec3 v)
+{
+	return (dot(u, v) / dot(u, u)) * u;
+}
+
+inline Mat orthogonalize(Mat v)
+{
+	Vec3 vx = v.GetRow(0);
+	Vec3 vy = v.GetRow(1);
+	Vec3 vz = v.GetRow(2);
+
+	Vec3 ux = vx;
+	Vec3 uy = vy - proj(ux, vy);
+	Vec3 uz = vz - proj(ux, vz) - proj(uy, vz);
+
+	ux = normalize(ux);
+	uy = normalize(uy);
+	uz = normalize(uz);
+	ux *= length(vx);
+	uy *= length(vx);
+	uz *= length(vx);
+
+	Mat u;
+	u.SetRow(0, ux);
+	u.SetRow(1, uy);
+	u.SetRow(2, uz);
+	u.SetRow(3, v.GetRow(3));
+	return u;
+}
+
 inline Quat inv(const Quat& q)
 {
 	Quat c = q.Conjugate();

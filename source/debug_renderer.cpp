@@ -97,37 +97,6 @@ void DebugRenderer::Init()
 	CreatePivotMesh();
 }
 
-// http://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process
-Vec3 Proj(Vec3 u, Vec3 v)
-{
-	return (dot(u, v) / dot(u, u)) * u;
-}
-
-Mat Orthogonalization(Mat v)
-{
-	Vec3 vx = v.GetRow(0);
-	Vec3 vy = v.GetRow(1);
-	Vec3 vz = v.GetRow(2);
-
-	Vec3 ux = vx;
-	Vec3 uy = vy - Proj(ux, vy);
-	Vec3 uz = vz - Proj(ux, vz) - Proj(uy, vz);
-
-	ux = normalize(ux);
-	uy = normalize(uy);
-	uz = normalize(uz);
-	ux *= length(vx);
-	uy *= length(vx);
-	uz *= length(vx);
-
-	Mat u;
-	u.SetRow(0, ux);
-	u.SetRow(1, uy);
-	u.SetRow(2, uz);
-	u.SetRow(3, v.GetRow(3));
-	return u;
-}
-
 void DebugRenderer::DrawPivots(const Matrix mat[BONE_MAX], int num)
 {
 	Matrix mat2[BONE_MAX];
@@ -138,7 +107,7 @@ void DebugRenderer::DrawPivots(const Matrix mat[BONE_MAX], int num)
 	pivotsRenderer.Draw(mat2, BONE_MAX, pivots);
 
 	for (int i = 0; i < BONE_MAX; i++) {
-		mat2[i] = Orthogonalization(mat2[i]);
+		mat2[i] = orthogonalize(mat2[i]);
 	}
 	pivotsRenderer.Draw(mat2, BONE_MAX, pivots);
 }

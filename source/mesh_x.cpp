@@ -1004,7 +1004,7 @@ void MeshX::LoadSub(const char *fileName)
 	for (auto& f : m_frames) {
 		if (f.parentId >= 0) {
 			f.initialMatrix = inv(f.boneOffsetMatrix) * m_frames[f.parentId].boneOffsetMatrix;
-			f.initialMatrix = Orthogonalization(f.initialMatrix);
+			f.initialMatrix = orthogonalize(f.initialMatrix);
 		}
 	}
 
