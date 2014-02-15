@@ -176,7 +176,7 @@ void App::DrawBoneNames(Bvh* bvh)
 void App::DrawBoneNames(const MeshX* meshX, const MeshXAnimResult& result)
 {
 	const std::vector<Frame>& frames = meshX->GetFrames();
-	for (BONE_ID id = 0; id < frames.size(); id++) {
+	for (BONE_ID id = 0; id < (BONE_ID)frames.size(); id++) {
 		const Frame& f = frames[id];
 		XMFLOAT2 pos = GetScreenPos(result.boneMat[id]);
 
@@ -250,10 +250,11 @@ void App::Draw()
 			if (bvh) {
 				bvh->Draw(animationNumber == 9 ? 0 : animationNumber, trackTime);
 				if (animationNumber == 9) {
-					meshX->DrawBvh(bvh, trackTime, meshXAnimResult);
+					meshX->CalcAnimationFromBvh(bvh, trackTime, meshXAnimResult);
 				} else {
-					meshX->Draw(animationNumber, trackTime, meshXAnimResult);
+					meshX->CalcAnimation(animationNumber, trackTime, meshXAnimResult);
 				}
+				meshX->Draw(meshXAnimResult);
 				if (GetKeyState('T') & 0x01) {
 					DrawBoneNames(bvh);
 				}

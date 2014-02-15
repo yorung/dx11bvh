@@ -135,7 +135,6 @@ private:
 	BONE_ID _getFrameIdByName(const char* name);
 	void _linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId);
 	void _storeWeight(MeshVertex& v, int frameId, float weight);
-	void CalcAnimation(int animId, double time, Mat localMats[BONE_MAX]) const;
 	void CalcFrameMatrices(MeshXAnimResult& animResult, const Mat localMats[BONE_MAX]) const;
 	void DumpFrames() const;
 	void CreateBoneMesh();
@@ -159,8 +158,9 @@ public:
 	const std::vector<Frame>& GetFrames() const { return m_frames; }
 	MeshX(const char *fileName);
 	~MeshX();
-	void Draw(int animId, double time, MeshXAnimResult& animResult);
-	void DrawBvh(class Bvh* bvh, double time, MeshXAnimResult& animResult);
+	void CalcAnimation(int animId, double time, MeshXAnimResult& result) const;
+	void CalcAnimationFromBvh(class Bvh* bvh, double time, MeshXAnimResult& animResult) const;
+	void Draw(const MeshXAnimResult& animResult) const;
 	void SyncLocalAxisWithBvh(Bvh* bvh);
 };
 

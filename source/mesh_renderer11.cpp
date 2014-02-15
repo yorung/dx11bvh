@@ -60,7 +60,7 @@ void MeshRenderer11::Init(int sizeVertices, int sizeIndices, void* vertices, voi
 	deviceMan11.GetDevice()->CreateDepthStencilState(&CD3D11_DEPTH_STENCIL_DESC(D3D11_DEFAULT), &pDSState);
 }
 
-void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Block& block)
+void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Block& block) const
 {
 	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	shaderMan.Apply(shaderId);
