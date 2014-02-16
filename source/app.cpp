@@ -58,7 +58,8 @@ void App::Init(const char* fileName)
 		}
 	} else {
 		const char* bvhNames[] = {
-			"D:\\bvh\\01\\01_01.bvh",
+	//		"D:\\bvh\\01\\01_01.bvh",
+			"D:\\github\\aachan.bvh",
 		};
 		for (int i = 0; i < dimof(bvhNames); i++) {
 			Bvh* bvh = new Bvh(bvhNames[i]);
@@ -69,7 +70,8 @@ void App::Init(const char* fileName)
 	}
 
 	radius = CalcRadius(mesh[0]);
-	scale = 1 / std::max(0.00001f, radius);
+//	scale = 1 / std::max(0.00001f, radius);
+	scale = 1 / std::max(0.00001f, meshTiny ? CalcRadius(meshTiny) : radius);
 
 	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, 0.1f, 1000.0f));
 
