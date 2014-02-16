@@ -1237,7 +1237,7 @@ void MeshX::CalcAnimationFromBvh(Bvh* bvh, const MeshXBvhBinding& bind, double t
 		Quat applied = f.parentId < 0 ? Quat() : appliedRot[f.parentId];
 
 		BONE_ID bvhBoneId = GetBvhBoneIdByTinyBoneName(f.name, bvh);
-		Quat toApply = bvhBoneId < 0 ? Quat() : m2q(bvh->GetFrames()[bvhBoneId].result);
+		Quat toApply = bvhBoneId < 0 ? applied : m2q(bvh->GetFrames()[bvhBoneId].result);
 
 		Quat diff = toApply * inv(applied);
 
