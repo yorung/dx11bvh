@@ -49,7 +49,10 @@ void App::Init(const char* fileName)
 	if (fileName) {
 		const char* ext = strrchr(fileName, '.');
 		if (ext && !_stricmp(ext, ".bvh")) {
-			mesh[0] = new Bvh(fileName);
+			Bvh* bvh = new Bvh(fileName);
+			mesh[0] = bvh;
+			bvh->ResetAnim();
+			meshTiny->SyncLocalAxisWithBvh(bvh, bind[0]);
 		} else {
 			mesh[0] = new MeshX(fileName);
 		}
