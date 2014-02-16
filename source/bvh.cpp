@@ -29,6 +29,33 @@ static const char *bvhPerfume[] =
 	"LeftToe",
 };
 
+static const char *bvhMocap[] =
+{
+	"RightWrist",
+	"LeftWrist",
+	"RightElbow",
+	"LeftElbow",
+	"RightShoulder",
+	"LeftShoulder",
+	"RightCollar",
+	"LeftCollar",
+	"Head",
+	"Neck",
+	"Chest2",
+	"Chest2",
+	"Chest",
+	"Chest",
+	"Hips",
+	"RightHip",
+	"LeftHip",
+	"RightKnee",
+	"LeftKnee",
+	"RightAnkle",
+	"LeftAnkle",
+	"End of RightAnkle",
+	"End of LeftAnkle",
+};
+
 static const char *bvhCmu[] =
 {
 	"RightHand",
@@ -56,7 +83,8 @@ static const char *bvhCmu[] =
 	"LeftToeBase",
 };
 
-static const char **bvhPresets[] = {bvhPerfume, bvhCmu};
+
+static const char **bvhPresets[] = {bvhPerfume, bvhMocap, bvhCmu};
 
 static void _enterBrace(char*& p)
 {
