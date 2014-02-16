@@ -219,7 +219,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		app.LButtonUp(LOWORD(lParam) / (float)SCR_W, HIWORD(lParam) / (float)SCR_H);
 		break;
 	case WM_MOUSEMOVE:
-		app.MouseMove(LOWORD(lParam) / (float)SCR_W, HIWORD(lParam) / (float)SCR_H);
+		app.MouseMove(MAKEPOINTS(lParam).x / (float)SCR_W, MAKEPOINTS(lParam).y / (float)SCR_H);
 		break;
 	case WM_MOUSEWHEEL:
 		app.MouseWheel((short)HIWORD(wParam) / (float)WHEEL_DELTA);

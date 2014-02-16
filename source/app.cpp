@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+static float INVALID_POS = -99999.f;
+
 static float CalcRadius(const Mesh* m)
 {
 	const Block& b = m->GetRawDatas();
@@ -11,7 +13,7 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), lastX(-1), lastY(-1), sprite(nullptr), font(nullptr)
+App::App() : scale(1), lastX(INVALID_POS), lastY(INVALID_POS), sprite(nullptr), font(nullptr)
 {
 	ZeroMemory(mesh, sizeof(mesh));
 }
@@ -66,12 +68,12 @@ void App::LButtonDown(float x, float y)
 void App::LButtonUp(float x, float y)
 {
 	MouseMove(x, y);
-	lastX = lastY = -1;
+	lastX = lastY = INVALID_POS;
 }
 
 void App::MouseMove(float x, float y)
 {
-	if (lastX < 0 || lastY < 0) {
+	if (lastX <= INVALID_POS || lastY <= INVALID_POS) {
 		return;
 	}
 	rotX += (x - lastX) * XM_PI * 2.0f;
