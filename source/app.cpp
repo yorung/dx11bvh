@@ -22,7 +22,7 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), lastX(INVALID_POS), lastY(INVALID_POS), sprite(nullptr), font(nullptr), animationNumber(0), trackTime(0), meshTiny(nullptr)
+App::App() : scale(1), radius(1), lastX(INVALID_POS), lastY(INVALID_POS), sprite(nullptr), font(nullptr), animationNumber(0), trackTime(0), meshTiny(nullptr)
 {
 	quat = XMQuaternionIdentity();
 	ZeroMemory(mesh, sizeof(mesh));
@@ -73,7 +73,7 @@ void App::Init(const char* fileName)
 		}
 	}
 
-	float radius = CalcRadius(mesh[0]);
+	radius = CalcRadius(mesh[0]);
 	scale = 1 / std::max(0.00001f, radius);
 
 	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, 0.1f, 1000.0f));
@@ -247,7 +247,7 @@ void App::Draw()
 			if (bvh) {
 				bvh->Draw(animationNumber == 9 ? 0 : animationNumber, trackTime);
 				if (animationNumber == 9) {
-					meshX->CalcAnimationFromBvh(bvh, bind[i], trackTime, meshXAnimResult);
+					meshX->CalcAnimationFromBvh(bvh, bind[i], trackTime, meshXAnimResult, 270 / radius);
 				} else {
 					meshX->CalcAnimation(animationNumber, trackTime, meshXAnimResult);
 				}

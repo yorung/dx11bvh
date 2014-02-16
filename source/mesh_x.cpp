@@ -1218,13 +1218,13 @@ void MeshX::SyncLocalAxisWithBvh(Bvh* bvh, MeshXBvhBinding& bind) const
 	}
 }
 
-void MeshX::CalcAnimationFromBvh(Bvh* bvh, const MeshXBvhBinding& bind, double time, MeshXAnimResult& animResult) const
+void MeshX::CalcAnimationFromBvh(Bvh* bvh, const MeshXBvhBinding& bind, double time, MeshXAnimResult& animResult, float translationScale) const
 {
 	Quat rotAnim[BONE_MAX];
 	bvh->GetRotAnim(rotAnim, time);
 
 	bvh->CalcAnimation(time);
-	Vec3 pos = bvh->GetFrames()[0].result.Translation();
+	Vec3 pos = bvh->GetFrames()[0].result.Translation() * translationScale;
 
 	assert(m_frames.size() <= BONE_MAX);
 

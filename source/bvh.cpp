@@ -328,7 +328,6 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 			frame.offset.x = _getF(child);
 			frame.offset.y = _getF(child);
 			frame.offset.z = -_getF(child);
-			frame.offset *= BVH_SCALE;
 			frame.offsetCombined = Vec3();
 
 			if (parentFrameId >= 0) {
@@ -470,7 +469,7 @@ void Bvh::CalcAnimation(double time)
 		Vec3 translate;
 		Quaternion q = pose.quats[i];
 		if (it.posIndices.x >= 0) {
-			translate = Vec3(mot[it.posIndices.x] * BVH_SCALE, mot[it.posIndices.y] * BVH_SCALE, -mot[it.posIndices.z] * BVH_SCALE);
+			translate = Vec3(mot[it.posIndices.x], mot[it.posIndices.y], -mot[it.posIndices.z]);
 		} else {
 			translate = it.offset;
 		}

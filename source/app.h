@@ -3,6 +3,7 @@ class App {
 	MeshXBvhBinding bind[3];
 	Mesh* mesh[3];
 	float scale;
+	float radius;
 	float lastX;
 	float lastY;
 	XMVECTOR quat;
