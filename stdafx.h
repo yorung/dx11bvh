@@ -49,6 +49,7 @@ static const int BONE_MAX = 50;
 #include "source/mesh_renderer11.h"
 #include "source/mesh_x.h"
 #include "source/bvh.h"
+#include "source/joint_db.h"
 #include "source/debug_renderer.h"
 #include "source/grid_renderer.h"
 

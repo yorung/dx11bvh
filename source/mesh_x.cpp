@@ -1154,53 +1154,6 @@ void MeshX::Draw(const MeshXAnimResult& animResult) const
 	}
 }
 
-static BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, const Bvh* bvh)
-{
-	struct BoneConvTbl {
-		char* bvh;
-		char* x;
-	};
-	const BoneConvTbl tbl[] =
-	{
-		{ "Bip01_L_Hand", "RightHand" },
-		{ "Bip01_R_Hand", "LeftHand" },
-		{ "Bip01_L_Forearm", "RightForeArm" },
-		{ "Bip01_R_Forearm", "LeftForeArm" },
-		{ "Bip01_L_UpperArm", "RightArm" },
-		{ "Bip01_R_UpperArm", "LeftArm" },
-		{ "Bip01_L_Clavicle", "RightShoulder" },
-		{ "Bip01_R_Clavicle", "LeftShoulder" },
-		{ "Bip01_Head", "Head" },
-		{ "Bip01_Neck", "Neck" },
-//		{ "Bip01_Spine3", "Chest4" },
-		{ "Bip01_Spine2", "Chest1" },
-		{ "Bip01_Spine1", "Spine" },
-		{ "Bip01_Spine", "LowerBack" },
-		{ "Bip01_Pelvis", "Hips" },
-		{ "Bip01_L_Thigh", "RightUpLeg" },
-		{ "Bip01_R_Thigh", "LeftUpLeg" },
-		{ "Bip01_L_Calf", "RightLeg" },
-		{ "Bip01_R_Calf", "LeftLeg" },
-		{ "Bip01_L_Foot", "RightFoot" },
-		{ "Bip01_R_Foot", "LeftFoot" },
-		{ "Bip01_L_Toe0", "RightToeBase" },
-		{ "Bip01_R_Toe0", "LeftToeBase" },
-	};
-
-	const char* bvhBoneName = nullptr;
-	for (auto& t : tbl) {
-		if (!strcmp(t.bvh, tinyBoneName)) {
-			bvhBoneName = t.x;
-			break;
-		}
-	}
-	if (!bvhBoneName) {
-		return -1;
-	}
-	BONE_ID bvhBoneId = bvh->BoneNameToId(bvhBoneName);
-	return bvhBoneId;
-}
-
 void MeshX::SyncLocalAxisWithBvh(Bvh* bvh, MeshXBvhBinding& bind) const
 {
 	ApplyBvhInitialStance(bvh, bind);
