@@ -1162,29 +1162,29 @@ static BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, const Bvh* b
 	};
 	const BoneConvTbl tbl[] =
 	{
-		{ "Bip01_L_Hand", "RightWrist" },
-		{ "Bip01_R_Hand", "LeftWrist" },
-		{ "Bip01_L_Forearm", "RightElbow" },
-		{ "Bip01_R_Forearm", "LeftElbow" },
-		{ "Bip01_L_UpperArm", "RightShoulder" },
-		{ "Bip01_R_UpperArm", "LeftShoulder" },
-		{ "Bip01_L_Clavicle", "RightCollar" },
-		{ "Bip01_R_Clavicle", "LeftCollar" },
+		{ "Bip01_L_Hand", "RightHand" },
+		{ "Bip01_R_Hand", "LeftHand" },
+		{ "Bip01_L_Forearm", "RightForeArm" },
+		{ "Bip01_R_Forearm", "LeftForeArm" },
+		{ "Bip01_L_UpperArm", "RightArm" },
+		{ "Bip01_R_UpperArm", "LeftArm" },
+		{ "Bip01_L_Clavicle", "RightShoulder" },
+		{ "Bip01_R_Clavicle", "LeftShoulder" },
 		{ "Bip01_Head", "Head" },
 		{ "Bip01_Neck", "Neck" },
-		{ "Bip01_Spine3", "Chest4" },
-		{ "Bip01_Spine2", "Chest3" },
-		{ "Bip01_Spine1", "Chest2" },
-		{ "Bip01_Spine", "Chest" },
+//		{ "Bip01_Spine3", "Chest4" },
+		{ "Bip01_Spine2", "Chest1" },
+		{ "Bip01_Spine1", "Spine" },
+		{ "Bip01_Spine", "LowerBack" },
 		{ "Bip01_Pelvis", "Hips" },
-		{ "Bip01_L_Thigh", "RightHip" },
-		{ "Bip01_R_Thigh", "LeftHip" },
-		{ "Bip01_L_Calf", "RightKnee" },
-		{ "Bip01_R_Calf", "LeftKnee" },
-		{ "Bip01_L_Foot", "RightAnkle" },
-		{ "Bip01_R_Foot", "LeftAnkle" },
-		{ "Bip01_L_Toe0", "RightToe" },
-		{ "Bip01_R_Toe0", "LeftToe" },
+		{ "Bip01_L_Thigh", "RightUpLeg" },
+		{ "Bip01_R_Thigh", "LeftUpLeg" },
+		{ "Bip01_L_Calf", "RightLeg" },
+		{ "Bip01_R_Calf", "LeftLeg" },
+		{ "Bip01_L_Foot", "RightFoot" },
+		{ "Bip01_R_Foot", "LeftFoot" },
+		{ "Bip01_L_Toe0", "RightToeBase" },
+		{ "Bip01_R_Toe0", "LeftToeBase" },
 	};
 
 	const char* bvhBoneName = nullptr;
@@ -1286,7 +1286,9 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh, MeshXBvhBinding& bind) const
 
 		const std::vector<BvhFrame>& bvhFrames = bvh->GetFrames();
 		BONE_ID bvhFrameId = GetBvhBoneIdByTinyBoneName(xBoneName, bvh);
-		assert(bvhFrameId >= 0);
+		if(bvhFrameId < 0) {
+			continue;
+		}
 		const BvhFrame& bvhF = bvhFrames[bvhFrameId];
 
 		BONE_ID myId = GetFrameIdByName(xBoneName);
@@ -1300,14 +1302,18 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh, MeshXBvhBinding& bind) const
 		assert(bvhF.childId >= 0);
 		assert(f->childId >= 0);
 		const BvhFrame* bvhChild = &bvhFrames[bvhF.childId];
-		while (bvhChild->siblingId >= 0 && (strstr(bvhChild->name, "Left") || strstr(bvhChild->name, "Right"))) {
+		while (bvhChild->siblingId >= 0 && (strstr(bvhChild->name, "Left") || strstr(bvhChild->name, "Right") || strstr(bvhChild->name, "LHipJoint") || strstr(bvhChild->name, "RHipJoint"))) {
 			bvhChild = &bvhFrames[bvhChild->siblingId];
 		}
 		BONE_ID childId = f->childId; 
 		while (m_frames[childId].siblingId >= 0 && (strstr(m_frames[childId].name, "_L_") || strstr(m_frames[childId].name, "_R_"))) {
 			childId = m_frames[childId].siblingId;
 		}
-		Vec3 worldBvh = normalize(bvhChild->offsetCombined - bvhF.offsetCombined);
+		Vec3 worldBvh = bvhChild->offsetCombined - bvhF.offsetCombined;
+		if (length(worldBvh) == 0) {
+			continue;
+		}
+		worldBvh = normalize(worldBvh);
 		Vec3 worldTiny = normalize(r.boneMat[childId].GetRow(3) - r.boneMat[myId].GetRow(3));
 
 		Vec3 rotAxis = cross(worldTiny, worldBvh);

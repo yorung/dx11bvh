@@ -55,19 +55,11 @@ void App::Init(const char* fileName)
 		}
 	} else {
 		const char* bvhNames[] = {
-			"D:\\github\\aachan.bvh",
-			"D:\\github\\kashiyuka.bvh",
-			"D:\\github\\nocchi.bvh",
+			"D:\\bvh\\01\\01_01.bvh",
 		};
 		for (int i = 0; i < dimof(bvhNames); i++) {
 			Bvh* bvh = new Bvh(bvhNames[i]);
 			mesh[i] = bvh;
-		//	bvh->FixBones("Chest");
-		//	bvh->LinkTo("RightHip", "Chest");
-		//	bvh->LinkTo("LeftHip", "Chest");
-		//	bvh->FixBones("Neck");
-		//	bvh->LinkTo("RightCollar", "Neck");
-		//	bvh->LinkTo("LeftCollar", "Neck");
 			bvh->ResetAnim();
 			meshTiny->SyncLocalAxisWithBvh(bvh, bind[i]);
 		}
