@@ -1,3 +1,7 @@
+class Bvh;
+
+typedef int BONE_ID;
+
 enum BoneType
 {
 	BT_INVALID = -1,
@@ -24,6 +28,8 @@ enum BoneType
 	BT_L_FOOT,
 	BT_R_TOE,
 	BT_L_TOE,
+
+	BT_MAX
 };
 
 BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, const Bvh* bvh);

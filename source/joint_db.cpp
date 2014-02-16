@@ -27,79 +27,17 @@ static const char *xBones[] =
 	"Bip01_R_Toe0",
 };
 
-static const char *bvhPerfume[] =
-{
-	"RightWrist",
-	"LeftWrist",
-	"RightElbow",
-	"LeftElbow",
-	"RightShoulder",
-	"LeftShoulder",
-	"RightCollar",
-	"LeftCollar",
-	"Head",
-	"Neck",
-	"Chest4",
-	"Chest3",
-	"Chest2",
-	"Chest",
-	"Hips",
-	"RightHip",
-	"LeftHip",
-	"RightKnee",
-	"LeftKnee",
-	"RightAnkle",
-	"LeftAnkle",
-	"RightToe",
-	"LeftToe",
-};
-
-static const char *bvhCmu[] =
-{
-	"RightHand",
-	"LeftHand",
-	"RightForeArm",
-	"LeftForeArm",
-	"RightArm",
-	"LeftArm",
-	"RightShoulder",
-	"LeftShoulder",
-	"Head",
-	"Neck",
-	"Spine1",
-	"Spine1",
-	"Spine",
-	"LowerBack",
-	"Hips",
-	"RightUpLeg",
-	"LeftUpLeg",
-	"RightLeg",
-	"LeftLeg",
-	"RightFoot",
-	"LeftFoot",
-	"RightToeBase",
-	"LeftToeBase",
-};
-
 BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, const Bvh* bvh)
 {
 	BoneType boneType = BT_INVALID;
 	for (int i = 0; i < dimof(xBones); i++) {
 		if (!strcmp(xBones[i], tinyBoneName)) {
 			boneType = (BoneType)i;
+			break;
 		}
 	}
-	for (auto& t : boneConvTbl) {
-		if (strcmp(t.x, tinyBoneName)) {
-			continue;
-		}
-		for (auto b : t.bvh) {
-			BONE_ID bvhBoneId = bvh->BoneNameToId(b);
-			if (bvhBoneId >= 0) {
-				return bvhBoneId;
-			}
-		}
+	if (boneType == BT_INVALID) {
 		return -1;
 	}
-	return -1;
+	return bvh->BoneTypeToId(boneType);
 }

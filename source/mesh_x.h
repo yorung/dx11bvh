@@ -13,8 +13,6 @@ struct TimedFloatKeys
 	Mat mat;
 };
 
-typedef int BONE_ID;
-
 struct AnimationKey
 {
 	int keyType;

@@ -2,6 +2,61 @@
 
 void *LoadFile(const char *fileName);
 
+static const char *bvhPerfume[] =
+{
+	"RightWrist",
+	"LeftWrist",
+	"RightElbow",
+	"LeftElbow",
+	"RightShoulder",
+	"LeftShoulder",
+	"RightCollar",
+	"LeftCollar",
+	"Head",
+	"Neck",
+	"Chest4",
+	"Chest3",
+	"Chest2",
+	"Chest",
+	"Hips",
+	"RightHip",
+	"LeftHip",
+	"RightKnee",
+	"LeftKnee",
+	"RightAnkle",
+	"LeftAnkle",
+	"RightToe",
+	"LeftToe",
+};
+
+static const char *bvhCmu[] =
+{
+	"RightHand",
+	"LeftHand",
+	"RightForeArm",
+	"LeftForeArm",
+	"RightArm",
+	"LeftArm",
+	"RightShoulder",
+	"LeftShoulder",
+	"Head",
+	"Neck",
+	"Spine1",
+	"Spine1",
+	"Spine",
+	"LowerBack",
+	"Hips",
+	"RightUpLeg",
+	"LeftUpLeg",
+	"RightLeg",
+	"LeftLeg",
+	"RightFoot",
+	"LeftFoot",
+	"RightToeBase",
+	"LeftToeBase",
+};
+
+static const char **bvhPresets[] = {bvhPerfume, bvhCmu};
 
 static void _enterBrace(char*& p)
 {
@@ -168,7 +223,24 @@ int Bvh::GetDepth(BONE_ID id)
 	return depth;
 }
 
-
+void Bvh::CreateBoneTypeToIdTbl()
+{
+	for (auto& it : bvhPresets) {
+		int cnt = 0;
+		for (int i = 0; i < BT_MAX; i++) {
+			for (BONE_ID id = 0; id < (BONE_ID)m_frames.size(); id++) {
+				const BvhFrame& f = m_frames[id];
+				if (!strcmp(f.name, it[i])) {
+					cnt++;
+					boneTypeToIdTbl[i] = id;
+				}
+			}
+		}
+		if (cnt == BT_MAX) {
+			return;
+		}
+	}
+}
 
 Bvh::Bvh(const char *fileName)
 {
@@ -196,6 +268,7 @@ Bvh::Bvh(const char *fileName)
 		CalcBoneOffsetMatrix(i);
 	}
 	CreateBoneMesh();
+	CreateBoneTypeToIdTbl();
 }
 
 void Bvh::CreateBoneMesh()
@@ -542,6 +615,11 @@ BONE_ID Bvh::BoneNameToId(const char* name) const
 		}
 	}
 	return -1;
+}
+
+BONE_ID Bvh::BoneTypeToId(BoneType type) const
+{
+	return boneTypeToIdTbl[type];
 }
 
 void Bvh::FixBones(const char* name)

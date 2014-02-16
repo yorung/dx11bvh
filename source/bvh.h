@@ -39,7 +39,11 @@ private:
 	int GetDepth(BONE_ID id);
 	void CreateBoneMesh();
 	void CalcCombinedOffsets();
+	BONE_ID BoneNameToId(const char* name) const;
+	void CreateBoneTypeToIdTbl();
 
+
+	BONE_ID boneTypeToIdTbl[BT_MAX];
 	std::vector<BvhFrame> m_frames;
 	std::vector<float> rawMotion;
 	Motion motion;
@@ -58,7 +62,7 @@ public:
 	void Draw(int animId, double time);
 	void ResetAnim();
 	void GetRotAnim(Quat quats[BONE_MAX], double time) const;
-	BONE_ID BoneNameToId(const char* name) const;
+	BONE_ID BoneTypeToId(BoneType type) const;
 	void FixBones(const char* name);
 	void LinkTo(const char* me, const char* linkTo);
 	bool UnlinkFromParent(BONE_ID id);
