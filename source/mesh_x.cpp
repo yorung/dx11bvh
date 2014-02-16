@@ -1266,7 +1266,7 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh, MeshXBvhBinding& bind) const
 		}
 		Vec3 worldBvh = bvhChild->offsetCombined - bvhF.offsetCombined;
 		if (length(worldBvh) == 0) {
-			continue;
+			worldBvh = Vec3(0, 1, 0);
 		}
 		worldBvh = normalize(worldBvh);
 		Vec3 worldTiny = normalize(r.boneMat[childId].GetRow(3) - r.boneMat[myId].GetRow(3));
