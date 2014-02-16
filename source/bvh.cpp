@@ -53,7 +53,7 @@ static double _getD(char*& p)
 	double result = atof(p);
 
 	while (*p) {
-		if (!strchr("0123456789-.", *p)) {
+		if (!strchr("0123456789-.eE", *p)) {
 			break;
 		}
 		p++;
