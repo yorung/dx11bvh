@@ -9,6 +9,7 @@ static double GetTime()
 	QueryPerformanceFrequency(&f);
 	return (double)t.QuadPart / f.QuadPart;
 }
+static float INVALID_POS = -99999.f;
 
 static float CalcRadius(const Mesh* m)
 {
@@ -21,7 +22,7 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), lastX(-1), lastY(-1), sprite(nullptr), font(nullptr), animationNumber(0), trackTime(0), meshTiny(nullptr)
+App::App() : scale(1), lastX(INVALID_POS), lastY(INVALID_POS), sprite(nullptr), font(nullptr), animationNumber(0), trackTime(0), meshTiny(nullptr)
 {
 	quat = XMQuaternionIdentity();
 	ZeroMemory(mesh, sizeof(mesh));
@@ -102,12 +103,12 @@ void App::LButtonDown(float x, float y)
 void App::LButtonUp(float x, float y)
 {
 	MouseMove(x, y);
-	lastX = lastY = -1;
+	lastX = lastY = INVALID_POS;
 }
 
 void App::MouseMove(float x, float y)
 {
-	if (lastX < 0 || lastY < 0) {
+	if (lastX <= INVALID_POS || lastY <= INVALID_POS) {
 		return;
 	}
 	float dx = x - lastX;
