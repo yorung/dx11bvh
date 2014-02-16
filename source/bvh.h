@@ -18,9 +18,9 @@ struct BvhFrame
 	BONE_ID siblingId;
 	XMINT3 rotIndices;
 	XMINT3 posIndices;
-	Matrix frameTransformMatrix;
-	Matrix boneOffsetMatrix;
-	Matrix result;
+	Mat frameTransformMatrix;
+	Mat boneOffsetMatrix;
+	Mat result;
 };
 
 class Bvh : public Mesh

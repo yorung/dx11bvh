@@ -1177,7 +1177,7 @@ void MeshX::CalcAnimationFromBvh(Bvh* bvh, const MeshXBvhBinding& bind, double t
 	bvh->GetRotAnim(rotAnim, time);
 
 	bvh->CalcAnimation(time);
-	Vec3 pos = bvh->GetFrames()[0].result.Translation() * translationScale;
+	Vec3 pos = bvh->GetFrames()[0].result.GetRow(3) * translationScale;
 
 	assert(m_frames.size() <= BONE_MAX);
 

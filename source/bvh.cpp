@@ -546,7 +546,7 @@ Bvh::~Bvh()
 void Bvh::CalcFrameMatrices()
 {
 	for (auto& f : m_frames) {
-		f.result = f.frameTransformMatrix * (f.parentId >= 0 ? m_frames[f.parentId].result : Matrix());
+		f.result = f.frameTransformMatrix * (f.parentId >= 0 ? m_frames[f.parentId].result : Mat());
 	}
 }
 
