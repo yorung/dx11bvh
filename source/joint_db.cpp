@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-static char *xBones[] =
+static const char *xBones[] =
 {
 	"Bip01_L_Hand",
 	"Bip01_R_Hand",
@@ -27,37 +27,58 @@ static char *xBones[] =
 	"Bip01_R_Toe0",
 };
 
-
-struct BoneConvTbl {
-	char* x;
-	std::vector<const char*> bvh;
+static const char *bvhPerfume[] =
+{
+	"RightWrist",
+	"LeftWrist",
+	"RightElbow",
+	"LeftElbow",
+	"RightShoulder",
+	"LeftShoulder",
+	"RightCollar",
+	"LeftCollar",
+	"Head",
+	"Neck",
+	"Chest4",
+	"Chest3",
+	"Chest2",
+	"Chest",
+	"Hips",
+	"RightHip",
+	"LeftHip",
+	"RightKnee",
+	"LeftKnee",
+	"RightAnkle",
+	"LeftAnkle",
+	"RightToe",
+	"LeftToe",
 };
 
-static const BoneConvTbl boneConvTbl[] =
+static const char *bvhCmu[] =
 {
-	{"Bip01_L_Hand", {"RightHand", "RightWrist"}},
-	{"Bip01_R_Hand", {"LeftHand", "LeftWrist"} },
-	{"Bip01_L_Forearm", {"RightForeArm", "RightElbow"} },
-	{"Bip01_R_Forearm", {"LeftForeArm", "LeftElbow"} },
-	{"Bip01_L_UpperArm", {"RightArm", "RightShoulder"} },
-	{"Bip01_R_UpperArm", {"LeftArm", "LeftShoulder"} },
-	{"Bip01_L_Clavicle", {"RightShoulder", "RightCollar"} },
-	{"Bip01_R_Clavicle", {"LeftShoulder", "LeftCollar"} },
-	{"Bip01_Head", {"Head"} },
-	{"Bip01_Neck", {"Neck"} },
-	{"Bip01_Spine3", {"Chest4"} },
-//	{"Bip01_Spine2", {"Chest1"} },
-	{"Bip01_Spine1", {"Spine", "Chest2"} },
-	{"Bip01_Spine", {"LowerBack", "Chest"} },
-	{"Bip01_Pelvis", {"Hips"} },
-	{"Bip01_L_Thigh", {"RightUpLeg", "RightHip"} },
-	{"Bip01_R_Thigh", {"LeftUpLeg", "LeftHip"} },
-	{"Bip01_L_Calf", {"RightLeg", "RightKnee"} },
-	{"Bip01_R_Calf", {"LeftLeg", "LeftKnee"} },
-	{"Bip01_L_Foot", {"RightFoot", "RightAnkle"} },
-	{"Bip01_R_Foot", {"LeftFoot", "LeftAnkle"} },
-	{"Bip01_L_Toe0", {"RightToeBase", "RightToe"} },
-	{"Bip01_R_Toe0", {"LeftToeBase", "LeftToe"} },
+	"RightHand",
+	"LeftHand",
+	"RightForeArm",
+	"LeftForeArm",
+	"RightArm",
+	"LeftArm",
+	"RightShoulder",
+	"LeftShoulder",
+	"Head",
+	"Neck",
+	"Spine1",
+	"Spine1",
+	"Spine",
+	"LowerBack",
+	"Hips",
+	"RightUpLeg",
+	"LeftUpLeg",
+	"RightLeg",
+	"LeftLeg",
+	"RightFoot",
+	"LeftFoot",
+	"RightToeBase",
+	"LeftToeBase",
 };
 
 BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, const Bvh* bvh)
