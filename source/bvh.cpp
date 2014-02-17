@@ -280,7 +280,7 @@ void Bvh::CreateBoneMesh()
 	mat.emissive.y = 0.4f;
 	mat.emissive.z = 0.4f;
 	mat.emissive.w = 1.0f;
-	mat.tmid = texMan.Create("white.bmp", true);
+	mat.tmid = texMan.Create("resource\\white.bmp", true);
 
 	MaterialMap map;
 	map.materialId = matMan.Create(mat);
