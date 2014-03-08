@@ -1,3 +1,5 @@
+//#define USE_DXMATH
+
 typedef float affloat;
 
 template <class VEC3> inline affloat dot(const VEC3& l, const VEC3& r)
@@ -19,6 +21,8 @@ inline double afsin(double s) { return sin(s); }
 inline float afcos(float s) { return cosf(s); }
 inline double afcos(double s) { return cos(s); }
 
+template <class T> inline void swap(T& a, T& b) { T t = a; a = b; b = t; }
+
 template <class VEC3> inline affloat length(const VEC3& v)
 {
 	return afsqrt(dot(v, v));
@@ -27,13 +31,6 @@ template <class VEC3> inline affloat length(const VEC3& v)
 template <class VEC3> inline VEC3 normalize(const VEC3& v)
 {
 	return v / length(v);
-}
-
-template <class QUAT> inline QUAT inv(const QUAT& q)
-{
-	QUAT c = q.Conjugate();
-	affloat lenSq = q.w * q.w + dot(q.v, q.v);
-	return QUAT(c.w / lenSq, c.v / lenSq);
 }
 
 struct Vec3
@@ -62,7 +59,7 @@ struct Quat
 	affloat w;
 	Quat() : Quat(1, Vec3()) {}
 	Quat(affloat W, const Vec3& V) : w(W), v(V) {}
-	Quat(const Vec3& axis, affloat angle) { w = afcos(angle / 2); v = axis * afsin(angle / 2); }
+	Quat(const Vec3& axis, affloat angle) { w = afcos(angle / 2); v = normalize(axis) * afsin(angle / 2); }
 
 	Quat(const Quaternion& q) : Quat(q.w, Vec3(q.x, q.y, q.z)) {}
 	operator Quaternion() const { return Quaternion(v.x, v.y, v.z, w); }
@@ -72,28 +69,154 @@ struct Quat
 	Quat Conjugate() const { return Quat(w, -v); }
 };
 
-inline Matrix inv(const Matrix& m)
+struct Mat
 {
-	XMVECTOR dummy;
-	return XMMatrixInverse(&dummy, m);
+	union {
+		affloat m[4][4];
+		struct {
+			affloat _11, _12, _13, _14, _21, _22, _23, _24, _31, _32, _33, _34, _41, _42, _43, _44;
+		};
+	};
+
+	Mat() {
+		_11 = _22 = _33 = _44 = 1;
+		_12 = _13 = _14 = _21 = _23 = _24 = _31 = _32 = _34 = _41 = _42 = _43 = 0;
+	};
+
+	Mat(affloat m11, affloat m12, affloat m13, affloat m14, affloat m21, affloat m22, affloat m23, affloat m24, affloat m31, affloat m32, affloat m33, affloat m34, affloat m41, affloat m42, affloat m43, affloat m44) :
+		_11(m11), _12(m12), _13(m13), _14(m14),
+		_21(m21), _22(m22), _23(m23), _24(m24),
+		_31(m31), _32(m32), _33(m33), _34(m34),
+		_41(m41), _42(m42), _43(m43), _44(m44) {}
+
+	Mat operator*(const Mat& r) const {
+#define m(i,j) (_##i####1## * r._##1####j## + _##i####2## * r._##2####j## + _##i####3## * r._##3####j## +_##i####4## * r._##4####j##)
+		return Mat(m(1,1), m(1,2), m(1,3), m(1,4), m(2,1), m(2,2), m(2,3), m(2,4), m(3,1), m(3,2), m(3,3), m(3,4), m(4,1), m(4,2), m(4,3), m(4,4));
+#undef m
+	}
+	const Mat& operator*=(const Mat& r) { *this = *this * r; return *this; }
+	const bool operator==(const Mat& r) { return !memcmp(m, r.m, sizeof(m)); }
+
+	Mat(const Matrix& mtx) { assert(sizeof(float) == sizeof(affloat)); memcpy(m, mtx.m, sizeof(m)); }
+	operator Matrix() const { return Matrix(_11, _12, _13, _14, _21, _22, _23, _24, _31, _32, _33, _34, _41, _42, _43, _44); }
+
+	Vec3 GetRow(int i) const { return Vec3(m[i][0], m[i][1], m[i][2]); }
+	void SetRow(int i, const Vec3& v) { m[i][0] = v.x; m[i][1] = v.y; m[i][2] = v.z; }
+};
+
+
+// http://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process
+inline Vec3 proj(Vec3 u, Vec3 v)
+{
+	return (dot(u, v) / dot(u, u)) * u;
 }
 
-inline Matrix q2m(const Quat& q)
+inline Mat orthogonalize(Mat v)
 {
+	Vec3 vx = v.GetRow(0);
+	Vec3 vy = v.GetRow(1);
+	Vec3 vz = v.GetRow(2);
+
+	Vec3 ux = vx;
+	Vec3 uy = vy - proj(ux, vy);
+	Vec3 uz = vz - proj(ux, vz) - proj(uy, vz);
+
+	ux = normalize(ux);
+	uy = normalize(uy);
+	uz = normalize(uz);
+	ux *= length(vx);
+	uy *= length(vx);
+	uz *= length(vx);
+
+	Mat u;
+	u.SetRow(0, ux);
+	u.SetRow(1, uy);
+	u.SetRow(2, uz);
+	u.SetRow(3, v.GetRow(3));
+	return u;
+}
+
+inline Quat inv(const Quat& q)
+{
+	Quat c = q.Conjugate();
+	affloat lenSq = q.w * q.w + dot(q.v, q.v);
+	return Quat(c.w / lenSq, c.v / lenSq);
+}
+
+inline Mat inv(const Matrix& mtx)
+{
+#ifdef USE_DXMATH
+	return mtx.Invert();
+#else
+	Mat l = mtx;
+	Mat r;
+	for (int j = 0; j < 4; j++) {
+		int d = j;
+
+		affloat maxf = 0;
+		int maxi = -1;
+		for (int i = d; i < 4; i++) {
+			affloat v = abs(l.m[i][j]);
+			if (v > maxf) {
+				maxf = v;
+				maxi = i;
+			}
+		}
+		if (maxi < 0) {
+			return Mat();	// fail
+		}
+		if (maxi != d) {
+			for (int jj = 0; jj < 4; jj++) {
+				swap(l.m[d][jj], l.m[maxi][jj]);
+				swap(r.m[d][jj], r.m[maxi][jj]);
+			}
+		}
+
+		affloat diag = l.m[d][j];
+		assert(diag);
+		for (int jj = 0; jj < 4; jj++) {
+			l.m[d][jj] /= diag;
+			r.m[d][jj] /= diag;
+		}
+
+		for (int i = 0; i < 4; i++) {
+			if (i == j) {
+				continue;
+			}
+			affloat mult = -l.m[i][j];
+			for (int jj = 0; jj < 4; jj++) {
+				l.m[i][jj] += l.m[d][jj] * mult;
+				r.m[i][jj] += r.m[d][jj] * mult;
+			}
+		}
+	}
+	return r;
+#endif
+}
+
+inline Mat q2m(const Quat& q)
+{
+#ifdef USE_DXMATH
+	return Matrix::CreateFromQuaternion(q);
+#else
 #define D(a,b) (1 - 2 * (q.v.a * q.v.a + q.v.b * q.v.b)) // diagonal
 #define P(a,b,c) (2 * (q.v.a * q.v.b + q.v.c * q.w)) // positive
 #define N(a,b,c) (2 * (q.v.a * q.v.b - q.v.c * q.w)) // negative
-	return Matrix(D(y,z), P(x,y,z), N(x,z,y), 0,
+	return Mat(D(y,z), P(x,y,z), N(x,z,y), 0,
 		   N(x,y,z), D(x,z), P(y,z,x), 0,
 		   P(x,z,y), N(y,z,x), D(x,y), 0, 0,0,0,1);
 #undef D
 #undef P
 #undef N
+#endif
 }
 
 inline Quat m2q(const Matrix& m_)
 {
-	Matrix m = m_ * Matrix::CreateScale(1.0f / length(Vec3(m_._11, m_._12, m_._13)));	// kill scaling if needed
+	Mat m = m_ * Matrix::CreateScale(1.0f / length(Vec3(m_._11, m_._12, m_._13)));	// kill scaling if needed
+#ifdef USE_DXMATH
+	return Quaternion::CreateFromRotationMatrix(m);
+#else
 
 	affloat x, y, z, w = afsqrt(m._11 + m._22 + m._33 + 1) / 2;
 	if (w > 0.5f) {							 // w is the largest
@@ -108,8 +231,8 @@ inline Quat m2q(const Matrix& m_)
 	} else if (m._22 > m._33) {					// y is the largest
 		y = afsqrt((m._11 - m._22 + m._33 - 1) / -4);
 		x = (m._12 + m._21) / (y * 4);
-		z = (m._31 - m._13) / (y * 4);
-		w = (m._23 + m._32) / (y * 4);
+		w = (m._31 - m._13) / (y * 4);
+		z = (m._23 + m._32) / (y * 4);
 	} else {									// z is the largest
 		z = afsqrt((m._11 + m._22 - m._33 - 1) / -4);
 		w = (m._12 - m._21) / (z * 4);
@@ -117,6 +240,7 @@ inline Quat m2q(const Matrix& m_)
 		y = (m._23 + m._32) / (z * 4);
 	}
 	return Quat(w, Vec3(x,y,z));
+#endif
 }
 
 inline Vec3 transform(const Vec3& v, const Matrix& m)
@@ -126,16 +250,16 @@ inline Vec3 transform(const Vec3& v, const Matrix& m)
 #undef _
 }
 
-inline Matrix translate(affloat x, affloat y, affloat z)
+inline Mat translate(affloat x, affloat y, affloat z)
 {
-	Matrix m;
+	Mat m;
 	m._41 = x;
 	m._42 = y;
 	m._43 = z;
 	return m;
 }
 
-inline Matrix v2m(const Vec3& v)
+inline Mat v2m(const Vec3& v)
 {
 	return translate(v.x, v.y, v.z);
 }
