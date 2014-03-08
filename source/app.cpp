@@ -127,6 +127,24 @@ void App::DrawBoneNames(Bvh* bvh)
 	}
 }
 
+void App::Update()
+{
+	if (GetKeyState('P') & 0x80) {
+		g_type = "pivot";
+	}
+	if (GetKeyState('M') & 0x80) {
+		g_type = "mesh";
+	}
+	if (GetKeyState('B') & 0x80) {
+		g_type = "bone";
+	}
+	for (auto& i : {'0', '1', '2', '3', '4', '9'}) {
+		if (GetKeyState(i) & 0x80) {
+			animationNumber = i - '0';
+		}
+	}
+}
+
 void App::Draw()
 {
 	LARGE_INTEGER t, f;
@@ -168,3 +186,6 @@ void App::Destroy()
 	SAFE_DELETE(sprite);
 	gridRenderer.Destroy();
 }
+
+
+std::string g_type;

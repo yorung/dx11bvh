@@ -104,6 +104,12 @@ struct Block
 	std::vector<MeshVertex> vertices;
 	std::vector<unsigned> indices;
 	std::vector<MaterialMap> materialMaps;
+	void Clear()
+	{
+		vertices.clear();
+		indices.clear();
+		materialMaps.clear();
+	}
 };
 
 class MeshX : public Mesh

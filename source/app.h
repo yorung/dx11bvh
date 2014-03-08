@@ -8,11 +8,13 @@ class App {
 	float height;
 	SpriteBatch* sprite;
 	SpriteFont* font;
+	int animationNumber;
 	GridRenderer gridRenderer;
 public:
 	App();
 	~App();
 	void Init(const char* fileName);
+	void Update();
 	void Draw();
 	void DrawBoneNames(Bvh* bvh);
 	void MouseWheel(float delta);
@@ -21,3 +23,5 @@ public:
 	void MouseMove(float x, float y);
 	void Destroy();
 };
+
+extern std::string g_type;
