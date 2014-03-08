@@ -9,6 +9,8 @@ class App {
 	SpriteBatch* sprite;
 	SpriteFont* font;
 	int animationNumber;
+	double trackTime;
+	double lastTime;
 	GridRenderer gridRenderer;
 public:
 	App();

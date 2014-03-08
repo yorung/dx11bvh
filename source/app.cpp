@@ -1,5 +1,12 @@
 #include "stdafx.h"
 
+static double GetTime()
+{
+	LARGE_INTEGER t, f;
+	QueryPerformanceCounter(&t);
+	QueryPerformanceFrequency(&f);
+	return (double)t.QuadPart / f.QuadPart;
+}
 static float INVALID_POS = -99999.f;
 
 static float CalcRadius(const Mesh* m)
@@ -16,6 +23,7 @@ static float CalcRadius(const Mesh* m)
 App::App() : scale(1), lastX(INVALID_POS), lastY(INVALID_POS), sprite(nullptr), font(nullptr)
 {
 	ZeroMemory(mesh, sizeof(mesh));
+	lastTime = GetTime();
 }
 
 App::~App()
@@ -47,6 +55,8 @@ void App::Init(const char* fileName)
 	scale = std::max(0.00001f, radius);
 
 	height = radius / 2;
+
+	lastTime = GetTime();
 }
 
 void App::MouseWheel(float delta)
@@ -147,10 +157,14 @@ void App::Update()
 
 void App::Draw()
 {
-	LARGE_INTEGER t, f;
-	QueryPerformanceCounter(&t);
-	QueryPerformanceFrequency(&f);
-	double time = ((double)t.QuadPart / f.QuadPart);
+	double currentTime = GetTime();
+	double deltaTime = currentTime - lastTime;
+	lastTime = currentTime;
+
+
+	if (GetKeyState(VK_RETURN) & 0x01) {
+		trackTime += deltaTime;
+	}
 
 	matrixMan.Set(MatrixMan::WORLD, Matrix());
 
@@ -163,7 +177,7 @@ void App::Draw()
 
 	for (auto& it : mesh) {
 		if (it) {
-			it->Draw(0, time);
+			it->Draw(0, trackTime);
 
 			Bvh* bvh = dynamic_cast<Bvh*>(it);
 			if (bvh) {
