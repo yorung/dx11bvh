@@ -63,9 +63,6 @@ public:
 	void ResetAnim();
 	void GetRotAnim(Quat quats[BONE_MAX], double time) const;
 	BONE_ID BoneTypeToId(BoneType type) const;
-	void FixBones(const char* name);
-	void LinkTo(const char* me, const char* linkTo);
-	bool UnlinkFromParent(BONE_ID id);
 	void CalcAnimation(double time);
 };
 
