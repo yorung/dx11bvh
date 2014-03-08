@@ -2,6 +2,90 @@
 
 void *LoadFile(const char *fileName);
 
+static const char *bvhPerfume[] =
+{
+	"RightWrist",
+	"LeftWrist",
+	"RightElbow",
+	"LeftElbow",
+	"RightShoulder",
+	"LeftShoulder",
+	"RightCollar",
+	"LeftCollar",
+	"Head",
+	"Neck",
+	"Chest4",
+	"Chest3",
+	"Chest2",
+	"Chest",
+	"Hips",
+	"RightHip",
+	"LeftHip",
+	"RightKnee",
+	"LeftKnee",
+	"RightAnkle",
+	"LeftAnkle",
+	"RightToe",
+	"LeftToe",
+};
+
+static const char *bvhMocap[] =
+{
+	"RightWrist",
+	"LeftWrist",
+	"RightElbow",
+	"LeftElbow",
+	"RightShoulder",
+	"LeftShoulder",
+	"RightCollar",
+	"LeftCollar",
+	"Head",
+	"Neck",
+	"Chest2",
+	"Chest2",
+	"Chest",
+	"Chest",
+	"Hips",
+	"RightHip",
+	"LeftHip",
+	"RightKnee",
+	"LeftKnee",
+	"RightAnkle",
+	"LeftAnkle",
+	"End of RightAnkle",
+	"End of LeftAnkle",
+};
+
+static const char *bvhCmu[] =
+{
+	"RightHand",
+	"LeftHand",
+	"RightForeArm",
+	"LeftForeArm",
+	"RightArm",
+	"LeftArm",
+	"RightShoulder",
+	"LeftShoulder",
+	"Head",
+	"Neck",
+	"Spine1",
+	"Spine1",
+	"Spine",
+	"LowerBack",
+	"Hips",
+	"RightUpLeg",
+	"LeftUpLeg",
+	"RightLeg",
+	"LeftLeg",
+	"RightFoot",
+	"LeftFoot",
+	"RightToeBase",
+	"LeftToeBase",
+};
+
+
+static const char **bvhPresets[] = {bvhPerfume, bvhMocap, bvhCmu};
+
 static void _enterBrace(char*& p)
 {
 	if (!p) {
@@ -157,18 +241,6 @@ static char* _searchChildTag(char* from, const char *tag, std::string* name = nu
 	return nullptr;
 }
 
-static void InitVertex(MeshVertex& v, BONE_ID boneId, DWORD color)
-{
-	v.blendIndices.x = v.blendIndices.y = v.blendIndices.z = v.blendIndices.w = boneId;
-	v.color = color;
-	v.blendWeights.x = v.blendWeights.y = v.blendWeights.z = 0;
-	v.normal.x = 1;
-	v.normal.y = 0;
-	v.normal.z = 0;
-	v.uv.x = v.uv.y = 0;
-	v.xyz.x = v.xyz.y = v.xyz.z = 0;
-}
-
 int Bvh::GetDepth(BONE_ID id)
 {
 	int depth = 0;
@@ -179,34 +251,22 @@ int Bvh::GetDepth(BONE_ID id)
 	return depth;
 }
 
-static inline void CreateCone(Block& b, XMVECTOR v1, XMVECTOR v2, BONE_ID boneId, DWORD color)
+void Bvh::CreateBoneTypeToIdTbl()
 {
-	float radius = 0.15f;
-	XMVECTOR boneDir = XMVectorSubtract(v2, v1);
-	XMVECTOR vRot0 = XMVector3Cross(boneDir, XMVectorSet(0, 0, radius, 0));
-	if (XMVector3Equal(XMVectorZero(), vRot0)) {
-		vRot0 = XMVector3Cross(boneDir, XMVectorSet(0, radius, 0, 0));
-	}
-	XMVECTOR vRot90 = XMVector3Cross(vRot0, XMVector3Normalize(boneDir));
-	XMVECTOR vRotLast = XMVectorAdd(v1, vRot0);
-	static const int div = 10;
-	for (int j = 0; j < div; j++) {
-		MeshVertex vert[3];
-		for (auto& it : vert) {
-			InitVertex(it, boneId, color);
+	for (auto& it : bvhPresets) {
+		int cnt = 0;
+		for (int i = 0; i < BT_MAX; i++) {
+			for (BONE_ID id = 0; id < (BONE_ID)m_frames.size(); id++) {
+				const BvhFrame& f = m_frames[id];
+				if (!strcmp(f.name, it[i])) {
+					cnt++;
+					boneTypeToIdTbl[i] = id;
+				}
+			}
 		}
-		float rad = XM_2PI / div * (j + 1);
-		XMVECTOR vRot = XMVectorAdd(v1, XMVectorScale(vRot0, cosf(rad)) + XMVectorScale(vRot90, sinf(rad)));
-		XMStoreFloat3(&vert[0].xyz, vRotLast);
-		XMStoreFloat3(&vert[1].xyz, v2);
-		XMStoreFloat3(&vert[2].xyz, vRot);
-		XMVECTOR normal = XMVector3Cross(XMVectorSubtract(vRotLast, v2), XMVectorSubtract(v2, vRot));
-		for (auto& it : vert) {
-			XMStoreFloat3(&it.normal, normal);
-			b.vertices.push_back(it);
-			b.indices.push_back(b.indices.size());
+		if (cnt == BT_MAX) {
+			return;
 		}
-		vRotLast = vRot;
 	}
 }
 
@@ -231,11 +291,18 @@ Bvh::Bvh(const char *fileName)
 	
     SetCurrentDirectoryA(strCWD);
 
+	CalcCombinedOffsets();
+	for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++) {
+		CalcBoneOffsetMatrix(i);
+	}
 	CreateBoneMesh();
+	CreateBoneTypeToIdTbl();
 }
 
 void Bvh::CreateBoneMesh()
 {
+	m_block.Clear();
+
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		BvhFrame& f2 = m_frames[i];
 		BONE_ID pId = f2.parentId;
@@ -244,8 +311,8 @@ void Bvh::CreateBoneMesh()
 		}
 		int depth = GetDepth(pId);
 		BvhFrame& f1 = m_frames[pId];
-		XMVECTOR v1 = XMLoadFloat3(&f1.offsetCombined);
-		XMVECTOR v2 = XMLoadFloat3(&f2.offsetCombined);
+		Vector3 v1 = f1.offsetCombined;
+		Vector3 v2 = f2.offsetCombined;
 
 		static const DWORD depthToColor[] = {
 			0xffffffff,
@@ -327,7 +394,7 @@ void Bvh::_linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId)
 	BvhFrame* frameChild = &m_frames[childFrameId];
 
 	frameChild->parentId = parentFrameId;
-	XMStoreFloat3(&frameChild->offsetCombined, XMVectorAdd(XMLoadFloat3(&frameParent->offsetCombined), XMLoadFloat3(&frameChild->offset)));
+	frameChild->offsetCombined = frameChild->offset * frameParent->offsetCombined;
 
 	if (frameParent->childId < 0) {
 		frameParent->childId = childFrameId;
@@ -338,6 +405,12 @@ void Bvh::_linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId)
 		}
 		m_frames[siblingId].siblingId = childFrameId;
 	}
+}
+
+void Bvh::CalcBoneOffsetMatrix(BONE_ID frameId)
+{
+	BvhFrame& frame = m_frames[frameId];
+	frame.boneOffsetMatrix = v2m(-frame.offsetCombined);
 }
 
 void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
@@ -356,17 +429,13 @@ void Bvh::ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId)
 			frame.offset.x = _getF(child);
 			frame.offset.y = _getF(child);
 			frame.offset.z = -_getF(child);
-
-			frame.offsetCombined.x = 0;
-			frame.offsetCombined.y = 0; 
-			frame.offsetCombined.z = 0;
+			frame.offsetCombined = Vec3();
 
 			if (parentFrameId >= 0) {
 				_linkFrame(parentFrameId, frameId);
 			}
 
-			XMVECTOR dummy;
-			XMStoreFloat4x4(&frame.boneOffsetMatrix, XMMatrixInverse(&dummy, (XMMatrixTranslation(frame.offsetCombined.x, frame.offsetCombined.y, frame.offsetCombined.z))));
+			CalcBoneOffsetMatrix(frameId);
 
 			if ("CHANNELS" == _getToken(child)) {
 				int nChannels = _getI(child);
@@ -402,9 +471,9 @@ void Bvh::DumpFrames(BONE_ID frameId, int depth) const
 		printf(" ");
 	}
 	printf("%s(%d) p=%d s=%d c=%d ", f.name, frameId, f.parentId, f.siblingId, f.childId);
-	const XMFLOAT3& m = f.offset;
-	const XMFLOAT3& m2 = f.offsetCombined;
-	printf("(%3.3f,%3.3f,%3.3f) (%3.3f,%3.3f,%3.3f)", m.x, m.y, m.z, m2.x, m2.y, m2.z);
+	const Vec3& v = f.offset;
+	const Vec3& v2 = f.offsetCombined;
+	printf("(%3.3f,%3.3f,%3.3f) (%3.3f,%3.3f,%3.3f)", v.x, v.y, v.z, v2.x, v2.y, v2.z);
 	printf("\n");
 	if (f.siblingId >= 0) {
 		DumpFrames(f.siblingId, depth);
@@ -420,7 +489,31 @@ void Bvh::ParseMotion(const char *p)
 	motionFrames = _getI(m);
 	frameTime = _getF(m);
 	while (m && *m) {
-		motion.push_back(_getF(m));
+		rawMotion.push_back(_getF(m));
+	}
+}
+
+void Bvh::PreCalculateMotion()
+{
+	motion.poses.resize(motionFrames);
+	for (int i = 0; i < motionFrames; i++) {
+		const float* mot = &rawMotion[i * channels];
+		Pose& pose = motion.poses[i];
+
+		for (auto& it : m_frames) {
+			Quat q[3];
+			int idxMin = std::min((uint32_t)it.rotIndices.x, std::min((uint32_t)it.rotIndices.y, (uint32_t)it.rotIndices.z));
+			if (it.rotIndices.x >= 0) {
+				q[it.rotIndices.x - idxMin] = Quat(Vec3(1,0,0), -mot[it.rotIndices.x] * XM_PI / 180);
+			}
+			if (it.rotIndices.y >= 0) {
+				q[it.rotIndices.y - idxMin] = Quat(Vec3(0,1,0), -mot[it.rotIndices.y] * XM_PI / 180);
+			}
+			if (it.rotIndices.z >= 0) {
+				q[it.rotIndices.z - idxMin] = Quat(Vec3(0,0,1), mot[it.rotIndices.z] * XM_PI / 180);
+			}
+			pose.quats.push_back(q[2] * q[1] * q[0]);
+		}
 	}
 }
 
@@ -436,6 +529,7 @@ void Bvh::LoadSub(const char *fileName)
 	channels = 0;
 	ParseFrame("ROOT", body, -1);
 	ParseMotion(body);
+	PreCalculateMotion();
 	free(img);
 
 	printf("===============DumpFrames begin\n");
@@ -449,32 +543,18 @@ Bvh::~Bvh()
 	m_meshRenderer.Destroy();
 }
 
-void Bvh::CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent)
+void Bvh::CalcFrameMatrices()
 {
-	BvhFrame& f = m_frames[frameId];
-	XMMATRIX result = XMLoadFloat4x4(&f.frameTransformMatrix) * parent;
-	XMStoreFloat4x4(&f.result, result);
-	if (f.siblingId >= 0) {
-		CalcFrameMatrices(f.siblingId, parent);
-	}
-	if (f.childId >= 0) {
-		CalcFrameMatrices(f.childId, result);
+	for (auto& f : m_frames) {
+		f.result = f.frameTransformMatrix * (f.parentId >= 0 ? m_frames[f.parentId].result : Mat());
 	}
 }
 
-static XMMATRIX Interpolate(const XMMATRIX& m1, const XMMATRIX& m2, float ratio)
+void Bvh::CalcCombinedOffsets()
 {
-	XMVECTOR q1 = XMQuaternionRotationMatrix(m1);
-	XMVECTOR q2 = XMQuaternionRotationMatrix(m2);
-	XMVECTOR q3 = XMQuaternionSlerp(q1, q2, ratio);
-
-	XMVECTOR t1 = m1.r[3];
-	XMVECTOR t2 = m2.r[3];
-	XMVECTOR t3 = XMVectorLerp(t1, t2, ratio);
-
-	XMMATRIX m3 = XMMatrixRotationQuaternion(q3);
-	m3.r[3] = t3;
-	return m3;
+	for (auto& f : m_frames) {
+		f.offsetCombined = f.offset + (f.parentId >= 0 ? m_frames[f.parentId].offsetCombined : Vec3());
+	}
 }
 
 void Bvh::CalcAnimation(double time)
@@ -482,32 +562,31 @@ void Bvh::CalcAnimation(double time)
 	int frame = (int)(time / frameTime);
 	frame %= motionFrames;
 
-	const float* mot = &motion[frame * channels];
+	const float* mot = &rawMotion[frame * channels];
+	const Pose& pose = motion.poses[frame];
 
-	for (auto& it : m_frames) {
-		XMMATRIX transMat = XMMatrixIdentity();
+	for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++) {
+		auto& it = m_frames[i];
+		Vec3 translate;
+		Quaternion q = pose.quats[i];
 		if (it.posIndices.x >= 0) {
-			transMat = XMMatrixTranslation(mot[it.posIndices.x], mot[it.posIndices.y], -mot[it.posIndices.z]);
+			translate = Vec3(mot[it.posIndices.x], mot[it.posIndices.y], -mot[it.posIndices.z]);
 		} else {
-			transMat = XMMatrixTranslation(it.offset.x, it.offset.y, it.offset.z);
+			translate = it.offset;
 		}
-
-		XMMATRIX rotMat[3] = { XMMatrixIdentity(), XMMatrixIdentity(), XMMatrixIdentity() };
-		int idxMin = std::min((uint32_t)it.rotIndices.x, std::min((uint32_t)it.rotIndices.y, (uint32_t)it.rotIndices.z));
-		if (it.rotIndices.x >= 0) {
-			rotMat[it.rotIndices.x - idxMin] = XMMatrixRotationX(-mot[it.rotIndices.x] * XM_PI / 180);
-		}
-		if (it.rotIndices.y >= 0) {
-			rotMat[it.rotIndices.y - idxMin] = XMMatrixRotationY(-mot[it.rotIndices.y] * XM_PI / 180);
-		}
-		if (it.rotIndices.z >= 0) {
-			rotMat[it.rotIndices.z - idxMin] = XMMatrixRotationZ(mot[it.rotIndices.z] * XM_PI / 180);
-		}
-
-		XMStoreFloat4x4(&it.frameTransformMatrix, rotMat[2] * rotMat[1] * rotMat[0] * transMat);
+		
+		it.frameTransformMatrix = q2m(q) * v2m(translate);
 	}
+	CalcFrameMatrices();
 }
 
+void Bvh::ResetAnim()
+{
+	for (auto& it : m_frames) {
+		it.frameTransformMatrix = v2m(it.offset);
+	}
+	CalcFrameMatrices();
+}
 
 void Bvh::Draw(int animId, double time)
 {
@@ -518,21 +597,55 @@ void Bvh::Draw(int animId, double time)
 	Mat BoneMatrices[BONE_MAX];
 	assert(m_frames.size() <= dimof(BoneMatrices));
 
+	if (animId != 0) {
+		for (auto& it : m_frames) {
+			it.frameTransformMatrix = v2m(it.offset);
+		}
+		CalcFrameMatrices();
+	} else {
+		CalcAnimation(time);
+	}
 
-	CalcAnimation(time);
+	if (g_type == "pivot") {
+		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+			BvhFrame& f = m_frames[i];
+			BoneMatrices[i] = f.result;
+		}
+		debugRenderer.DrawPivots(BoneMatrices, m_frames.size());
+	} else {
+		for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+			BvhFrame& f = m_frames[i];
+			BoneMatrices[i] = f.boneOffsetMatrix * f.result;
+		}
+		m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
+	}
+}
 
-	CalcFrameMatrices(0, XMMatrixIdentity());
+void Bvh::GetRotAnim(Quat quats[BONE_MAX], double time) const
+{
+	int frame = (int)(time / frameTime);
+	frame %= motionFrames;
+
+	const Pose& pose = motion.poses[frame];
 
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-		BvhFrame& f = m_frames[i];
-		XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
-		XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
-		BoneMatrices[i] = boneOffset * frameTransform;
+		const BvhFrame& f = m_frames[i];
+		quats[i] = pose.quats[i];
 	}
+}
 
-	for (auto& it : BoneMatrices) {
-//		it = XMMatrixIdentity();
+BONE_ID Bvh::BoneNameToId(const char* name) const
+{
+	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+		const BvhFrame& f = m_frames[i];
+		if (!strcmp(f.name, name)) {
+			return i;
+		}
 	}
+	return -1;
+}
 
-	m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
+BONE_ID Bvh::BoneTypeToId(BoneType type) const
+{
+	return boneTypeToIdTbl[type];
 }

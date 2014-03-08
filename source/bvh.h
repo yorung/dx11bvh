@@ -1,36 +1,53 @@
+struct Pose
+{
+	std::vector<Quat> quats;
+};
+
+struct Motion
+{
+	std::vector<Pose> poses;
+};
+
 struct BvhFrame
 {
 	char name[32];
-	XMFLOAT3 offset;
-	XMFLOAT3 offsetCombined;
+	Vec3 offset;
+	Vec3 offsetCombined;
 	BONE_ID parentId;
 	BONE_ID childId;
 	BONE_ID siblingId;
 	XMINT3 rotIndices;
 	XMINT3 posIndices;
-	XMFLOAT4X4 frameTransformMatrix;
-	XMFLOAT4X4 boneOffsetMatrix;
-	XMFLOAT4X4 result;
+	Mat frameTransformMatrix;
+	Mat boneOffsetMatrix;
+	Mat result;
 };
 
 class Bvh : public Mesh
 {
 private:
+	void CalcBoneOffsetMatrix(BONE_ID frameId);
 	void ParseFrame(const char* frameStr, char* p, BONE_ID parentFrameId);
 	void LoadSub(const char* fileName);
 	BONE_ID _getFrameIdByName(const char* name);
 	void _linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId);
 	void _storeWeight(MeshVertex& v, int frameId, float weight);
-	void CalcAnimation(int animId, double time);
-	void CalcFrameMatrices(BONE_ID frameId, XMMATRIX& parent);
+	void CalcFrameMatrices();
 	void DumpFrames(BONE_ID frameId, int depth) const;
 	void ParseMotion(const char *p);
-	void CalcAnimation(double time);
+	void PreCalculateMotion();
 	int GetDepth(BONE_ID id);
 	void CreateBoneMesh();
+	void CalcCombinedOffsets();
+	BONE_ID BoneNameToId(const char* name) const;
+	void CreateBoneTypeToIdTbl();
 
+
+	BONE_ID boneTypeToIdTbl[BT_MAX];
 	std::vector<BvhFrame> m_frames;
-	std::vector<float> motion;
+	std::vector<float> rawMotion;
+	Motion motion;
+
 	int motionFrames;
 	float frameTime;
 	int channels;
@@ -43,5 +60,9 @@ public:
 	Bvh(const char *fileName);
 	~Bvh();
 	void Draw(int animId, double time);
+	void ResetAnim();
+	void GetRotAnim(Quat quats[BONE_MAX], double time) const;
+	BONE_ID BoneTypeToId(BoneType type) const;
+	void CalcAnimation(double time);
 };
 

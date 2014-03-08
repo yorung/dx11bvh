@@ -57,10 +57,16 @@
     <ClInclude Include="source\tex_man11.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="source\debug_renderer.h">
+      <Filter>source</Filter>
+    </ClInclude>
     <ClInclude Include="source\af_math.h">
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="source\grid_renderer.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="source\joint_db.h">
       <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
@@ -98,7 +104,13 @@
     <ClCompile Include="source\tex_man11.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="source\debug_renderer.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
     <ClCompile Include="source\grid_renderer.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\joint_db.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

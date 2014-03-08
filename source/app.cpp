@@ -111,7 +111,7 @@ void App::DrawBoneNames(Bvh* bvh)
 		if (it.childId < 0) {
 			continue;
 		}
-		XMFLOAT2 pos = GetScreenPos(XMLoadFloat4x4(&it.result));
+		XMFLOAT2 pos = GetScreenPos(it.result);
 
 		WCHAR wname[MAX_PATH];
 		MultiByteToWideChar(CP_ACP, 0, it.name, -1, wname, dimof(wname));
