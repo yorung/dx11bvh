@@ -2,12 +2,12 @@
 
 MatrixMan matrixMan;
 
-void MatrixMan::Get(Type type, XMMATRIX& m)
+void MatrixMan::Get(Type type, Mat& m)
 {
-	m = XMLoadFloat4x4(&matrices[type]);
+	m = matrices[type];
 }
 
-void MatrixMan::Set(Type type, const XMMATRIX& m)
+void MatrixMan::Set(Type type, const Mat& m)
 {
-	XMStoreFloat4x4(&matrices[type], m);
+	matrices[type] = m;
 }
