@@ -29,13 +29,15 @@
 // DirectX
 #include <d3d11.h>
 #include <D3Dcompiler.h>
-#include <directxmath.h>
+#include <SimpleMath.h>
 #include <DDSTextureLoader.h>
 #include <WICTextureLoader.h>
 #include <SpriteFont.h>
-#include <SimpleMath.h>
+
 using namespace DirectX;
 using namespace SimpleMath;
+
+static const int BONE_MAX = 50;
 
 // TODO: reference additional headers your program requires here
 #include "source/af_math.h"
@@ -56,5 +58,5 @@ using namespace SimpleMath;
 #define SAFE_DELETE(p)       { if (p) { delete (p);     (p)=NULL; } }
 #define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p)=NULL; } }
 
-#define SCR_W 640
-#define SCR_H 480
+#define SCR_W 1024
+#define SCR_H 600

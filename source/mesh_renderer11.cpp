@@ -8,7 +8,7 @@ struct MeshConstantBuffer
 	XMFLOAT4 emissive;
 	XMFLOAT4 padding1;
 	XMFLOAT4 padding2;
-	XMFLOAT4X4 bone[50];
+	XMFLOAT4X4 bone[BONE_MAX];
 };
 
 MeshRenderer11::MeshRenderer11()
@@ -36,6 +36,8 @@ void MeshRenderer11::Destroy()
 
 void MeshRenderer11::Init(int sizeVertices, int sizeIndices, void* vertices, void* indices)
 {
+	Destroy();
+
 	D3D11_INPUT_ELEMENT_DESC layout[] = {
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -58,7 +60,7 @@ void MeshRenderer11::Init(int sizeVertices, int sizeIndices, void* vertices, voi
 	deviceMan11.GetDevice()->CreateDepthStencilState(&CD3D11_DEPTH_STENCIL_DESC(D3D11_DEFAULT), &pDSState);
 }
 
-void MeshRenderer11::Draw(XMMATRIX BoneMatrices[], int nBones, const Block& block)
+void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Block& block) const
 {
 	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	shaderMan.Apply(shaderId);
@@ -90,7 +92,7 @@ void MeshRenderer11::Draw(XMMATRIX BoneMatrices[], int nBones, const Block& bloc
 		XMStoreFloat4x4(&cBuf.matVP, matVP);
 		cBuf.faceColor = mat->faceColor;
 		cBuf.emissive = mat->emissive;
-		CopyMemory(cBuf.bone, BoneMatrices, 50 * sizeof(XMMATRIX));
+		CopyMemory(cBuf.bone, BoneMatrices, BONE_MAX * sizeof(Matrix));
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		HRESULT hr = deviceMan11.GetContext()->Map(pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		CopyMemory(mappedResource.pData, &cBuf, sizeof(cBuf));

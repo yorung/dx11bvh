@@ -515,7 +515,7 @@ void Bvh::Draw(int animId, double time)
 		return;
 	}
 
-	XMMATRIX BoneMatrices[50];
+	Mat BoneMatrices[BONE_MAX];
 	assert(m_frames.size() <= dimof(BoneMatrices));
 
 
