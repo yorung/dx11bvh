@@ -591,14 +591,10 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 	} else {
 		for (int i = 0; (unsigned)i < indices.size() / 3; i++) {
 			int idx = i * 3;
-			XMVECTOR v[3];
-			v[0] = XMLoadFloat3(&vertices[indices[idx]].xyz);
-			v[1] = XMLoadFloat3(&vertices[indices[idx + 1]].xyz);
-			v[2] = XMLoadFloat3(&vertices[indices[idx + 2]].xyz);
-			XMVECTOR result = XMVector3Cross(v[1] - v[0], v[2] - v[1]);
-			XMStoreFloat3(&vertices[indices[idx]].normal, result);
-			XMStoreFloat3(&vertices[indices[idx + 1]].normal, result);
-			XMStoreFloat3(&vertices[indices[idx + 2]].normal, result);
+			MeshVertex& v0 = vertices[indices[idx]];
+			MeshVertex& v1 = vertices[indices[idx + 1]];
+			MeshVertex& v2 = vertices[indices[idx + 2]];
+			v0.normal = v1.normal = v2.normal = cross(v1.xyz - v0.xyz, v2.xyz - v1.xyz);
 		}
 	}
 
