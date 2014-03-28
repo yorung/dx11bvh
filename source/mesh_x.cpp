@@ -134,10 +134,10 @@ static void _getFloat2Array(char*& p, std::vector<Vector2>& vertices, int nVerti
 	}
 }
 
-static void _getVertexColors(char*& p, std::vector<XMFLOAT4>& vertices, int nVertices)
+static void _getVertexColors(char*& p, std::vector<Vector4>& vertices, int nVertices)
 {
 	for (int i = 0; i < nVertices; i++) {
-		XMFLOAT4 f4;
+		Vector4 f4;
 		_getF(p);
 		f4.x = _getF(p);
 		f4.y = _getF(p);
@@ -370,12 +370,21 @@ void MeshX::_pushMaterialMap(Block& block, const MaterialMap& map)
 	}
 }
 
-BONE_ID MeshX::_getFrameIdByName(const char* name)
+BONE_ID MeshX::GetFrameIdByName(const char* name) const
 {
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++) {
 		if (!strcmp(m_frames[i].name, name)) {
 			return i;
 		}
+	}
+	return -1;
+}
+
+BONE_ID MeshX::GetOrCreateFrameIdByName(const char* name)
+{
+	BONE_ID id = GetFrameIdByName(name);
+	if (id >= 0) {
+		return id;
 	}
 	Frame f;
 	strncpy(f.name, name, sizeof(f.name));
@@ -461,7 +470,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 
 	p = _searchChildTag((char*)imgMesh, "MeshVertexColors");
 	int nVertexColors = _getI(p);
-	std::vector<XMFLOAT4> vertexColors;
+	std::vector<Vector4> vertexColors;
 	_getVertexColors(p, vertexColors, nVertexColors);
 
 	p = _searchChildTag((char*)imgMesh, "MeshNormals");
@@ -511,7 +520,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 			skin.vertexWeight.push_back(_getF(p));
 		}
 		_getMatrix(p, skin.mtx);
-		skin.frameId = _getFrameIdByName(skin.frameName.c_str());
+		skin.frameId = GetOrCreateFrameIdByName(skin.frameName.c_str());
 		p = _leaveBrace(p);
 		skinWeights.push_back(skin);
 
@@ -638,7 +647,7 @@ void MeshX::ParseFrame(char* p, BONE_ID parentFrameId)
 		char* child = _searchChildTag(p, "Frame", &name);
 		if (child) {
 			char* frameMat = _searchChildTag(child, "FrameTransformMatrix");
-			BONE_ID frameId = _getFrameIdByName(name.c_str());
+			BONE_ID frameId = GetOrCreateFrameIdByName(name.c_str());
 			Frame& frame = m_frames[frameId];
 			_getMatrix(frameMat, frame.frameTransformMatrix);
 			_linkFrame(parentFrameId, frameId);
@@ -748,7 +757,7 @@ void MeshX::ParseAnimations(char* p, AnimationSet& animationSet)
 		if (animation.animationKeys.size()) {
 			char *frameName = _searchChildTag(anim, "");
 			animation.frameName = _getToken(frameName);
-			BONE_ID frameId = _getFrameIdByName(animation.frameName.c_str());
+			BONE_ID frameId = GetOrCreateFrameIdByName(animation.frameName.c_str());
 
 			animationSet.animations[frameId] = animation;
 		}
@@ -780,7 +789,7 @@ void MeshX::LoadSub(const char *fileName)
 		return;
 	}
 
-	BONE_ID frameId = _getFrameIdByName("@myroot");
+	BONE_ID frameId = GetOrCreateFrameIdByName("@myroot");
 
 	Block b;
 	char* body = (char*)img + 16;
