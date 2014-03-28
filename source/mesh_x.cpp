@@ -113,10 +113,10 @@ static float _getF(char*& p)
 	return (float)_getD(p);
 }
 
-static void _getFloat3Array(char*& p, std::vector<XMFLOAT3>& vertices, int nVertices)
+static void _getFloat3Array(char*& p, std::vector<Vector3>& vertices, int nVertices)
 {
 	for (int i = 0; i < nVertices; i++) {
-		XMFLOAT3 f3;
+		Vector3 f3;
 		f3.x = _getF(p);
 		f3.y = _getF(p);
 		f3.z = _getF(p);
@@ -124,10 +124,10 @@ static void _getFloat3Array(char*& p, std::vector<XMFLOAT3>& vertices, int nVert
 	}
 }
 
-static void _getFloat2Array(char*& p, std::vector<XMFLOAT2>& vertices, int nVertices)
+static void _getFloat2Array(char*& p, std::vector<Vector2>& vertices, int nVertices)
 {
 	for (int i = 0; i < nVertices; i++) {
-		XMFLOAT2 f2;
+		Vector2 f2;
 		f2.x = _getF(p);
 		f2.y = _getF(p);
 		vertices.push_back(f2);
@@ -443,7 +443,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 
 	char *p = imgMesh;
 	int nVertices = _getI(p);
-	std::vector<XMFLOAT3> vertPos;
+	std::vector<Vector3> vertPos;
 	_getFloat3Array(p, vertPos, nVertices);
 	int nOrgFaces = _getI(p);
 	std::vector<bool> isOrgFace4Vertices;
@@ -452,7 +452,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 	p = _searchChildTag((char*)imgMesh, "MeshTextureCoords");
 	int nVerticesCoords = _getI(p);
 	assert(nVertices == nVerticesCoords || nVerticesCoords == 0);
-	std::vector<XMFLOAT2> texCoords;
+	std::vector<Vector2> texCoords;
 	_getFloat2Array(p, texCoords, nVerticesCoords);
 
 	if (nVertices > nVerticesCoords) {
@@ -466,7 +466,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 
 	p = _searchChildTag((char*)imgMesh, "MeshNormals");
 	int nNormals = _getI(p);
-	std::vector<XMFLOAT3> normals;
+	std::vector<Vector3> normals;
 	_getFloat3Array(p, normals, nNormals);
 	int nOrgNormalFaces = _getI(p);
 	std::vector<bool> isOrgFace4VerticesNormal;
