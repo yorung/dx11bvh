@@ -11,7 +11,7 @@ public:
 struct TimedFloatKeys
 {
 	DWORD time;
-	Matrix mat;
+	Mat mat;
 };
 
 struct AnimationKey
@@ -91,9 +91,9 @@ struct MaterialMap
 struct Frame
 {
 	char name[32];
-	Matrix frameTransformMatrix;
+	Mat frameTransformMatrix;
 	Matrix boneOffsetMatrix;
-	Matrix result;
+	Mat result;
 	BONE_ID parentId;
 	BONE_ID childId;
 	BONE_ID siblingId;

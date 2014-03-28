@@ -147,10 +147,10 @@ static void _getVertexColors(char*& p, std::vector<Vector4>& vertices, int nVert
 	}
 }
 
-static void _getMatrix(char*& p, XMFLOAT4X4& m)
+static void _getMatrix(char*& p, Mat& m)
 {
 	if (!p) {
-		XMStoreFloat4x4(&m, XMMatrixIdentity());
+		m = Mat();
 		return;
 	}
 	m._11 = _getF(p);
@@ -391,8 +391,6 @@ BONE_ID MeshX::GetOrCreateFrameIdByName(const char* name)
 	f.parentId = -1;
 	f.childId = -1;
 	f.siblingId = -1;
-	XMStoreFloat4x4(&f.frameTransformMatrix, XMMatrixIdentity());
-	XMStoreFloat4x4(&f.boneOffsetMatrix, XMMatrixIdentity());
 	m_frames.push_back(f);
 	return m_frames.size() - 1;
 }
@@ -402,7 +400,7 @@ struct SkinWeights {
 	std::vector<float> vertexWeight;
 	std::string frameName;
 	int frameId;
-	Matrix mtx;
+	Mat mtx;
 	const SkinWeights& operator=(const SkinWeights& r) {
 		vertexIndices = r.vertexIndices;
 		vertexWeight = r.vertexWeight;
@@ -710,25 +708,22 @@ static void ParseAnimationKeys(char* p, Animation& animation)
 			case 0:		// rotation
 				assert(nValues == 4);
 				{
-					XMFLOAT4 q;
+					Quat q;
 					q.w = _getF(key);
-					q.x = _getF(key);
-					q.y = _getF(key);
-					q.z = _getF(key);
-				//	XMStoreFloat4x4(&k.mat, XMMatrixRotationQuaternion(XMLoadFloat4(&q)));
-					XMStoreFloat4x4(&k.mat, XMMatrixRotationQuaternion(XMQuaternionInverse(XMLoadFloat4(&q))));
+					q.v.x = _getF(key);
+					q.v.y = _getF(key);
+					q.v.z = _getF(key);
+					k.mat = q2m(inv(q));
 				}
 				break;
 			case 1:		// scale
 				assert(nValues == 3);
-				XMStoreFloat4x4(&k.mat, XMMatrixIdentity());
 				k.mat._11 = _getF(key);
 				k.mat._22 = _getF(key);
 				k.mat._33 = _getF(key);
 				break;
 			case 2:		// position
 				assert(nValues == 3);
-				XMStoreFloat4x4(&k.mat, XMMatrixIdentity());
 				k.mat._41 = _getF(key);
 				k.mat._42 = _getF(key);
 				k.mat._43 = _getF(key);
@@ -823,7 +818,7 @@ MeshX::~MeshX()
 void MeshX::CalcFrameMatrices(BONE_ID frameId)
 {
 	Frame& f = m_frames[frameId];
-	Matrix result = f.frameTransformMatrix * (f.parentId >= 0 ? m_frames[f.parentId].result : Matrix());
+	Mat result = f.frameTransformMatrix * (f.parentId >= 0 ? m_frames[f.parentId].result : Mat());
 	f.result = result;
 	if (f.siblingId >= 0) {
 		CalcFrameMatrices(f.siblingId);
@@ -914,9 +909,7 @@ void MeshX::Draw(int animId, double time)
 
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
 		Frame& f = m_frames[i];
-		XMMATRIX frameTransform = XMLoadFloat4x4(&f.result);
-		XMMATRIX boneOffset = XMLoadFloat4x4(&f.boneOffsetMatrix);
-		BoneMatrices[i] = boneOffset * frameTransform;
+		BoneMatrices[i] = f.boneOffsetMatrix * f.result;
 	}
 
 	m_meshRenderer.Draw(BoneMatrices, dimof(BoneMatrices), m_block);
