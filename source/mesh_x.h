@@ -1,3 +1,5 @@
+class Bvh;
+
 class Mesh
 {
 public:
@@ -11,8 +13,6 @@ struct TimedFloatKeys
 	DWORD time;
 	Matrix mat;
 };
-
-typedef int BONE_ID;
 
 struct AnimationKey
 {
