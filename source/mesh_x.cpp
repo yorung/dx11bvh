@@ -327,6 +327,107 @@ static MatMan::MMID _getMaterial(char*& p)
 	return matMan.Create(mat);
 }
 
+class FrameIterator
+{
+	const std::vector<Frame>& frames;
+	BONE_ID cur;
+public:
+	FrameIterator(const std::vector<Frame>& f) : cur(0), frames(f) {}
+	BONE_ID GetCurrent() { return cur; }
+	void operator++() {
+		if (frames[cur].childId >= 0) {
+			cur = frames[cur].childId;
+			return;
+		}
+		for(;;) {
+			if (frames[cur].siblingId >= 0) {
+				cur = frames[cur].siblingId;
+				return;
+			}
+			if (frames[cur].parentId >= 0) {
+				cur = frames[cur].parentId;
+			} else {
+				cur = -1;
+				return;
+			}
+		}
+	}
+};
+
+int MeshX::GetDepth(BONE_ID id) const
+{
+	int depth = 0;
+	const Frame* f = &m_frames[id];
+	for (; f->parentId >= 0; depth++) {
+		f = &m_frames[f->parentId];
+	}
+	return depth;
+}
+
+void MeshX::CreateBoneMesh()
+{
+	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
+		Frame& f2 = m_frames[i];
+		BONE_ID pId = f2.parentId;
+		if (pId < 0) {
+			continue;
+		}
+		int depth = GetDepth(pId);
+		Frame& f1 = m_frames[pId];
+
+		if (Mat() == f1.boneOffsetMatrix) {
+			continue;
+		}
+
+		if (Mat() == f2.boneOffsetMatrix) {
+			continue;
+		}
+
+		static const DWORD depthToColor[] = {
+			0xffffffff,
+			0xffffff00,
+			0xffff00ff,
+			0xffff0000,
+			0xff00ffff,
+			0xff00ff00,
+			0xff0000ff,
+			0xff000000,
+		};
+		Vector3 v1 = Matrix(inv(f1.boneOffsetMatrix)).Translation();
+		Vector3 v2 = Matrix(inv(f2.boneOffsetMatrix)).Translation();
+		CreateCone(bones, v1, v2, pId, depthToColor[depth % dimof(depthToColor)]);
+	}
+
+	int sizeVertices = bones.vertices.size() * sizeof(bones.vertices[0]);
+	int sizeIndices = bones.indices.size() * sizeof(bones.indices[0]);
+	if (sizeVertices && sizeIndices) {
+		bonesRenderer.Init(sizeVertices, sizeIndices, &bones.vertices[0], &bones.indices[0]);
+	}
+
+	Material mat;
+	mat.faceColor.x = 0.6f;
+	mat.faceColor.y = 0.6f;
+	mat.faceColor.z = 0.6f;
+	mat.faceColor.w = 1.0f;
+	mat.power = 1.0f;
+	mat.specular.x = 1.0f;
+	mat.specular.y = 1.0f;
+	mat.specular.z = 1.0f;
+	mat.specular.w = 1.0f;
+	mat.emissive.x = 0.4f;
+	mat.emissive.y = 0.4f;
+	mat.emissive.z = 0.4f;
+	mat.emissive.w = 1.0f;
+	mat.tmid = texMan.Create("white.bmp", true);
+
+	MaterialMap map;
+	map.materialId = matMan.Create(mat);
+	map.faceStartIndex = 0;
+	map.faces = bones.indices.size() / 3;
+	bones.materialMaps.push_back(map);
+}
+
+
 MeshX::MeshX(const char *fileName)
 {
     char strPath[MAX_PATH];
@@ -351,6 +452,8 @@ MeshX::MeshX(const char *fileName)
 	int sizeVertices = m_block.vertices.size() * sizeof(m_block.vertices[0]);
 	int sizeIndices = m_block.indices.size() * sizeof(m_block.indices[0]);
 	m_meshRenderer.Init(sizeVertices, sizeIndices, &m_block.vertices[0], &m_block.indices[0]);
+
+	CreateBoneMesh();
 }
 
 static DWORD _conv1To255(float f, int bit)
@@ -656,30 +759,146 @@ void MeshX::ParseFrame(char* p, BONE_ID parentFrameId)
 	}
 }
 
-void MeshX::DumpFrames(BONE_ID frameId, int depth) const
+
+void MeshX::GetVertStatistics(std::vector<int>& cnts) const
 {
-	const Frame& f = m_frames[frameId];
-	for (int i = 0; i < depth; i++) {
-		printf(" ");
+	cnts.resize(m_frames.size());
+	for (auto& it : cnts) {
+		it = 0;
 	}
-//	printf("%s(%d) p=%d s=%d c=%d\n", f.name, frameId, f.parentId, f.siblingId, f.childId);
-	printf("%s: ", f.name);
-	for (int r = 0; r < 4; r++) {
-		for (int c = 0; c < 4; c++) {
-			float m = f.frameTransformMatrix.m[r][c];
-			if (m - int(m)) {
-				printf("%.3f,", m);
-			}else{
-				printf("%d,", (int)m);
-			}
+	for (auto& it : m_block.vertices)
+	{
+		assert(it.blendIndices.x >= 0 && it.blendIndices.x < m_frames.size());
+		assert(it.blendIndices.y >= 0 && it.blendIndices.y < m_frames.size());
+		assert(it.blendIndices.z >= 0 && it.blendIndices.z < m_frames.size());
+		assert(it.blendIndices.w >= 0 && it.blendIndices.w < m_frames.size());
+		if (it.blendWeights.x > 0) {
+			cnts[it.blendIndices.x]++;
+		}
+		if (it.blendWeights.y > 0) {
+			cnts[it.blendIndices.y]++;
+		}
+		if (it.blendWeights.z > 0) {
+			cnts[it.blendIndices.z]++;
+		}
+		if (it.blendWeights.x + it.blendWeights.y + it.blendWeights.z < 1.0f) {
+			cnts[it.blendIndices.w]++;
 		}
 	}
-	printf("\n");
-	if (f.siblingId >= 0) {
-		DumpFrames(f.siblingId, depth);
+}
+
+void MeshX::GetAnimStatistics(std::vector<int>& animCnts) const
+{
+	animCnts.resize(m_frames.size());
+	for (auto& it : animCnts) {
+		it = 0;
 	}
+	for (auto& i : m_animationSets) {
+		for (auto& j : i.animations) {
+			assert(j.first >= 0 && j.first < (BONE_ID)m_frames.size());
+			animCnts[j.first]++;
+		}
+	}
+}
+
+void MeshX::PrintStatistics() const
+{
+	std::vector<int> vCnts;
+	GetVertStatistics(vCnts);
+	std::vector<int> aCnts;
+	GetAnimStatistics(aCnts);
+	for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++)
+	{
+		const Frame& f = m_frames[i];
+		printf("v=%d a=%d, parentId=%d, childId=%d, %s(%d)\n", vCnts[i], aCnts[i], f.parentId, f.childId, f.name, i);
+	}
+}
+
+bool MeshX::UnlinkFrame(BONE_ID id)
+{
+	Frame& f = m_frames[id];
 	if (f.childId >= 0) {
-		DumpFrames(f.childId, depth + 1);
+		return false;
+	}
+	if (f.parentId < 0) {
+		return false;
+	}
+	Frame& p = m_frames[f.parentId];
+	if (p.childId == id) {
+		p.childId = f.siblingId;
+	}
+	else {
+		Frame* mySibling = &m_frames[p.childId];
+		do {
+			if (mySibling->siblingId == id)
+			{
+				mySibling->siblingId = f.siblingId;
+			}
+			mySibling = mySibling->siblingId >= 0 ? &m_frames[mySibling->siblingId] : nullptr;
+		} while (mySibling);
+	}
+	f.parentId = -1;
+
+	for (auto& i : m_animationSets) {
+		auto& j = i.animations.find(id);
+		if (j != i.animations.end()) {
+			i.animations.erase(j);
+		}
+	}
+
+	return true;
+}
+
+void MeshX::DeleteDummyFrames()
+{
+	std::vector<int> cnts;
+
+	bool deleted = false;
+	do {
+		deleted = false;
+		GetVertStatistics(cnts);
+		for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++)
+		{
+			const Frame& f = m_frames[i];
+			int cnt = cnts[i];
+			if (cnt) {
+				continue;
+			}
+			if (f.childId >= 0)
+			{
+				continue;
+			}
+			deleted = UnlinkFrame(i);
+		}
+	} while (deleted);
+
+	while (!m_frames.empty() && m_frames.rbegin()->parentId < 0 && m_frames.rbegin()->childId < 0) {
+		m_frames.erase(m_frames.end() - 1);
+	}
+}
+
+void MeshX::DumpFrames() const
+{
+	for (FrameIterator it(m_frames); it.GetCurrent() >= 0; ++it) {
+		const Frame& f = m_frames[it.GetCurrent()];
+
+		for (int i = 0; i < GetDepth(it.GetCurrent()); i++) {
+			printf(" ");
+		}
+	//	printf("%s(%d) p=%d s=%d c=%d\n", f.name, frameId, f.parentId, f.siblingId, f.childId);
+		printf("%s: ", f.name);
+		for (int r = 0; r < 4; r++) {
+			for (int c = 0; c < 4; c++) {
+				float m = f.initialMatrix.m[r][c];
+				if (m - int(m)) {
+					printf("%.2f,", m);
+				}else{
+					printf("%d,", (int)m);
+				}
+			}
+			printf(" ");
+		}
+		printf("\n");
 	}
 }
 
@@ -800,15 +1019,25 @@ void MeshX::LoadSub(const char *fileName)
 
 	free(img);
 
+	DeleteDummyFrames();
+
+	if (m_frames.empty()) {
+		m_frames.resize(1);
+	}
+
 	printf("===============DumpFrames begin\n");
-	DumpFrames(0, 0);
+	DumpFrames();
 	printf("===============DumpFrames end\n");
 
+	printf("===============DumpStatistics begin\n");
+	PrintStatistics();
+	printf("===============DumpStatistics end\n");
 }
 
 MeshX::~MeshX()
 {
 	m_meshRenderer.Destroy();
+	bonesRenderer.Destroy();
 }
 
 void MeshX::CalcFrameMatrices(BONE_ID frameId)
