@@ -54,9 +54,17 @@ void App::Init(const char* fileName)
 			mesh[0] = new MeshX(fileName);
 		}
 	} else {
-		mesh[0] = new Bvh("D:\\github\\aachan.bvh");
-		mesh[1] = new Bvh("D:\\github\\kashiyuka.bvh");
-		mesh[2] = new Bvh("D:\\github\\nocchi.bvh");
+		const char* bvhNames[] = {
+			"D:\\github\\aachan.bvh",
+			"D:\\github\\kashiyuka.bvh",
+			"D:\\github\\nocchi.bvh",
+		};
+		for (int i = 0; i < dimof(bvhNames); i++) {
+			Bvh* bvh = new Bvh(bvhNames[i]);
+			mesh[i] = bvh;
+			bvh->ResetAnim();
+			meshTiny->SyncLocalAxisWithBvh(bvh, bind[i]);
+		}
 	}
 
 	radius = CalcRadius(mesh[0]);
