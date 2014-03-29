@@ -20,7 +20,7 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), lastX(INVALID_POS), lastY(INVALID_POS), sprite(nullptr), font(nullptr)
+App::App() : scale(1), radius(1), lastX(INVALID_POS), lastY(INVALID_POS), sprite(nullptr), font(nullptr), animationNumber(0), trackTime(0), meshTiny(nullptr)
 {
 	ZeroMemory(mesh, sizeof(mesh));
 	lastTime = GetTime();
@@ -41,11 +41,15 @@ void App::Init(const char* fileName)
 
 	sprite = new SpriteBatch(deviceMan11.GetContext());
 	font = new SpriteFont(deviceMan11.GetDevice(), L"resource\\font.spritefont");
+	meshTiny = new MeshX("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\Media\\Tiny\\tiny.x");
 
 	if (fileName) {
 		const char* ext = strrchr(fileName, '.');
 		if (ext && !_stricmp(ext, ".bvh")) {
-			mesh[0] = new Bvh(fileName);
+			Bvh* bvh = new Bvh(fileName);
+			mesh[0] = bvh;
+			bvh->ResetAnim();
+			meshTiny->SyncLocalAxisWithBvh(bvh, bind[0]);
 		} else {
 			mesh[0] = new MeshX(fileName);
 		}
@@ -55,7 +59,7 @@ void App::Init(const char* fileName)
 		mesh[2] = new Bvh("D:\\github\\nocchi.bvh");
 	}
 
-	float radius = CalcRadius(mesh[0]);
+	radius = CalcRadius(mesh[0]);
 	scale = std::max(0.00001f, radius);
 
 	height = radius / 2;
@@ -141,6 +145,30 @@ void App::DrawBoneNames(Bvh* bvh)
 	}
 }
 
+void App::DrawBoneNames(const MeshX* meshX, const MeshXAnimResult& result)
+{
+	const std::vector<Frame>& frames = meshX->GetFrames();
+	for (BONE_ID id = 0; id < (BONE_ID)frames.size(); id++) {
+		const Frame& f = frames[id];
+		XMFLOAT2 pos = GetScreenPos(result.boneMat[id]);
+
+		WCHAR wname[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, 0, f.name, -1, wname, dimof(wname));
+		if (wname[0] == '\0') {
+			wcscpy(wname, L"[NO NAME]");
+		}
+
+		XMVECTOR size = font->MeasureString(wname);
+		pos.x -= XMVectorGetX(size) / 2;
+		pos.y -= XMVectorGetY(size) / 2;
+		XMFLOAT2 origin = {0, 0};
+		font->DrawString(sprite, wname, pos, Colors::Black, 0, origin, 0.7f);
+		pos.x += 1.0f;
+		pos.y += 1.0f;
+		font->DrawString(sprite, wname, pos, Colors::White, 0, origin, 0.7f);
+	}
+}
+
 void App::Update()
 {
 	if (GetKeyState('P') & 0x80) {
@@ -179,19 +207,29 @@ void App::Draw()
 
 	sprite->Begin();
 
-	for (auto& it : mesh) {
-		if (it) {
+	for (int i = 0; i < dimof(mesh); i++) {
+		Mesh* it = mesh[i];
+		MeshX* meshX = meshTiny;
+		MeshXAnimResult meshXAnimResult;
+		if (it && meshX) {
+
 			Bvh* bvh = dynamic_cast<Bvh*>(it);
+
 			if (bvh) {
-				bvh->Draw(0, trackTime);
-				DrawBoneNames(bvh);
+				bvh->Draw(animationNumber == 9 ? 0 : animationNumber, trackTime);
+				if (animationNumber == 9) {
+					meshX->CalcAnimationFromBvh(bvh, bind[i], trackTime, meshXAnimResult, 270 / radius);
+				} else {
+					meshX->CalcAnimation(animationNumber, trackTime, meshXAnimResult);
+				}
+				meshX->Draw(meshXAnimResult);
+				if (GetKeyState('T') & 0x01) {
+					DrawBoneNames(bvh);
+				}
 			}
-			MeshX* meshX = dynamic_cast<MeshX*>(it);
-			if (meshX) {
-				MeshXAnimResult animResult;
-				meshX->CalcAnimation(0, trackTime, animResult);
-				meshX->Draw(animResult);
-			}
+		}
+		if (meshX && (GetKeyState('T') & 0x01)) {
+			DrawBoneNames(meshX, meshXAnimResult);
 		}
 	}
 
@@ -202,9 +240,10 @@ void App::Draw()
 
 void App::Destroy()
 {
-	SAFE_DELETE(mesh[0]);
-	SAFE_DELETE(mesh[1]);
-	SAFE_DELETE(mesh[2]);
+	for (auto& it : mesh) {
+		SAFE_DELETE(it);
+	}
+	SAFE_DELETE(meshTiny);
 	SAFE_DELETE(font);
 	SAFE_DELETE(sprite);
 

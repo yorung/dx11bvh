@@ -1,6 +1,9 @@
 class App {
+	MeshX* meshTiny;
+	MeshXBvhBinding bind[3];
 	Mesh* mesh[3];
 	float scale;
+	float radius;
 	float lastX;
 	float lastY;
 	float rotX;
@@ -19,6 +22,7 @@ public:
 	void Update();
 	void Draw();
 	void DrawBoneNames(Bvh* bvh);
+	void DrawBoneNames(const MeshX* meshX, const MeshXAnimResult& result);
 	void MouseWheel(float delta);
 	void LButtonDown(float x, float y);
 	void LButtonUp(float x, float y);
