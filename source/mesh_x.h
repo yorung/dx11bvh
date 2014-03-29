@@ -4,7 +4,6 @@ class Mesh
 {
 public:
 	virtual ~Mesh() {}
-	virtual void Draw(int animId, double time) = 0;
 	virtual const struct Block& GetRawDatas() const = 0;
 };
 
@@ -92,9 +91,7 @@ struct Frame
 {
 	char name[32];
 	Mat initialMatrix;
-	Mat frameTransformMatrix;
-	Matrix boneOffsetMatrix;
-	Mat result;
+	Mat boneOffsetMatrix;
 	BONE_ID parentId;
 	BONE_ID childId;
 	BONE_ID siblingId;
@@ -111,6 +108,17 @@ struct Block
 		indices.clear();
 		materialMaps.clear();
 	}
+};
+
+struct MeshXAnimResult
+{
+	Mat boneMat[BONE_MAX];
+};
+
+struct MeshXBvhBinding
+{
+	Quat axisAlignQuats[BONE_MAX];
+	Quat boneAlignQuats[BONE_MAX];
 };
 
 class MeshX : public Mesh
@@ -130,8 +138,7 @@ private:
 	BONE_ID GetFrameIdByName(const char* name) const;
 	void _linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId);
 	void _storeWeight(MeshVertex& v, int frameId, float weight);
-	void CalcAnimation(int animId, double time);
-	void CalcFrameMatrices(BONE_ID frameId);
+	void CalcFrameMatrices(MeshXAnimResult& animResult, const Mat localMats[BONE_MAX]) const;
 	void DumpFrames() const;
 	void CreateBoneMesh();
 	int GetDepth(BONE_ID id) const;
@@ -140,6 +147,7 @@ private:
 	void GetAnimStatistics(std::vector<int>& animCnts) const;
 	void DeleteDummyFrames();
 	bool UnlinkFrame(BONE_ID id);
+	void ApplyBvhInitialStance(const Bvh* bvh, MeshXBvhBinding& bind) const;
 
 	std::vector<Frame> m_frames;
 	std::vector<AnimationSet> m_animationSets;
@@ -150,8 +158,12 @@ private:
 	Block bones;
 public:
 	const Block& GetRawDatas() const { return m_block; }
+	const std::vector<Frame>& GetFrames() const { return m_frames; }
 	MeshX(const char *fileName);
 	~MeshX();
-	void Draw(int animId, double time);
+	void CalcAnimation(int animId, double time, MeshXAnimResult& result) const;
+	void CalcAnimationFromBvh(class Bvh* bvh, const MeshXBvhBinding& bind, double time, MeshXAnimResult& animResult, float translationScale) const;
+	void Draw(const MeshXAnimResult& animResult) const;
+	void SyncLocalAxisWithBvh(Bvh* bvh, MeshXBvhBinding& bind) const;
 };
 

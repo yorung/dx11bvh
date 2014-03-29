@@ -181,11 +181,16 @@ void App::Draw()
 
 	for (auto& it : mesh) {
 		if (it) {
-			it->Draw(0, trackTime);
-
 			Bvh* bvh = dynamic_cast<Bvh*>(it);
 			if (bvh) {
+				bvh->Draw(0, trackTime);
 				DrawBoneNames(bvh);
+			}
+			MeshX* meshX = dynamic_cast<MeshX*>(it);
+			if (meshX) {
+				MeshXAnimResult animResult;
+				meshX->CalcAnimation(0, trackTime, animResult);
+				meshX->Draw(animResult);
 			}
 		}
 	}
