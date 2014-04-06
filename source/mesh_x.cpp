@@ -318,7 +318,7 @@ static MatMan::MMID _getMaterial(char*& p)
 	mat.emissive.y = _getF(p);
 	mat.emissive.z = _getF(p);
 	mat.emissive.w = 1.0f;
-	std::string textureFilename = "white.bmp";
+	std::string textureFilename = "resource\\white.bmp";
 	char *tx = _searchChildTag(p, "TextureFilename");
 	if (tx) {
 		textureFilename = _getString(tx);
@@ -418,7 +418,7 @@ void MeshX::CreateBoneMesh()
 	mat.emissive.y = 0.4f;
 	mat.emissive.z = 0.4f;
 	mat.emissive.w = 1.0f;
-	mat.tmid = texMan.Create("white.bmp", true);
+	mat.tmid = texMan.Create("resource\\white.bmp", true);
 
 	MaterialMap map;
 	map.materialId = matMan.Create(mat);
