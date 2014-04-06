@@ -111,22 +111,20 @@ void App::MouseMove(float x, float y)
 
 inline XMFLOAT2 GetScreenPos(const XMMATRIX& mLocal)
 {
-	XMFLOAT4X4 mViewport;
-	XMMATRIX mW, mV, mP;
+	Mat mW, mV, mP, mViewport;
 	matrixMan.Get(MatrixMan::WORLD, mW);
 	matrixMan.Get(MatrixMan::VIEW, mV);
 	matrixMan.Get(MatrixMan::PROJ, mP);
-	XMStoreFloat4x4(&mViewport, XMMatrixIdentity());
 	mViewport._11 = SCR_W / 2;
 	mViewport._22 = -SCR_H / 2;
 	mViewport._41 = SCR_W / 2;
 	mViewport._42 = SCR_H / 2;
 
-	XMMATRIX m = mLocal * mW * mV * mP * XMLoadFloat4x4(&mViewport);
+	Mat m = mLocal * mW * mV * mP * mViewport;
 
 	XMFLOAT2 p;
-	p.x = XMVectorGetX(m.r[3]) / XMVectorGetW(m.r[3]);
-	p.y = XMVectorGetY(m.r[3]) / XMVectorGetW(m.r[3]);
+	p.x = m._41 / m._44;
+	p.y = m._42 / m._44;
 	return p;
 }
 

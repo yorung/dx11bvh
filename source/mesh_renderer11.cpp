@@ -65,12 +65,12 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	shaderMan.Apply(shaderId);
 
-	XMMATRIX matWorld, matView, matProj;
+	Mat matWorld, matView, matProj;
 	matrixMan.Get(MatrixMan::WORLD, matWorld);
 	matrixMan.Get(MatrixMan::VIEW, matView);
 	matrixMan.Get(MatrixMan::PROJ, matProj);
-	XMMATRIX matW = matWorld;
-	XMMATRIX matVP = matView * matProj;
+	Mat matW = matWorld;
+	Mat matVP = matView * matProj;
 
 	deviceMan11.GetContext()->OMSetDepthStencilState(pDSState, 1);
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);

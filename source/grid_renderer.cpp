@@ -88,12 +88,12 @@ void GridRenderer::Draw()
 	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 	shaderMan.Apply(shaderId);
 
-	XMMATRIX matWorld, matView, matProj;
+	Mat matWorld, matView, matProj;
 	matrixMan.Get(MatrixMan::WORLD, matWorld);
 	matrixMan.Get(MatrixMan::VIEW, matView);
 	matrixMan.Get(MatrixMan::PROJ, matProj);
-	XMMATRIX matW = matWorld;
-	XMMATRIX matVP = matView * matProj;
+	Mat matW = matWorld;
+	Mat matVP = matView * matProj;
 
 	deviceMan11.GetContext()->OMSetDepthStencilState(pDSState, 1);
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);

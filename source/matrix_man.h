@@ -12,7 +12,6 @@ public:
 public:
 	void Get(Type type, Mat& m);
 	void Set(Type type, const Mat& m);
-	void Get(Type type, XMMATRIX& m) { Mat t; Get(type, t); m = t; }
 };
 
 extern MatrixMan matrixMan;
