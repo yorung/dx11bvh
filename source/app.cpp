@@ -14,7 +14,7 @@ static float CalcRadius(const Mesh* m)
 	const Block& b = m->GetRawDatas();
 	float maxSq = 0;
 	for (auto& it : b.vertices) {
-		float sq = XMVectorGetX(XMVector3LengthSq(XMLoadFloat3(&it.xyz)));
+		float sq = lengthSq(it.xyz);
 		maxSq = std::max(maxSq, sq);
 	}
 	return sqrt(maxSq);

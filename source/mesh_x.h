@@ -72,11 +72,11 @@ struct ubyte4
 
 struct MeshVertex
 {
-	Vector3 xyz;
-	Vector3 normal;
+	Vec3 xyz;
+	Vec3 normal;
 	DWORD color;
 	Vector2 uv;
-	Vector3 blendWeights;
+	Vec3 blendWeights;
 	ubyte4 blendIndices;
 };
 

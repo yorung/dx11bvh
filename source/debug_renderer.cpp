@@ -49,9 +49,9 @@ void DebugRenderer::CreatePivotMesh()
 {
 	for (BONE_ID i = 0; (unsigned)i < BONE_MAX; i++)	{
 		float len = 12.0f;
-		CreateCone(pivots, Vector3(), Vector3(len, 0, 0), i, 0xff0000ff);
-		CreateCone(pivots, Vector3(), Vector3(0, len, 0), i, 0xff00ff00);
-		CreateCone(pivots, Vector3(), Vector3(0, 0, len), i, 0xffff0000);
+		CreateCone(pivots, Vec3(), Vec3(len, 0, 0), i, 0xff0000ff);
+		CreateCone(pivots, Vec3(), Vec3(0, len, 0), i, 0xff00ff00);
+		CreateCone(pivots, Vec3(), Vec3(0, 0, len), i, 0xffff0000);
 	}
 
 	int sizeVertices = pivots.vertices.size() * sizeof(pivots.vertices[0]);

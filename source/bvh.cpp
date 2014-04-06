@@ -311,8 +311,8 @@ void Bvh::CreateBoneMesh()
 		}
 		int depth = GetDepth(pId);
 		BvhFrame& f1 = m_frames[pId];
-		Vector3 v1 = f1.offsetCombined;
-		Vector3 v2 = f2.offsetCombined;
+		Vec3 v1 = f1.offsetCombined;
+		Vec3 v2 = f2.offsetCombined;
 
 		static const DWORD depthToColor[] = {
 			0xffffffff,

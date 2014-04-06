@@ -113,10 +113,10 @@ static float _getF(char*& p)
 	return (float)_getD(p);
 }
 
-static void _getFloat3Array(char*& p, std::vector<Vector3>& vertices, int nVertices)
+static void _getFloat3Array(char*& p, std::vector<Vec3>& vertices, int nVertices)
 {
 	for (int i = 0; i < nVertices; i++) {
-		Vector3 f3;
+		Vec3 f3;
 		f3.x = _getF(p);
 		f3.y = _getF(p);
 		f3.z = _getF(p);
@@ -393,8 +393,8 @@ void MeshX::CreateBoneMesh()
 			0xff0000ff,
 			0xff000000,
 		};
-		Vector3 v1 = Matrix(inv(f1.boneOffsetMatrix)).Translation();
-		Vector3 v2 = Matrix(inv(f2.boneOffsetMatrix)).Translation();
+		Vec3 v1 = Matrix(inv(f1.boneOffsetMatrix)).Translation();
+		Vec3 v2 = Matrix(inv(f2.boneOffsetMatrix)).Translation();
 		CreateCone(bones, v1, v2, pId, depthToColor[depth % dimof(depthToColor)]);
 	}
 
@@ -553,7 +553,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 
 	char *p = imgMesh;
 	int nVertices = _getI(p);
-	std::vector<Vector3> vertPos;
+	std::vector<Vec3> vertPos;
 	_getFloat3Array(p, vertPos, nVertices);
 	int nOrgFaces = _getI(p);
 	std::vector<bool> isOrgFace4Vertices;
@@ -576,7 +576,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 
 	p = _searchChildTag((char*)imgMesh, "MeshNormals");
 	int nNormals = _getI(p);
-	std::vector<Vector3> normals;
+	std::vector<Vec3> normals;
 	_getFloat3Array(p, normals, nNormals);
 	int nOrgNormalFaces = _getI(p);
 	std::vector<bool> isOrgFace4VerticesNormal;

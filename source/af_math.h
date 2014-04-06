@@ -23,9 +23,14 @@ inline double afcos(double s) { return cos(s); }
 
 template <class T> inline void swap(T& a, T& b) { T t = a; a = b; b = t; }
 
+template <class VEC3> inline affloat lengthSq(const VEC3& v)
+{
+	return dot(v, v);
+}
+
 template <class VEC3> inline affloat length(const VEC3& v)
 {
-	return afsqrt(dot(v, v));
+	return afsqrt(lengthSq(v));
 }
 
 template <class VEC3> inline VEC3 normalize(const VEC3& v)
