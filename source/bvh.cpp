@@ -164,7 +164,7 @@ static std::string _getToken(char*& p)
 	}
 
 	std::string r;
-	while (*p && (isalnum(*p) || *p == '_')) {
+	while (*p && (isalnum(*p) || *p == '_' || *p == ':')) {
 		r = r + *p++;
 	}
 
@@ -296,6 +296,12 @@ Bvh::Bvh(const char *fileName)
 		CalcBoneOffsetMatrix(i);
 	}
 	CreateBoneMesh();
+
+	for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++) {
+		if (!memcmp(m_frames[i].name, "mixamorig:", 10)) {
+			memmove(m_frames[i].name, m_frames[i].name + 10, strlen(m_frames[i].name + 10) + 1);
+		}
+	}
 	CreateBoneTypeToIdTbl();
 }
 
