@@ -37,7 +37,7 @@
 using namespace DirectX;
 using namespace SimpleMath;
 
-static const int BONE_MAX = 50;
+static const int BONE_MAX = 70;
 
 // TODO: reference additional headers your program requires here
 #include "source/af_math.h"
