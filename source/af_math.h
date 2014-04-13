@@ -2,6 +2,8 @@
 
 typedef float affloat;
 
+inline affloat clamp(affloat x, affloat mi, affloat ma) { return std::max(std::min(x, ma), mi); }
+
 template <class VEC3> inline affloat dot(const VEC3& l, const VEC3& r)
 {
 	return l.x * r.x + l.y * r.y + l.z * r.z;
@@ -20,6 +22,8 @@ inline float afsin(float s) { return sinf(s); }
 inline double afsin(double s) { return sin(s); }
 inline float afcos(float s) { return cosf(s); }
 inline double afcos(double s) { return cos(s); }
+inline float afacos(float s) { return acosf(s); }
+inline double afacos(double s) { return acos(s); }
 
 template <class T> inline void swap(T& a, T& b) { T t = a; a = b; b = t; }
 
@@ -70,9 +74,40 @@ struct Quat
 	operator Quaternion() const { return Quaternion(v.x, v.y, v.z, w); }
 
 	Quat operator*(const Quat& r) const { return Quat(w * r.w - dot(v, r.v), r.v * w + v * r.w + cross(r.v, v)); }
+	Quat operator*(affloat s) const { return Quat(w * s, v * s); }
 	const Quat& operator*=(const Quat& r) { *this = *this * r; return *this; }
 	Quat Conjugate() const { return Quat(w, -v); }
 };
+
+inline affloat dot(const Quat& l, const Quat& r)
+{
+	return dot(l.v, r.v) + l.w * r.w;
+}
+
+inline Quat slerp(const Quat& l, const Quat& r, affloat ratio)
+{
+#ifdef USE_DXMATH
+	return Quaternion::Slerp(l, r, ratio);
+#else
+	affloat angle = afacos(clamp(dot(l, r), -1, 1));
+	if (angle == 0) {
+		return l;
+	}
+	affloat sinangle = afsin(angle);
+	if (sinangle == 0) {
+		return l;
+	}
+	affloat reciprocal = 1 / sinangle;
+	Quat afr = l * afsin((1 - ratio) * angle) * reciprocal + r * afsin(ratio * angle) * reciprocal;
+
+	Quat dx = Quaternion::Slerp(l, r, ratio);
+	assert(abs(afr.w - dx.w) < 0.1f);
+	assert(abs(afr.v.x - dx.v.x) < 0.1f);
+	assert(abs(afr.v.x - dx.v.x) < 0.1f);
+	assert(abs(afr.v.z - dx.v.z) < 0.1f);
+	return afr;
+#endif
+}
 
 struct Mat
 {

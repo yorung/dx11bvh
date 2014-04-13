@@ -1016,7 +1016,7 @@ void MeshX::CalcFrameMatrices(MeshXAnimResult& animResult, const Mat localMats[B
 static Mat Interpolate(const Mat& m1, const Mat& m2, float ratio)
 {
 	Vec3 t = m1.GetRow(3) * (1 - ratio) + m2.GetRow(3) * ratio;
-	Mat m3 = q2m(Quaternion::Slerp(m2q(m1), m2q(m2), ratio));
+	Mat m3 = q2m(slerp(m2q(m1), m2q(m2), ratio));
 	m3.m[3][0] = t.x;
 	m3.m[3][1] = t.y;
 	m3.m[3][2] = t.z;
