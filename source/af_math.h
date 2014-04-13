@@ -84,12 +84,19 @@ inline affloat dot(const Quat& l, const Quat& r)
 	return dot(l.v, r.v) + l.w * r.w;
 }
 
-inline Quat slerp(const Quat& l, const Quat& r, affloat ratio)
+inline Quat slerp(const Quat& l, Quat r, affloat ratio)
 {
 #ifdef USE_DXMATH
 	return Quaternion::Slerp(l, r, ratio);
 #else
-	affloat angle = afacos(clamp(dot(l, r), -1, 1));
+	affloat dotlr = dot(l, r);
+	if (dotlr < 0) {
+		dotlr = -dotlr;
+		r = r.Conjugate();
+		r.w = -r.w;
+	}
+
+	affloat angle = afacos(clamp(dotlr, -1, 1));
 	if (angle == 0) {
 		return l;
 	}
@@ -101,10 +108,10 @@ inline Quat slerp(const Quat& l, const Quat& r, affloat ratio)
 	Quat afr = l * afsin((1 - ratio) * angle) * reciprocal + r * afsin(ratio * angle) * reciprocal;
 
 	Quat dx = Quaternion::Slerp(l, r, ratio);
-	assert(abs(afr.w - dx.w) < 0.1f);
-	assert(abs(afr.v.x - dx.v.x) < 0.1f);
-	assert(abs(afr.v.x - dx.v.x) < 0.1f);
-	assert(abs(afr.v.z - dx.v.z) < 0.1f);
+	assert(abs(afr.w - dx.w) < 0.01f);
+	assert(abs(afr.v.x - dx.v.x) < 0.01f);
+	assert(abs(afr.v.y - dx.v.y) < 0.01f);
+	assert(abs(afr.v.z - dx.v.z) < 0.01f);
 	return afr;
 #endif
 }
