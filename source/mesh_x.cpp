@@ -490,6 +490,7 @@ BONE_ID MeshX::GetOrCreateFrameIdByName(const char* name)
 		return id;
 	}
 	Frame f;
+	assert(strlen(name) < sizeof(f.name));
 	strncpy(f.name, name, sizeof(f.name));
 	f.parentId = -1;
 	f.childId = -1;
