@@ -52,13 +52,10 @@ static const int BONE_MAX = 70;
 #include "source/bvh.h"
 #include "source/debug_renderer.h"
 #include "source/grid_renderer.h"
+#include "source/helper.h"
 
 #include "source/app.h"
 
-#define dimof(x) (sizeof(x) / sizeof(x[0]))
-
-#define SAFE_DELETE(p)       { if (p) { delete (p);     (p)=NULL; } }
-#define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p)=NULL; } }
 
 #define SCR_W 1024
 #define SCR_H 600

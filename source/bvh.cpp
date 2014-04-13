@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-void *LoadFile(const char *fileName);
-
 static const char *bvhPerfume[] =
 {
 	"RightWrist",
