@@ -599,7 +599,7 @@ void Bvh::CalcAnimation(double time)
 	for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++) {
 		auto& it = m_frames[i];
 		Vec3 translate;
-		Quaternion q = pose.quats[i];
+		Quat q = pose.quats[i];
 		if (it.posIndices.x >= 0) {
 			translate = Vec3(mot[it.posIndices.x], mot[it.posIndices.y], -mot[it.posIndices.z]);
 		} else {

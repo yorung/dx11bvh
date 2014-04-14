@@ -109,7 +109,7 @@ void App::MouseMove(float x, float y)
 	lastY = y;
 }
 
-inline XMFLOAT2 GetScreenPos(const XMMATRIX& mLocal)
+inline XMFLOAT2 GetScreenPos(const Mat& mLocal)
 {
 	Mat mW, mV, mP, mViewport;
 	matrixMan.Get(MatrixMan::WORLD, mW);
@@ -204,11 +204,11 @@ void App::Draw()
 		trackTime += deltaTime;
 	}
 
-	matrixMan.Set(MatrixMan::WORLD, Matrix());
+	matrixMan.Set(MatrixMan::WORLD, Mat());
 
 	float dist = 3 * scale;
-	Matrix cam = translate(0, height, -dist) * q2m(Quat(Vec3(1,0,0), rotY)) * q2m(Quat(Vec3(0,1,0), rotX));
-	matrixMan.Set(MatrixMan::VIEW, (Matrix)inv(cam));
+	Mat cam = translate(0, height, -dist) * q2m(Quat(Vec3(1,0,0), rotY)) * q2m(Quat(Vec3(0,1,0), rotX));
+	matrixMan.Set(MatrixMan::VIEW, inv(cam));
 	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, dist / 1000, dist * 1000));
 
 	sprite->Begin();

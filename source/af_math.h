@@ -293,7 +293,7 @@ inline Quat m2q(const Matrix& m_)
 #endif
 }
 
-inline Vec3 transform(const Vec3& v, const Matrix& m)
+inline Vec3 transform(const Vec3& v, const Mat& m)
 {
 #define _(c) (m._1##c## * v.x + m._2##c## * v.y + m._3##c## * v.z + m._4##c##)
 	return Vec3(_(1), _(2), _(3));

@@ -348,8 +348,8 @@ void MeshX::CreateBoneMesh()
 			0xff0000ff,
 			0xff000000,
 		};
-		Vec3 v1 = Matrix(inv(f1.boneOffsetMatrix)).Translation();
-		Vec3 v2 = Matrix(inv(f2.boneOffsetMatrix)).Translation();
+		Vec3 v1 = inv(f1.boneOffsetMatrix).GetRow(3);
+		Vec3 v2 = inv(f2.boneOffsetMatrix).GetRow(3);
 		CreateCone(bones, v1, v2, pId, depthToColor[depth % dimof(depthToColor)]);
 	}
 
@@ -1230,7 +1230,7 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh, MeshXBvhBinding& bind) const
 		Vec3 rotAxis = cross(worldTiny, worldBvh);
 		float rotRad = acosf(dot(worldTiny, worldBvh));
 
-		Matrix rotMat = r.boneMat[myId];
+		Mat rotMat = r.boneMat[myId];
 		rotMat._41 = rotMat._42 = rotMat._43 = 0;
 		Vec3 rotAxisLocal = transform(rotAxis, inv(rotMat));
 		bind.boneAlignQuats[myId] *= Quat(rotAxisLocal, rotRad);

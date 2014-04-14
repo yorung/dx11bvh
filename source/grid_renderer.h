@@ -1,7 +1,7 @@
 struct SolidConstantBuffer
 {
-	Matrix matW;
-	Matrix matVP;
+	Mat matW;
+	Mat matVP;
 };
 
 class GridRenderer
