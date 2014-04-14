@@ -109,7 +109,7 @@ void App::MouseMove(float x, float y)
 	lastY = y;
 }
 
-inline XMFLOAT2 GetScreenPos(const Mat& mLocal)
+inline Vec2 GetScreenPos(const Mat& mLocal)
 {
 	Mat mW, mV, mP, mViewport;
 	matrixMan.Get(MatrixMan::WORLD, mW);
@@ -122,7 +122,7 @@ inline XMFLOAT2 GetScreenPos(const Mat& mLocal)
 
 	Mat m = mLocal * mW * mV * mP * mViewport;
 
-	XMFLOAT2 p;
+	Vec2 p;
 	p.x = m._41 / m._44;
 	p.y = m._42 / m._44;
 	return p;
@@ -135,7 +135,7 @@ void App::DrawBoneNames(Bvh* bvh)
 		if (it.childId < 0) {
 			continue;
 		}
-		XMFLOAT2 pos = GetScreenPos(it.result);
+		Vec2 pos = GetScreenPos(it.result);
 
 		WCHAR wname[MAX_PATH];
 		MultiByteToWideChar(CP_ACP, 0, it.name, -1, wname, dimof(wname));
@@ -156,7 +156,7 @@ void App::DrawBoneNames(const MeshX* meshX, const MeshXAnimResult& result)
 	const std::vector<Frame>& frames = meshX->GetFrames();
 	for (BONE_ID id = 0; id < (BONE_ID)frames.size(); id++) {
 		const Frame& f = frames[id];
-		XMFLOAT2 pos = GetScreenPos(result.boneMat[id]);
+		Vec2 pos = GetScreenPos(result.boneMat[id]);
 
 		WCHAR wname[MAX_PATH];
 		MultiByteToWideChar(CP_ACP, 0, f.name, -1, wname, dimof(wname));

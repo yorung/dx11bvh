@@ -42,6 +42,26 @@ template <class VEC3> inline VEC3 normalize(const VEC3& v)
 	return v / length(v);
 }
 
+struct Vec2
+{
+	affloat x, y;
+	Vec2() : Vec2(0, 0) {}
+	Vec2(affloat X, affloat Y) : x(X), y(Y) {}
+
+	Vec2(const Vector2& v) : Vec2(v.x, v.y) {}
+	operator Vector2() const { return Vector2(x, y); }
+
+	Vec2 operator+(const Vec2& r) const { return Vec2(x + r.x, y + r.y); }
+	Vec2 operator-(const Vec2& r) const { return Vec2(x - r.x, y - r.y); }
+	Vec2 operator*(affloat r) const { return Vec2(x * r, y * r); }
+	Vec2 operator/(affloat r) const { return Vec2(x / r, y / r); }
+
+	Vec2 operator-() const { return Vec2(-x, -y); }
+
+	Vec2 operator-=(const Vec2& r) { return *this = *this - r; }
+	Vec2 operator*=(affloat r) { return *this = *this * r; }
+};
+
 struct Vec3
 {
 	affloat x, y, z;
