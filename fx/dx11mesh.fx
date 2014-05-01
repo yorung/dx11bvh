@@ -47,6 +47,5 @@ SamplerState gSampler : register(s0);
 Texture2D gTexture : register(t0);
 float4 mainPS( VS_OUTPUT _In ) : SV_TARGET
 {
-	float4 diffuse = gTexture.Sample( gSampler, _In.Tex0 );
-	return float4(CalcColor(_In.normal).xyz, 1) * _In.Col * diffuse;
+	return gTexture.Sample(gSampler, _In.normal.xy * float2(0.5, -0.5) + 0.5);
 }

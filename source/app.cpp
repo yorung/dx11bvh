@@ -41,7 +41,7 @@ void App::Init(const char* fileName)
 
 	sprite = new SpriteBatch(deviceMan11.GetContext());
 	font = new SpriteFont(deviceMan11.GetDevice(), L"resource\\font.spritefont");
-	meshTiny = new MeshX("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\Media\\Tiny\\tiny.x");
+	meshTiny = new MeshX("resource\\tiny.x");
 
 	if (fileName) {
 		const char* ext = strrchr(fileName, '.');
