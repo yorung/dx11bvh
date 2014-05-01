@@ -26,6 +26,7 @@ struct VS_INPUT {
 
 struct VS_OUTPUT {
 	float4 Pos : SV_POSITION;
+	float4 normal : NORMAL;
 	float4 Col : COLOR;
 	float2 Tex0: TEXCOORD0;
 };
@@ -37,8 +38,8 @@ VS_OUTPUT mainVS( VS_INPUT _In ) {
 		bones[_In.indices[2]] * _In.weights[2] +
 		bones[_In.indices[3]] * (1 - _In.weights[0] - _In.weights[1] - _In.weights[2]);
 	Out.Pos = mul(float4( _In.Pos, 1 ), mul(comb, mul(g_matW,g_matVP)));
-	_In.Normal = normalize(mul(_In.Normal, mul(comb, g_matW)));
-	Out.Col = float4(CalcColor(_In.Normal).xyz, 1) * _In.Col;
+	Out.normal = normalize(mul(_In.Normal, mul(comb, g_matW)));
+	Out.Col = _In.Col;
 	Out.Tex0 = _In.Tex0;
 	return Out;
 }
@@ -47,5 +48,5 @@ Texture2D gTexture : register(t0);
 float4 mainPS( VS_OUTPUT _In ) : SV_TARGET
 {
 	float4 diffuse = gTexture.Sample( gSampler, _In.Tex0 );
-	return _In.Col * diffuse;
+	return float4(CalcColor(_In.normal).xyz, 1) * _In.Col * diffuse;
 }

@@ -98,6 +98,7 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 		CopyMemory(mappedResource.pData, &cBuf, sizeof(cBuf));
 		deviceMan11.GetContext()->Unmap(pConstantBuffer, 0);
 		deviceMan11.GetContext()->VSSetConstantBuffers(0, 1, &pConstantBuffer);
+		deviceMan11.GetContext()->PSSetConstantBuffers(0, 1, &pConstantBuffer);
 
 		deviceMan11.GetContext()->DrawIndexed(matMap.faces * 3, matMap.faceStartIndex * 3, 0);
 	}
