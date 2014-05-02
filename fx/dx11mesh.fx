@@ -1,10 +1,12 @@
 cbuffer perMaterial : register(b0)
 {
-	row_major float4x4 g_matW : packoffset(c0);
-	row_major float4x4 g_matVP : packoffset(c4);
-	float4 faceColor : packoffset(c8);
-	float4 emissive : packoffset(c9);
-	row_major float4x4 bones[70] : packoffset(c12);
+	row_major float4x4 g_matW;
+	row_major float4x4 g_matVP;
+	float4 faceColor;
+	float4 emissive;
+	float4 padding1;
+	float4 padding2;
+	row_major float4x4 bones[70];
 };
 
 float4 CalcColor(float3 normal)
