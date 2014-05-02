@@ -1,7 +1,8 @@
 cbuffer perMaterial : register(b0)
 {
 	row_major float4x4 g_matW;
-	row_major float4x4 g_matVP;
+	row_major float4x4 g_matV;
+	row_major float4x4 g_matP;
 	float4 faceColor;
 	float4 emissive;
 	float4 padding1;
@@ -39,7 +40,7 @@ VS_OUTPUT mainVS( VS_INPUT _In ) {
 		bones[_In.indices[1]] * _In.weights[1] +
 		bones[_In.indices[2]] * _In.weights[2] +
 		bones[_In.indices[3]] * (1 - _In.weights[0] - _In.weights[1] - _In.weights[2]);
-	Out.Pos = mul(float4( _In.Pos, 1 ), mul(comb, mul(g_matW,g_matVP)));
+	Out.Pos = mul(float4( _In.Pos, 1 ), mul(comb, mul(g_matW, mul(g_matV, g_matP))));
 	Out.normal = normalize(mul(_In.Normal, mul(comb, g_matW)));
 	Out.Col = _In.Col;
 	Out.Tex0 = _In.Tex0;

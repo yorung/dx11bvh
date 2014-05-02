@@ -3,7 +3,8 @@
 struct MeshConstantBuffer
 {
 	Mat matW;
-	Mat matVP;
+	Mat matV;
+	Mat matP;
 	XMFLOAT4 faceColor;
 	XMFLOAT4 emissive;
 	XMFLOAT4 padding1;
@@ -69,8 +70,6 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 	matrixMan.Get(MatrixMan::WORLD, matWorld);
 	matrixMan.Get(MatrixMan::VIEW, matView);
 	matrixMan.Get(MatrixMan::PROJ, matProj);
-	Mat matW = matWorld;
-	Mat matVP = matView * matProj;
 
 	deviceMan11.GetContext()->OMSetDepthStencilState(pDSState, 1);
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
@@ -88,8 +87,9 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 		deviceMan11.GetContext()->PSSetShaderResources(0, 1, &tx);
 
 		MeshConstantBuffer cBuf;
-		cBuf.matW = matW;
-		cBuf.matVP = matVP;
+		cBuf.matW = matWorld;
+		cBuf.matV = matView;
+		cBuf.matP = matProj;
 		cBuf.faceColor = mat->faceColor;
 		cBuf.emissive = mat->emissive;
 		CopyMemory(cBuf.bone, BoneMatrices, BONE_MAX * sizeof(Mat));
