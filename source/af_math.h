@@ -334,3 +334,18 @@ inline Mat v2m(const Vec3& v)
 	return translate(v.x, v.y, v.z);
 }
 
+inline Mat transpose(const Mat& mtx)
+{
+#define m(i) mtx._1##i, mtx._2##i, mtx._3##i, mtx._4##i
+	return Mat(m(1), m(2), m(3), m(4));
+#undef m
+}
+
+inline Mat fastInv(const Mat& mtx)
+{
+#define m(i) mtx._1##i, mtx._2##i, mtx._3##i, 0
+	Mat r(m(1), m(2), m(3), 0, 0, 0, 1);
+#undef m
+	r.SetRow(3, -transform(mtx.GetRow(3), r));
+	return r;
+}
