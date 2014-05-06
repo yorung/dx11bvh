@@ -30,11 +30,14 @@ struct VS_INPUT {
 struct VS_OUTPUT {
 	float4 Pos : SV_POSITION;
 	float4 normalInView : NORMAL;
+	float3 reflectDir : REFDIR;
 	float4 Col : COLOR;
 	float2 Tex0: TEXCOORD0;
 };
 VS_OUTPUT mainVS( VS_INPUT _In ) {
 	VS_OUTPUT Out = (VS_OUTPUT)0;
+	float3 camDir = float3(g_matV._13, g_matV._23, g_matV._33);
+
 	float4x4 comb =
 		bones[_In.indices[0]] * _In.weights[0] +
 		bones[_In.indices[1]] * _In.weights[1] +
@@ -42,6 +45,7 @@ VS_OUTPUT mainVS( VS_INPUT _In ) {
 		bones[_In.indices[3]] * (1 - _In.weights[0] - _In.weights[1] - _In.weights[2]);
 	Out.Pos = mul(float4( _In.Pos, 1 ), mul(comb, mul(g_matW, mul(g_matV, g_matP))));
 	Out.normalInView = normalize(mul(_In.Normal, mul(comb, mul(g_matW, g_matV))));
+	Out.reflectDir = reflect(camDir, normalize(mul(_In.Normal, mul(comb, g_matW))));
 	Out.Col = _In.Col;
 	Out.Tex0 = _In.Tex0;
 	return Out;
