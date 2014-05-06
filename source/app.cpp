@@ -187,13 +187,18 @@ void App::DrawCameraParams()
 
 	sprintf(buf, "cam pos(via inv view):%f, %f, %f dir:%f, %f, %f", mInv._41, mInv._42, mInv._43, mInv._31, mInv._32, mInv._33);
 	MultiByteToWideChar(CP_ACP, 0, buf, -1, wBuf, dimof(wBuf));
-
 	Vec2 pos = {5, 5};
+	font->DrawString(sprite, wBuf, pos, Colors::White, 0, origin, 1.0f);
+
+	mInv = fastInv(v);
+	sprintf(buf, "cam pos(by fastInv):%f, %f, %f dir:%f, %f, %f", mInv._41, mInv._42, mInv._43, mInv._31, mInv._32, mInv._33);
+	MultiByteToWideChar(CP_ACP, 0, buf, -1, wBuf, dimof(wBuf));
+	pos.y = 25;
 	font->DrawString(sprite, wBuf, pos, Colors::White, 0, origin, 1.0f);
 
 	sprintf(buf, "cam dir(view mtx direct): %f, %f, %f", v._13, v._23, v._33);
 	MultiByteToWideChar(CP_ACP, 0, buf, -1, wBuf, dimof(wBuf));
-	pos.y = 30;
+	pos.y = 45;
 	font->DrawString(sprite, wBuf, pos, Colors::White, 0, origin, 1.0f);
 }
 
