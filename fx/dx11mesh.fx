@@ -54,5 +54,7 @@ SamplerState gSampler : register(s0);
 Texture2D gTexture : register(t0);
 float4 mainPS( VS_OUTPUT _In ) : SV_TARGET
 {
-	return gTexture.Sample(gSampler, _In.normalInView.xy * float2(0.5, -0.5) + 0.5);
+//	float3 normalForSample = _In.normalInView;
+	float3 normalForSample = (_In.reflectDir + float3(0, 0, 1)) * 0.5;
+	return gTexture.Sample(gSampler, normalForSample.xy * float2(0.5, -0.5) + 0.5);
 }
