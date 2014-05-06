@@ -175,6 +175,28 @@ void App::DrawBoneNames(const MeshX* meshX, const MeshXAnimResult& result)
 	}
 }
 
+void App::DrawCameraParams()
+{
+	Mat v;
+	matrixMan.Get(MatrixMan::VIEW, v);
+	Mat mInv = inv(v);
+
+	char buf[128];
+	WCHAR wBuf[128];
+	XMFLOAT2 origin = {0, 0};
+
+	sprintf(buf, "cam pos(via inv view):%f, %f, %f dir:%f, %f, %f", mInv._41, mInv._42, mInv._43, mInv._31, mInv._32, mInv._33);
+	MultiByteToWideChar(CP_ACP, 0, buf, -1, wBuf, dimof(wBuf));
+
+	Vec2 pos = {5, 5};
+	font->DrawString(sprite, wBuf, pos, Colors::White, 0, origin, 1.0f);
+
+	sprintf(buf, "cam dir(view mtx direct): %f, %f, %f", v._13, v._23, v._33);
+	MultiByteToWideChar(CP_ACP, 0, buf, -1, wBuf, dimof(wBuf));
+	pos.y = 30;
+	font->DrawString(sprite, wBuf, pos, Colors::White, 0, origin, 1.0f);
+}
+
 void App::Update()
 {
 	if (GetKeyState('P') & 0x80) {
@@ -238,6 +260,8 @@ void App::Draw()
 			DrawBoneNames(meshX, meshXAnimResult);
 		}
 	}
+
+	DrawCameraParams();
 
 	sprite->End();
 
