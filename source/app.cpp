@@ -39,20 +39,21 @@ void App::Init(const char* fileName)
 
 	g_type = "mesh";
 
+	const char* meshFileName = "resource\\tiny.x";
+	const char* ext = fileName ? strrchr(fileName, '.') : nullptr;
+	if (ext && !_stricmp(ext, ".x")) {
+		meshFileName = fileName;
+	}
+
 	sprite = new SpriteBatch(deviceMan11.GetContext());
 	font = new SpriteFont(deviceMan11.GetDevice(), L"resource\\font.spritefont");
-	meshTiny = new MeshX("resource\\tiny.x");
+	meshTiny = new MeshX(meshFileName);
 
-	if (fileName) {
-		const char* ext = strrchr(fileName, '.');
-		if (ext && !_stricmp(ext, ".bvh")) {
-			Bvh* bvh = new Bvh(fileName);
-			mesh[0] = bvh;
-			bvh->ResetAnim();
-			meshTiny->SyncLocalAxisWithBvh(bvh, bind[0]);
-		} else {
-			mesh[0] = new MeshX(fileName);
-		}
+	if (ext && !_stricmp(ext, ".bvh")) {
+		Bvh* bvh = new Bvh(fileName);
+		mesh[0] = bvh;
+		bvh->ResetAnim();
+		meshTiny->SyncLocalAxisWithBvh(bvh, bind[0]);
 	} else {
 		const char* bvhNames[] = {
 			"D:\\github\\aachan.bvh",
