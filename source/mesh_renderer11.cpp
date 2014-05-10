@@ -7,7 +7,8 @@ struct MeshConstantBuffer
 	Mat matP;
 	XMFLOAT4 faceColor;
 	XMFLOAT4 emissive;
-	XMFLOAT4 padding1;
+	Vec3 camPos;
+	float padding1;
 	XMFLOAT4 padding2;
 	Mat bone[BONE_MAX];
 };
@@ -92,6 +93,7 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 		cBuf.matP = matProj;
 		cBuf.faceColor = mat->faceColor;
 		cBuf.emissive = mat->emissive;
+		cBuf.camPos = fastInv(matView).GetRow(3);
 		CopyMemory(cBuf.bone, BoneMatrices, BONE_MAX * sizeof(Mat));
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		HRESULT hr = deviceMan11.GetContext()->Map(pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
