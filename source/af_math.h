@@ -25,8 +25,6 @@ inline double afcos(double s) { return cos(s); }
 inline float afacos(float s) { return acosf(s); }
 inline double afacos(double s) { return acos(s); }
 
-template <class T> inline void swap(T& a, T& b) { T t = a; a = b; b = t; }
-
 template <class VEC3> inline affloat lengthSq(const VEC3& v)
 {
 	return dot(v, v);
@@ -237,8 +235,8 @@ inline Mat inv(const Matrix& mtx)
 		}
 		if (maxi != d) {
 			for (int jj = 0; jj < 4; jj++) {
-				swap(l.m[d][jj], l.m[maxi][jj]);
-				swap(r.m[d][jj], r.m[maxi][jj]);
+				std::swap(l.m[d][jj], l.m[maxi][jj]);
+				std::swap(r.m[d][jj], r.m[maxi][jj]);
 			}
 		}
 
