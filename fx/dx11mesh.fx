@@ -5,7 +5,8 @@ cbuffer perMaterial : register(b0)
 	row_major float4x4 g_matP;
 	float4 faceColor;
 	float4 emissive;
-	float4 padding1;
+	float3 camPos;
+	float padding1;
 	float4 padding2;
 	row_major float4x4 bones[70];
 };
@@ -36,7 +37,8 @@ struct VS_OUTPUT {
 };
 VS_OUTPUT mainVS( VS_INPUT _In ) {
 	VS_OUTPUT Out = (VS_OUTPUT)0;
-	float3 camDir = float3(g_matV._13, g_matV._23, g_matV._33);
+//	float3 camDir = float3(g_matV._13, g_matV._23, g_matV._33);
+	float3 camDir = normalize(mul(float4(_In.Pos, 1), g_matW) - camPos);
 
 	float4x4 comb =
 		bones[_In.indices[0]] * _In.weights[0] +
