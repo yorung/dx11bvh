@@ -2,9 +2,9 @@ struct Block;
 
 class MeshRenderer11
 {
+	static BufferMan::BMID constantBufferId;
 	ID3D11Buffer* pVertexBuffer;
 	ID3D11Buffer* pIndexBuffer;
-	ID3D11Buffer* pConstantBuffer;
 	ID3D11SamplerState* pSamplerState;
 	ID3D11DepthStencilState* pDSState;
 	ShaderMan11::SMID shaderId;

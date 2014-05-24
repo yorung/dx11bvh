@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+BufferMan::BMID MeshRenderer11::constantBufferId = -1;
+
 struct MeshConstantBuffer
 {
 	Mat matW;
@@ -17,7 +19,6 @@ MeshRenderer11::MeshRenderer11()
 {
 	pVertexBuffer = nullptr;
 	pIndexBuffer = nullptr;
-	pConstantBuffer = nullptr;
 	pSamplerState = nullptr;
 	pDSState = nullptr;
 }
@@ -31,7 +32,6 @@ void MeshRenderer11::Destroy()
 {
 	SAFE_RELEASE(pIndexBuffer);
 	SAFE_RELEASE(pVertexBuffer);
-	SAFE_RELEASE(pConstantBuffer);
 	SAFE_RELEASE(pSamplerState);
 	SAFE_RELEASE(pDSState);
 }
@@ -54,7 +54,9 @@ void MeshRenderer11::Init(int sizeVertices, int sizeIndices, void* vertices, voi
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeVertices, D3D11_BIND_VERTEX_BUFFER), &subresData, &pVertexBuffer);
 	subresData.pSysMem = indices;
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeIndices, D3D11_BIND_INDEX_BUFFER), &subresData, &pIndexBuffer);
-	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeof(MeshConstantBuffer), D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE), nullptr, &pConstantBuffer);
+	if (constantBufferId < 0) {
+		constantBufferId = bufferMan.Create(sizeof(MeshConstantBuffer));
+	}
 
 	CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
 	descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -95,12 +97,10 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 		cBuf.emissive = mat->emissive;
 		cBuf.camPos = fastInv(matView).GetRow(3);
 		CopyMemory(cBuf.bone, BoneMatrices, BONE_MAX * sizeof(Mat));
-		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		HRESULT hr = deviceMan11.GetContext()->Map(pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-		CopyMemory(mappedResource.pData, &cBuf, sizeof(cBuf));
-		deviceMan11.GetContext()->Unmap(pConstantBuffer, 0);
-		deviceMan11.GetContext()->VSSetConstantBuffers(0, 1, &pConstantBuffer);
-		deviceMan11.GetContext()->PSSetConstantBuffers(0, 1, &pConstantBuffer);
+		bufferMan.Write(constantBufferId, &cBuf);
+		const auto buf = bufferMan.Get(constantBufferId);
+		deviceMan11.GetContext()->VSSetConstantBuffers(0, 1, &buf);
+		deviceMan11.GetContext()->PSSetConstantBuffers(0, 1, &buf);
 
 		deviceMan11.GetContext()->DrawIndexed(matMap.faces * 3, matMap.faceStartIndex * 3, 0);
 	}
