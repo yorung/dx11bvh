@@ -72,6 +72,9 @@
     <ClInclude Include="source\helper.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="source\buffer_man11.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -117,6 +120,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\helper.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\buffer_man11.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

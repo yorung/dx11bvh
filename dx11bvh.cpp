@@ -99,6 +99,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE,
 	app.Destroy();
 	texMan.Destroy();
 	shaderMan.Destroy();
+	bufferMan.Destroy();
 	deviceMan11.Destroy();
 	return 0;
 }
