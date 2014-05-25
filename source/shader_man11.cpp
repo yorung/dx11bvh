@@ -42,8 +42,10 @@ ShaderMan11::SMID ShaderMan11::Create(const char *name, const D3D11_INPUT_ELEMEN
 	hr = deviceMan11.GetDevice()->CreatePixelShader(pBlobPS->GetBufferPointer(), pBlobPS->GetBufferSize(), nullptr, &effect.pPixelShader);
 	assert(!hr);
 
-	hr = deviceMan11.GetDevice()->CreateInputLayout(elements, numElements, pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &effect.pInputLayout);
-	assert(!hr);
+	if (elements) {
+		hr = deviceMan11.GetDevice()->CreateInputLayout(elements, numElements, pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &effect.pInputLayout);
+		assert(!hr);
+	}
 
 	SAFE_RELEASE(pBlobVS);
 	SAFE_RELEASE(pBlobPS);

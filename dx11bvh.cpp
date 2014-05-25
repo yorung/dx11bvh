@@ -82,6 +82,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE,
 	deviceMan11.Create(hWnd);
 
 	app.Init(nullptr);
+	skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds");
 
 	// Main message loop:
 	for (;;) {
@@ -91,12 +92,14 @@ int APIENTRY _tWinMain(_In_ HINSTANCE,
 		app.Update();
 
 		deviceMan11.BeginScene();
+		skyMan.Draw();
 		app.Draw();
 		deviceMan11.EndScene();
 		Sleep(1);
 	}
 
 	app.Destroy();
+	skyMan.Destroy();
 	texMan.Destroy();
 	shaderMan.Destroy();
 	bufferMan.Destroy();
