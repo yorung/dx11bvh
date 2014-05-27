@@ -55,6 +55,7 @@ void SkyMan::Draw()
 	bufferMan.Write(constantBufferId, &invVP);
 	auto buf = bufferMan.Get(constantBufferId);
 	deviceMan11.GetContext()->VSSetConstantBuffers(0, 1, &buf);
+	deviceMan11.GetContext()->PSSetConstantBuffers(0, 1, &buf);
 
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &sampler);
 	ID3D11ShaderResourceView* tx = texMan.Get(texId);
