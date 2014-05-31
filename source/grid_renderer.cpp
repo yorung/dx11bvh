@@ -65,7 +65,7 @@ void GridRenderer::Init()
 	void* indices = &indi[0];
 	lines = indi.size() / 2;
 
-	D3D11_INPUT_ELEMENT_DESC layout[] = {
+	static D3D11_INPUT_ELEMENT_DESC layout[] = {
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
