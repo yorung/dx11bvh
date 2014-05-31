@@ -59,6 +59,6 @@ Texture2D gTexture : register(t0);
 float4 mainPS( VS_OUTPUT _In ) : SV_TARGET
 {
 //	float3 normalForSample = _In.normalInView;
-	float3 normalForSample = normalize((normalize(_In.reflectDir) - float3(0, 0, 1)) * 0.5);
+	float3 normalForSample = normalize(normalize(_In.reflectDir) - float3(0, 0, 1));
 	return gTexture.Sample(gSampler, normalForSample.xy * float2(0.5, -0.5) + 0.5);
 }
