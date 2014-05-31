@@ -47,7 +47,9 @@ VS_OUTPUT mainVS( VS_INPUT _In ) {
 		bones[_In.indices[3]] * (1 - _In.weights[0] - _In.weights[1] - _In.weights[2]);
 	Out.Pos = mul(float4( _In.Pos, 1 ), mul(comb, mul(g_matW, mul(g_matV, g_matP))));
 	Out.normalInView = normalize(mul(_In.Normal, mul(comb, mul(g_matW, g_matV))));
-	Out.reflectDir = reflect(camDir, normalize(mul(_In.Normal, mul(comb, g_matW))));
+	float4 normalInWorld = normalize(mul(_In.Normal, mul(comb, g_matW)));
+//	Out.reflectDir = reflect(camDir, normalInWorld);
+	Out.reflectDir = refract(camDir, normalInWorld, 1 / 1.3333);
 	Out.Col = _In.Col;
 	Out.Tex0 = _In.Tex0;
 	return Out;
