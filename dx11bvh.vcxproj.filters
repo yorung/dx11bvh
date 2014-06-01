@@ -78,6 +78,9 @@
     <ClInclude Include="source\sky_man11.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="source\water_surface.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -129,6 +132,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\sky_man11.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\water_surface.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

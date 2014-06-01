@@ -36,6 +36,7 @@ void App::Init(const char* fileName)
 
 	debugRenderer.Init();
 	gridRenderer.Init();
+	waterSurface.Init();
 
 	g_type = "mesh";
 
@@ -239,7 +240,8 @@ void App::Draw()
 	matrixMan.Set(MatrixMan::VIEW, fastInv(cam));
 	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, dist / 1000, dist * 1000));
 
-	gridRenderer.Draw();
+//	gridRenderer.Draw();
+	waterSurface.Draw();
 
 	sprite->Begin();
 
@@ -287,6 +289,7 @@ void App::Destroy()
 
 	debugRenderer.Destroy();
 	gridRenderer.Destroy();
+	waterSurface.Destroy();
 }
 
 

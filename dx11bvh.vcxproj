@@ -100,6 +100,7 @@
     <ClInclude Include="source\shader_man11.h" />
     <ClInclude Include="source\sky_man11.h" />
     <ClInclude Include="source\tex_man11.h" />
+    <ClInclude Include="source\water_surface.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -120,6 +121,7 @@
     <ClCompile Include="source\shader_man11.cpp" />
     <ClCompile Include="source\sky_man11.cpp" />
     <ClCompile Include="source\tex_man11.cpp" />
+    <ClCompile Include="source\water_surface.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

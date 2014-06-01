@@ -54,6 +54,7 @@ static const int BONE_MAX = 70;
 #include "source/bvh.h"
 #include "source/debug_renderer.h"
 #include "source/grid_renderer.h"
+#include "source/water_surface.h"
 #include "source/helper.h"
 
 #include "source/app.h"
