@@ -1,8 +1,8 @@
 cbuffer perMaterial : register(b0)
 {
-	row_major float4x4 g_matW;
-	row_major float4x4 g_matV;
-	row_major float4x4 g_matP;
+	row_major float4x4 matW;
+	row_major float4x4 matV;
+	row_major float4x4 matP;
 	float4 faceColor;
 	float4 emissive;
 	float3 camPos;
@@ -30,25 +30,29 @@ struct VS_INPUT {
 
 struct VS_OUTPUT {
 	float4 Pos : SV_POSITION;
-	float4 normalInView : NORMAL;
+	float3 normalInView : NORMAL;
 	float3 reflectDir : REFDIR;
 	float3 refractDir : REFRDIR;
 	float4 Col : COLOR;
-	float2 Tex0: TEXCOORD0;
+	float2 Tex0 : TEXCOORD0;
 };
 VS_OUTPUT mainVS( VS_INPUT _In ) {
 	VS_OUTPUT Out = (VS_OUTPUT)0;
+
 //	float3 camDir = float3(g_matV._13, g_matV._23, g_matV._33);
-	float3 camDir = normalize(mul(float4(_In.Pos, 1), g_matW) - camPos);
+	float3 camDir = normalize(mul(float4(_In.Pos, 1), matW).xyz - camPos);
 
 	float4x4 comb =
 		bones[_In.indices[0]] * _In.weights[0] +
 		bones[_In.indices[1]] * _In.weights[1] +
 		bones[_In.indices[2]] * _In.weights[2] +
 		bones[_In.indices[3]] * (1 - _In.weights[0] - _In.weights[1] - _In.weights[2]);
-	Out.Pos = mul(float4( _In.Pos, 1 ), mul(comb, mul(g_matW, mul(g_matV, g_matP))));
-	Out.normalInView = normalize(mul(_In.Normal, mul(comb, mul(g_matW, g_matV))));
-	float4 normalInWorld = normalize(mul(_In.Normal, mul(comb, g_matW)));
+	float4x4 cw = mul(comb, matW);
+	float4x4 cwv = mul(cw, matV);
+	float4x4 cwvp = mul(cwv, matP);
+	Out.Pos = mul(float4(_In.Pos, 1), cwvp);
+	Out.normalInView = normalize(mul(float4(_In.Normal, 0), cwv)).xyz;
+	float3 normalInWorld = normalize(mul(float4(_In.Normal, 0), cw)).xyz;
 	Out.reflectDir = reflect(camDir, normalInWorld);
 	Out.refractDir = refract(camDir, normalInWorld, 1 / 1.3333);
 	Out.Col = _In.Col;
@@ -57,7 +61,7 @@ VS_OUTPUT mainVS( VS_INPUT _In ) {
 }
 SamplerState gSampler : register(s0);
 Texture2D gTexture : register(t0);
-float4 mainPS( VS_OUTPUT _In ) : SV_TARGET
+float4 mainPS(VS_OUTPUT _In) : SV_TARGET
 {
 	float3 samp1 = normalize(normalize(_In.reflectDir) - float3(0, 0, 1));
 	float3 samp2 = normalize(normalize(_In.refractDir) - float3(0, 0, 1));

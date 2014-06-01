@@ -22,8 +22,7 @@ VsToPs mainVS(uint id : SV_VertexID)
 
 float4 mainPS(VsToPs inp) : SV_Target
 {
-	float3 dir = normalize(mul(inp.pos2, invVP));
-	//	return texCube.Sample(samplerState, dir);
+	float3 dir = normalize(mul(inp.pos2, invVP).xyz);
 	float3 normalForSample = normalize(dir - float3(0, 0, 1));
 	return gTexture.Sample(samplerState, normalForSample.xy * float2(0.5, -0.5) + 0.5);
 }
