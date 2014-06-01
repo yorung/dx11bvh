@@ -2,6 +2,7 @@
 
 GridRenderer gridRenderer;
 
+BufferMan::BMID GridRenderer::constantBufferId = -1;
 
 struct GridVert {
 	Vec3 pos;
@@ -12,7 +13,6 @@ GridRenderer::GridRenderer()
 {
 	pVertexBuffer = nullptr;
 	pIndexBuffer = nullptr;
-	pConstantBuffer = nullptr;
 	pSamplerState = nullptr;
 	pDSState = nullptr;
 }
@@ -26,7 +26,6 @@ void GridRenderer::Destroy()
 {
 	SAFE_RELEASE(pIndexBuffer);
 	SAFE_RELEASE(pVertexBuffer);
-	SAFE_RELEASE(pConstantBuffer);
 	SAFE_RELEASE(pSamplerState);
 	SAFE_RELEASE(pDSState);
 }
@@ -75,7 +74,9 @@ void GridRenderer::Init()
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeVertices, D3D11_BIND_VERTEX_BUFFER), &subresData, &pVertexBuffer);
 	subresData.pSysMem = indices;
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeIndices, D3D11_BIND_INDEX_BUFFER), &subresData, &pIndexBuffer);
-	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeof(SolidConstantBuffer), D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE), nullptr, &pConstantBuffer);
+	if (constantBufferId < 0) {
+		constantBufferId = bufferMan.Create(sizeof(SolidConstantBuffer));
+	}
 
 	CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
 	descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -106,11 +107,9 @@ void GridRenderer::Draw()
 	SolidConstantBuffer cBuf;
 	cBuf.matW = matW;
 	cBuf.matVP = matVP;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	HRESULT hr = deviceMan11.GetContext()->Map(pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	CopyMemory(mappedResource.pData, &cBuf, sizeof(cBuf));
-	deviceMan11.GetContext()->Unmap(pConstantBuffer, 0);
-	deviceMan11.GetContext()->VSSetConstantBuffers(0, 1, &pConstantBuffer);
+	bufferMan.Write(constantBufferId, &cBuf);
+	const auto buf = bufferMan.Get(constantBufferId);
+	deviceMan11.GetContext()->VSSetConstantBuffers(0, 1, &buf);
 
 	deviceMan11.GetContext()->DrawIndexed(lines * 2, 0, 0);
 }
