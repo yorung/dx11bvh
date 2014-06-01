@@ -34,9 +34,10 @@ void SkyMan::Create(const char *strCubeMapFile)
 	deviceMan11.GetDevice()->CreateSamplerState(&CD3D11_SAMPLER_DESC(D3D11_DEFAULT), &sampler);
 
 	CD3D11_DEPTH_STENCIL_DESC desc(D3D11_DEFAULT);
-	desc.DepthEnable = FALSE;
-	desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 	deviceMan11.GetDevice()->CreateDepthStencilState(&desc, &depthStencilState);
+
 }
 
 void SkyMan::Draw()

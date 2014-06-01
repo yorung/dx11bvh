@@ -239,6 +239,8 @@ void App::Draw()
 	matrixMan.Set(MatrixMan::VIEW, fastInv(cam));
 	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, dist / 1000, dist * 1000));
 
+	gridRenderer.Draw();
+
 	sprite->Begin();
 
 	for (int i = 0; i < dimof(mesh); i++) {
@@ -267,11 +269,11 @@ void App::Draw()
 		}
 	}
 
+	skyMan.Draw();
+
 	DrawCameraParams();
 
 	sprite->End();
-
-	gridRenderer.Draw();
 }
 
 void App::Destroy()

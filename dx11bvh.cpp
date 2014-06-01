@@ -92,7 +92,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE,
 		app.Update();
 
 		deviceMan11.BeginScene();
-		skyMan.Draw();
 		app.Draw();
 		deviceMan11.EndScene();
 		Sleep(1);
