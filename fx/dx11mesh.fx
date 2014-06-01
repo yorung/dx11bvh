@@ -32,6 +32,7 @@ struct VS_OUTPUT {
 	float4 Pos : SV_POSITION;
 	float4 normalInView : NORMAL;
 	float3 reflectDir : REFDIR;
+	float3 refractDir : REFRDIR;
 	float4 Col : COLOR;
 	float2 Tex0: TEXCOORD0;
 };
@@ -48,8 +49,8 @@ VS_OUTPUT mainVS( VS_INPUT _In ) {
 	Out.Pos = mul(float4( _In.Pos, 1 ), mul(comb, mul(g_matW, mul(g_matV, g_matP))));
 	Out.normalInView = normalize(mul(_In.Normal, mul(comb, mul(g_matW, g_matV))));
 	float4 normalInWorld = normalize(mul(_In.Normal, mul(comb, g_matW)));
-//	Out.reflectDir = reflect(camDir, normalInWorld);
-	Out.reflectDir = refract(camDir, normalInWorld, 1 / 1.3333);
+	Out.reflectDir = reflect(camDir, normalInWorld);
+	Out.refractDir = refract(camDir, normalInWorld, 1 / 1.3333);
 	Out.Col = _In.Col;
 	Out.Tex0 = _In.Tex0;
 	return Out;
@@ -58,7 +59,10 @@ SamplerState gSampler : register(s0);
 Texture2D gTexture : register(t0);
 float4 mainPS( VS_OUTPUT _In ) : SV_TARGET
 {
-//	float3 normalForSample = _In.normalInView;
-	float3 normalForSample = normalize(normalize(_In.reflectDir) - float3(0, 0, 1));
-	return gTexture.Sample(gSampler, normalForSample.xy * float2(0.5, -0.5) + 0.5);
+	float3 samp1 = normalize(normalize(_In.reflectDir) - float3(0, 0, 1));
+	float3 samp2 = normalize(normalize(_In.refractDir) - float3(0, 0, 1));
+	return lerp(
+		gTexture.Sample(gSampler, samp1.xy * float2(0.5, -0.5) + 0.5),
+		gTexture.Sample(gSampler, samp2.xy * float2(0.5, -0.5) + 0.5),
+		dot(_In.normalInView, -float3(0, 0, 1)));
 }
