@@ -2,6 +2,19 @@
 
 ShaderMan11 shaderMan;
 
+static void Compile(const char* name, bool ps, ID3D10Blob*& blob)
+{
+	blob = nullptr;
+	ID3D10Blob* err = 0;
+	WCHAR wname[MAX_PATH];
+	MultiByteToWideChar(CP_ACP, 0, name, -1, wname, dimof(wname));
+	D3DCompileFromFile(wname, nullptr, nullptr, ps ? "mainPS" : "mainVS", ps ? "ps_4_0" : "vs_4_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, &blob, &err);
+	if(err) {
+		MessageBoxA(nullptr, (const char*)err->GetBufferPointer(), name, MB_OK | MB_ICONERROR);
+		SAFE_RELEASE(err);
+	}
+}
+
 ShaderMan11::SMID ShaderMan11::Create(const char *name, const D3D11_INPUT_ELEMENT_DESC elements[], int numElements)
 {
 	auto it = m_nameToId.find(name);
@@ -13,40 +26,17 @@ ShaderMan11::SMID ShaderMan11::Create(const char *name, const D3D11_INPUT_ELEMEN
 	Effect effect;
 	memset(&effect, 0, sizeof(effect));
 
-	ID3D10Blob* pBlobVS = 0;
-	ID3D10Blob* pErrMsg = 0;
-
-	WCHAR wname[MAX_PATH];
-	MultiByteToWideChar(CP_ACP, 0, name, -1, wname, dimof(wname));
-
-	D3DCompileFromFile(wname, nullptr, nullptr, "mainVS", "vs_4_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, &pBlobVS, &pErrMsg);
-//	D3DX11CompileFromFileA(name, nullptr, nullptr, "mainVS", "vs_4_0", D3D10_SHADER_ENABLE_STRICTNESS | D3D10_SHADER_PACK_MATRIX_COLUMN_MAJOR, 0, nullptr, &pBlobVS, &pErrMsg, nullptr);
-	if(pErrMsg) {
-		OutputDebugStringA( (const char*) pErrMsg->GetBufferPointer() );
-		OutputDebugStringA( "\n" );
-		pErrMsg->Release();
-		pErrMsg = 0;
-	}
-
+	ID3D10Blob* pBlobVS;
+	ID3D10Blob* pBlobPS;
+	Compile(name, false, pBlobVS);
+	Compile(name, true, pBlobPS);
 	HRESULT hr = deviceMan11.GetDevice()->CreateVertexShader(pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), nullptr, &effect.pVertexShader);
-
-	ID3D10Blob* pBlobPS = 0;
-	D3DCompileFromFile(wname, nullptr, nullptr, "mainPS", "ps_4_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, &pBlobPS, &pErrMsg);
-	if( pErrMsg ) {
-		OutputDebugStringA( (const char*) pErrMsg->GetBufferPointer() );
-		OutputDebugStringA( "\n" );
-		pErrMsg->Release();
-		pErrMsg = 0;
-	}
-
 	hr = deviceMan11.GetDevice()->CreatePixelShader(pBlobPS->GetBufferPointer(), pBlobPS->GetBufferSize(), nullptr, &effect.pPixelShader);
-	assert(!hr);
 
 	if (elements) {
 		hr = deviceMan11.GetDevice()->CreateInputLayout(elements, numElements, pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &effect.pInputLayout);
-		assert(!hr);
+	//	assert(!hr);
 	}
-
 	SAFE_RELEASE(pBlobVS);
 	SAFE_RELEASE(pBlobPS);
 
