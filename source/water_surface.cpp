@@ -37,25 +37,29 @@ void WaterSurface::Init()
 	std::vector<WaterVert> vert;
 	std::vector<DWORD> indi;
 
-	for (float x = -10; x <= 10; x++) {
-		WaterVert v;
-		v.color = 0xff00aa00;
-		v.pos = Vec3(x * 100, 0, -1000);
-		vert.push_back(v);
-		indi.push_back(indi.size());
-		v.pos = Vec3(x * 100, 0, 1000);
-		vert.push_back(v);
-		indi.push_back(indi.size());
+	const int tileMax = 20;
+	const int vertMax = tileMax + 1;
+	for (float z = 0; z <= tileMax; z++) {
+		for (float x = 0; x <= tileMax; x++) {
+			WaterVert v;
+			v.color = 0xff00aa00;
+			v.pos = Vec3((x - tileMax / 2) * 100, 0, (z - tileMax / 2) * 100);
+			vert.push_back(v);
+		}
 	}
-	for (float z = -10; z <= 10; z++) {
-		WaterVert v;
-		v.color = 0xff00aa00;
-		v.pos = Vec3(-1000, 0, z * 100);
-		vert.push_back(v);
-		indi.push_back(indi.size());
-		v.pos = Vec3(1000, 0, z * 100);
-		vert.push_back(v);
-		indi.push_back(indi.size());
+	for (float z = 0; z < tileMax; z++) {
+		if (z != 0) {
+			indi.push_back(z * vertMax);
+		}
+		indi.push_back(z * vertMax);
+		for (float x = 0; x < tileMax; x++) {
+			indi.push_back((z + 1) * vertMax + x);
+			indi.push_back(z * vertMax + x + 1);
+		}
+		indi.push_back((z + 1) * vertMax + vertMax - 1);
+		if (z != tileMax - 1) {
+			indi.push_back((z + 1) * vertMax + vertMax - 1);
+		}
 	}
 
 	int sizeVertices = vert.size() * sizeof(WaterVert);
@@ -86,7 +90,8 @@ void WaterSurface::Init()
 
 void WaterSurface::Draw()
 {
-	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+//	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
 	shaderMan.Apply(shaderId);
 
 	Mat matWorld, matView, matProj;
