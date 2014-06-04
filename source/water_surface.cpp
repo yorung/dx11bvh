@@ -17,8 +17,8 @@ const int tileMax = 80;
 const int vertMax = tileMax + 1;
 const float pitch = 50;
 const float repeat = 4;
-const float halflife = 1;
-const float heightUnit = 5.0f;
+const float halflife = 0.6f;
+const float heightUnit = 15.0f;
 
 static Vec3 MakePos(int x, int z, float hmap[vertMax][vertMax])
 {
