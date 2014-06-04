@@ -5,7 +5,7 @@ BufferMan bufferMan;
 BufferMan::BMID BufferMan::Create(int size)
 {
 	ID3D11Buffer *p = nullptr;
-	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(size, D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE), nullptr, &p);
+	HRESULT hr = deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(size, D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE), nullptr, &p);
 	if (!p) {
 		return -1;
 	}
