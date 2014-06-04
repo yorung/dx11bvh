@@ -1,5 +1,7 @@
 void *LoadFile(const char *fileName);
 
+double GetTime();
+
 template <class T> inline void SAFE_DELETE(T& p)
 {
 	delete p;

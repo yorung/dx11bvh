@@ -1,12 +1,5 @@
 #include "stdafx.h"
 
-static double GetTime()
-{
-	LARGE_INTEGER t, f;
-	QueryPerformanceCounter(&t);
-	QueryPerformanceFrequency(&f);
-	return (double)t.QuadPart / f.QuadPart;
-}
 static float INVALID_POS = -99999.f;
 
 static float CalcRadius(const Mesh* m)

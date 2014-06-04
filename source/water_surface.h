@@ -1,3 +1,9 @@
+struct WaterVert {
+	Vec3 pos;
+	Vec3 normal;
+	DWORD color;
+};
+
 class WaterSurface
 {
 	static BufferMan::BMID constantBufferId;
@@ -8,6 +14,7 @@ class WaterSurface
 	ID3D11DepthStencilState* pDSState;
 	ShaderMan11::SMID shaderId;
 	int lines;
+	void UpdateVert(std::vector<WaterVert>& vert);
 	void Update();
 public:
 	WaterSurface();

@@ -13,12 +13,6 @@ struct WaterConstantBuffer
 	float padding;
 };
 
-struct WaterVert {
-	Vec3 pos;
-	Vec3 normal;
-	DWORD color;
-};
-
 const int tileMax = 80;
 const int vertMax = tileMax + 1;
 const float pitch = 50;
@@ -29,10 +23,9 @@ static Vec3 MakePos(int x, int z, float hmap[vertMax][vertMax])
 	return Vec3(((float)x - tileMax / 2) * pitch, height, ((float)z - tileMax / 2) * pitch);
 }
 
-static void UpdateVert(std::vector<WaterVert>& vert)
+void WaterSurface::UpdateVert(std::vector<WaterVert>& vert)
 {
-	static float tm;
-	tm += 1.0f / 60;
+	double tm = GetTime();
 	float repeat = 4;
 
 	float hmap[vertMax][vertMax];
@@ -41,11 +34,10 @@ static void UpdateVert(std::vector<WaterVert>& vert)
 			float u = (float)x / tileMax * 2 - 1;
 			float v = (float)z / tileMax * 2 - 1;
 			float l = sqrt(u * u + v * v);
-			float h = sinf((tm - l) * XM_2PI * repeat) * 10;
+			float h = (float)sin((tm - l) * XM_2PI * repeat) * 10;
 			hmap[x][z] = h;
 		}
 	}
-
 
 	for (int z = 0; z <= tileMax; z++) {
 		for (int x = 0; x <= tileMax; x++) {
