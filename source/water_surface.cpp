@@ -19,6 +19,22 @@ struct WaterVert {
 	DWORD color;
 };
 
+const int tileMax = 20;
+const int vertMax = tileMax + 1;
+
+static void UpdateVert(std::vector<WaterVert>& vert)
+{
+	for (float z = 0; z <= tileMax; z++) {
+		for (float x = 0; x <= tileMax; x++) {
+			WaterVert v;
+			v.color = 0xff00aa00;
+			v.pos = Vec3((x - tileMax / 2) * 100, 0, (z - tileMax / 2) * 100);
+			v.normal = Vec3((rand() / (float)RAND_MAX) * 0.05f - 0.025f, 1, (rand() / (float)RAND_MAX) * 0.05f - 0.025f);
+			vert.push_back(v);
+		}
+	}
+}
+
 WaterSurface::WaterSurface()
 {
 	pVertexBuffer = nullptr;
@@ -44,20 +60,10 @@ void WaterSurface::Init()
 {
 	Destroy();
 
-	std::vector<WaterVert> vert;
 	std::vector<DWORD> indi;
+	std::vector<WaterVert> vert;
+	UpdateVert(vert);
 
-	const int tileMax = 20;
-	const int vertMax = tileMax + 1;
-	for (float z = 0; z <= tileMax; z++) {
-		for (float x = 0; x <= tileMax; x++) {
-			WaterVert v;
-			v.color = 0xff00aa00;
-			v.pos = Vec3((x - tileMax / 2) * 100, 0, (z - tileMax / 2) * 100);
-			v.normal = Vec3(0, 1, 0);
-			vert.push_back(v);
-		}
-	}
 	for (int z = 0; z < tileMax; z++) {
 		if (z != 0) {
 			indi.push_back(z * vertMax);
@@ -88,7 +94,7 @@ void WaterSurface::Init()
 	shaderId = shaderMan.Create("fx\\water_surface.fx", layout, dimof(layout));
 
 	D3D11_SUBRESOURCE_DATA subresData = { vertices, 0, 0 };
-	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeVertices, D3D11_BIND_VERTEX_BUFFER), &subresData, &pVertexBuffer);
+	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeVertices, D3D11_BIND_VERTEX_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE), &subresData, &pVertexBuffer);
 	subresData.pSysMem = indices;
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeIndices, D3D11_BIND_INDEX_BUFFER), &subresData, &pIndexBuffer);
 	if (constantBufferId < 0) {
@@ -101,8 +107,20 @@ void WaterSurface::Init()
 	deviceMan11.GetDevice()->CreateDepthStencilState(&CD3D11_DEPTH_STENCIL_DESC(D3D11_DEFAULT), &pDSState);
 }
 
+void WaterSurface::Update()
+{
+	std::vector<WaterVert> vert;
+	UpdateVert(vert);
+	D3D11_MAPPED_SUBRESOURCE r;
+	deviceMan11.GetContext()->Map(pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &r);
+	memcpy(r.pData, &vert[0], vert.size() * sizeof(WaterVert));
+	deviceMan11.GetContext()->Unmap(pVertexBuffer, 0);
+}
+
 void WaterSurface::Draw()
 {
+	Update();
+
 	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 //	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
 	shaderMan.Apply(shaderId);

@@ -8,6 +8,7 @@ class WaterSurface
 	ID3D11DepthStencilState* pDSState;
 	ShaderMan11::SMID shaderId;
 	int lines;
+	void Update();
 public:
 	WaterSurface();
 	~WaterSurface();
