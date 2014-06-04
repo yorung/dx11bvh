@@ -84,6 +84,8 @@ void App::LButtonDown(float x, float y)
 {
 	lastX = x;
 	lastY = y;
+
+	waterSurface.CreateRipple();
 }
 
 void App::LButtonUp(float x, float y)

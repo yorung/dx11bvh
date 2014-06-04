@@ -16,6 +16,9 @@ struct WaterConstantBuffer
 const int tileMax = 80;
 const int vertMax = tileMax + 1;
 const float pitch = 50;
+const float repeat = 4;
+const float halflife = 1;
+const float heightUnit = 5.0f;
 
 static Vec3 MakePos(int x, int z, float hmap[vertMax][vertMax])
 {
@@ -23,19 +26,49 @@ static Vec3 MakePos(int x, int z, float hmap[vertMax][vertMax])
 	return Vec3(((float)x - tileMax / 2) * pitch, height, ((float)z - tileMax / 2) * pitch);
 }
 
+void WaterSurface::CreateRipple()
+{
+	WaterRipple r;
+	r.generatedTime = GetTime();
+	r.u = Random() * 2 - 1;
+	r.v = Random() * 2 - 1;
+	ripples.push_back(r);
+
+	if (ripples.size() > 10) {
+		ripples.pop_front();
+	}
+}
+
 void WaterSurface::UpdateVert(std::vector<WaterVert>& vert)
 {
 	double tm = GetTime();
-	float repeat = 4;
 
 	float hmap[vertMax][vertMax];
+	memset(hmap, 0, sizeof(hmap));
 	for (int z = 0; z <= tileMax; z++) {
 		for (int x = 0; x <= tileMax; x++) {
+/*
 			float u = (float)x / tileMax * 2 - 1;
 			float v = (float)z / tileMax * 2 - 1;
 			float l = sqrt(u * u + v * v);
 			float h = (float)sin((tm - l) * XM_2PI * repeat) * 10;
-			hmap[x][z] = h;
+			hmap[x][z] += h;
+			*/
+			std::for_each(ripples.begin(), ripples.end(),
+				[&](const WaterRipple& r) {
+					float u = (float)x / tileMax * 2 - 1;
+					float v = (float)z / tileMax * 2 - 1;
+					float uDist = u - r.u;
+					float vDist = v - r.v;
+					float l = sqrt(uDist * uDist + vDist * vDist);
+					float lifeTime = (float)(tm - r.generatedTime);
+					float timeAfterArrived = lifeTime - l;
+					float h = timeAfterArrived > 0 ? (float)sin(timeAfterArrived * XM_2PI * repeat) * heightUnit : 0;
+					float life = (float)(tm - r.generatedTime);
+					h *= std::min(1.0f, std::powf(0.5f, life / halflife));
+					hmap[x][z] += h;
+				}
+			);
 		}
 	}
 

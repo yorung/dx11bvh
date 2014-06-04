@@ -1,7 +1,14 @@
-struct WaterVert {
+struct WaterVert
+{
 	Vec3 pos;
 	Vec3 normal;
 	DWORD color;
+};
+
+struct WaterRipple
+{
+	double generatedTime;
+	float u, v;
 };
 
 class WaterSurface
@@ -16,12 +23,14 @@ class WaterSurface
 	int lines;
 	void UpdateVert(std::vector<WaterVert>& vert);
 	void Update();
+	std::deque<WaterRipple> ripples;
 public:
 	WaterSurface();
 	~WaterSurface();
 	void Destroy();
 	void Init();
 	void Draw();
+	void CreateRipple();
 };
 
 extern WaterSurface waterSurface;

@@ -52,3 +52,8 @@ double GetTime()
 	QueryPerformanceFrequency(&f);
 	return (double)t.QuadPart / f.QuadPart;
 }
+
+float Random()
+{
+	return (float)rand() / RAND_MAX;
+}

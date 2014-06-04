@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <map>
 #include <vector>
+#include <deque>
 
 // DirectX
 #include <d3d11.h>
