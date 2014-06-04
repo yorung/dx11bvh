@@ -19,17 +19,45 @@ struct WaterVert {
 	DWORD color;
 };
 
-const int tileMax = 20;
+const int tileMax = 80;
 const int vertMax = tileMax + 1;
+const float pitch = 50;
+
+static Vec3 MakePos(int x, int z, float hmap[vertMax][vertMax])
+{
+	float height = hmap[std::max(0,std::min(tileMax, x))][std::max(0,std::min(tileMax, z))];
+	return Vec3(((float)x - tileMax / 2) * pitch, height, ((float)z - tileMax / 2) * pitch);
+}
 
 static void UpdateVert(std::vector<WaterVert>& vert)
 {
-	for (float z = 0; z <= tileMax; z++) {
-		for (float x = 0; x <= tileMax; x++) {
+	static float tm;
+	tm += 1.0f / 60;
+	float repeat = 4;
+
+	float hmap[vertMax][vertMax];
+	for (int z = 0; z <= tileMax; z++) {
+		for (int x = 0; x <= tileMax; x++) {
+			float u = (float)x / tileMax * 2 - 1;
+			float v = (float)z / tileMax * 2 - 1;
+			float l = sqrt(u * u + v * v);
+			float h = sinf((tm - l) * XM_2PI * repeat) * 10;
+			hmap[x][z] = h;
+		}
+	}
+
+
+	for (int z = 0; z <= tileMax; z++) {
+		for (int x = 0; x <= tileMax; x++) {
+			float h = hmap[x][z];
 			WaterVert v;
 			v.color = 0xff00aa00;
-			v.pos = Vec3((x - tileMax / 2) * 100, 0, (z - tileMax / 2) * 100);
-			v.normal = Vec3((rand() / (float)RAND_MAX) * 0.05f - 0.025f, 1, (rand() / (float)RAND_MAX) * 0.05f - 0.025f);
+			v.pos = MakePos(x, z, hmap);
+			Vec3 v1 = MakePos(x, z - 1, hmap);
+			Vec3 v2 = MakePos(x - 1, z, hmap);
+			Vec3 v3 = MakePos(x + 1, z + 1, hmap);
+			v.normal = cross(v2 - v1, v3 - v2);
+//			v.normal = Vec3((rand() / (float)RAND_MAX) * 0.05f - 0.025f, 1, (rand() / (float)RAND_MAX) * 0.05f - 0.025f);
 			vert.push_back(v);
 		}
 	}
