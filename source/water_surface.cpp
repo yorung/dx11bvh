@@ -15,6 +15,7 @@ struct WaterConstantBuffer
 
 struct WaterVert {
 	Vec3 pos;
+	Vec3 normal;
 	DWORD color;
 };
 
@@ -53,6 +54,7 @@ void WaterSurface::Init()
 			WaterVert v;
 			v.color = 0xff00aa00;
 			v.pos = Vec3((x - tileMax / 2) * 100, 0, (z - tileMax / 2) * 100);
+			v.normal = Vec3(0, 1, 0);
 			vert.push_back(v);
 		}
 	}
@@ -79,7 +81,8 @@ void WaterSurface::Init()
 
 	static D3D11_INPUT_ELEMENT_DESC layout[] = {
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	texId = texMan.Create("resource\\Tiny_skin.dds", true);
 	shaderId = shaderMan.Create("fx\\water_surface.fx", layout, dimof(layout));
