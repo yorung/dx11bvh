@@ -5,10 +5,6 @@ typedef float affloat;
 
 inline affloat clamp(affloat x, affloat mi, affloat ma) { return std::max(std::min(x, ma), mi); }
 
-template <class VEC3> inline affloat dot(const VEC3& l, const VEC3& r)
-{
-	return l.x * r.x + l.y * r.y + l.z * r.z;
-}
 
 template <class VEC3> inline VEC3 cross(const VEC3& l, const VEC3& r)
 {
@@ -25,21 +21,6 @@ inline float afcos(float s) { return cosf(s); }
 inline double afcos(double s) { return cos(s); }
 inline float afacos(float s) { return acosf(s); }
 inline double afacos(double s) { return acos(s); }
-
-template <class VEC3> inline affloat lengthSq(const VEC3& v)
-{
-	return dot(v, v);
-}
-
-template <class VEC3> inline affloat length(const VEC3& v)
-{
-	return afsqrt(lengthSq(v));
-}
-
-template <class VEC3> inline VEC3 normalize(const VEC3& v)
-{
-	return v / length(v);
-}
 
 struct Vec2
 {
@@ -81,6 +62,31 @@ struct Vec3
 	Vec3 operator-=(const Vec3& r) { return *this = *this - r; }
 	Vec3 operator*=(affloat r) { return *this = *this * r; }
 };
+
+inline affloat dot(const Vec3& l, const Vec3& r)
+{
+	return l.x * r.x + l.y * r.y + l.z * r.z;
+}
+
+inline affloat dot(const Vec2& l, const Vec2& r)
+{
+	return l.x * r.x + l.y * r.y;
+}
+
+template <class V> inline affloat lengthSq(const V& v)
+{
+	return dot(v, v);
+}
+
+template <class V3> inline affloat length(const V3& v)
+{
+	return afsqrt(lengthSq(v));
+}
+
+template <class V> inline V normalize(const V& v)
+{
+	return v / length(v);
+}
 
 struct Quat
 {
