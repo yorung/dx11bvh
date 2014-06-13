@@ -48,7 +48,7 @@ void WaterSurface::UpdateVert(std::vector<WaterVert>& vert)
 		for (int x = 0; x <= tileMax; x++) {
 			std::for_each(ripples.begin(), ripples.end(),
 				[&](const WaterRipple& r) {
-					Vec2 pos = Vec2(x, z) / tileMax * 2 - Vec2(1, 1);
+					Vec2 pos = Vec2((float)x, (float)z) / tileMax * 2 - Vec2(1, 1);
 					float uDist = pos.x - r.centerPos.x;
 					float vDist = pos.y - r.centerPos.y;
 					float l = sqrt(uDist * uDist + vDist * vDist);
