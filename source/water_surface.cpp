@@ -182,7 +182,7 @@ void WaterSurface::Draw()
 
 	WaterConstantBuffer cBuf;
 //	matrixMan.Get(MatrixMan::WORLD, cBuf.matW);
-	cBuf.matW = Matrix::CreateScale(4000);
+	cBuf.matW = scale(4000);
 	matrixMan.Get(MatrixMan::VIEW, cBuf.matV);
 	matrixMan.Get(MatrixMan::PROJ, cBuf.matP);
 	cBuf.camPos = fastInv(cBuf.matV).GetRow(3);

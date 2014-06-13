@@ -327,6 +327,11 @@ inline Mat translate(affloat x, affloat y, affloat z)
 	return m;
 }
 
+inline Mat scale(affloat s)
+{
+	return Mat(s, 0, 0, 0, 0, s, 0, 0, 0, 0, s, 0, 0, 0, 0, 1);
+}
+
 inline Mat v2m(const Vec3& v)
 {
 	return translate(v.x, v.y, v.z);
