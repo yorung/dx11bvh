@@ -13,12 +13,12 @@ struct WaterConstantBuffer
 	float padding;
 };
 
-const int tileMax = 80;
+const int tileMax = 50;
 const int vertMax = tileMax + 1;
-const float pitch = 50;
+const float pitch = 1.0f / tileMax;
 const float repeat = 4;
 const float halflife = 0.6f;
-const float heightUnit = 15.0f;
+const float heightUnit = 0.00375f;
 
 static Vec3 MakePos(int x, int z, float hmap[vertMax][vertMax])
 {
@@ -47,13 +47,6 @@ void WaterSurface::UpdateVert(std::vector<WaterVert>& vert)
 	memset(hmap, 0, sizeof(hmap));
 	for (int z = 0; z <= tileMax; z++) {
 		for (int x = 0; x <= tileMax; x++) {
-/*
-			float u = (float)x / tileMax * 2 - 1;
-			float v = (float)z / tileMax * 2 - 1;
-			float l = sqrt(u * u + v * v);
-			float h = (float)sin((tm - l) * XM_2PI * repeat) * 10;
-			hmap[x][z] += h;
-			*/
 			std::for_each(ripples.begin(), ripples.end(),
 				[&](const WaterRipple& r) {
 					float u = (float)x / tileMax * 2 - 1;
@@ -82,7 +75,6 @@ void WaterSurface::UpdateVert(std::vector<WaterVert>& vert)
 			Vec3 v2 = MakePos(x - 1, z, hmap);
 			Vec3 v3 = MakePos(x + 1, z + 1, hmap);
 			v.normal = cross(v2 - v1, v3 - v2);
-//			v.normal = Vec3((rand() / (float)RAND_MAX) * 0.05f - 0.025f, 1, (rand() / (float)RAND_MAX) * 0.05f - 0.025f);
 			vert.push_back(v);
 		}
 	}
@@ -189,7 +181,8 @@ void WaterSurface::Draw()
 	deviceMan11.GetContext()->IASetVertexBuffers(0, 1, &pVertexBuffer, strides, offsets);
 
 	WaterConstantBuffer cBuf;
-	matrixMan.Get(MatrixMan::WORLD, cBuf.matW);
+//	matrixMan.Get(MatrixMan::WORLD, cBuf.matW);
+	cBuf.matW = Matrix::CreateScale(4000);
 	matrixMan.Get(MatrixMan::VIEW, cBuf.matV);
 	matrixMan.Get(MatrixMan::PROJ, cBuf.matP);
 	cBuf.camPos = fastInv(cBuf.matV).GetRow(3);
