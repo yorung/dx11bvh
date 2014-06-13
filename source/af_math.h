@@ -171,13 +171,13 @@ struct Mat
 	}
 	const Mat& operator*=(const Mat& r) { *this = *this * r; return *this; }
 	const bool operator==(const Mat& r) { return !memcmp(m, r.m, sizeof(m)); }
-
+#ifdef USE_SIMPLE_MATH
 	Mat(const Matrix& mtx) { assert(sizeof(float) == sizeof(affloat)); memcpy(m, mtx.m, sizeof(m)); }
 	operator Matrix() const { return Matrix(_11, _12, _13, _14, _21, _22, _23, _24, _31, _32, _33, _34, _41, _42, _43, _44); }
 
 	Mat(const XMMATRIX& mtx) : Mat(Matrix(mtx)) {}
 	operator XMMATRIX() const { return Matrix(*this); }
-
+#endif
 	Vec3 GetRow(int i) const { return Vec3(m[i][0], m[i][1], m[i][2]); }
 	void SetRow(int i, const Vec3& v) { m[i][0] = v.x; m[i][1] = v.y; m[i][2] = v.z; }
 };
@@ -221,7 +221,7 @@ inline Quat inv(const Quat& q)
 	return Quat(c.w / lenSq, c.v / lenSq);
 }
 
-inline Mat inv(const Matrix& mtx)
+inline Mat inv(const Mat& mtx)
 {
 #ifdef USE_DXMATH
 	return mtx.Invert();
@@ -272,6 +272,16 @@ inline Mat inv(const Matrix& mtx)
 #endif
 }
 
+inline Mat scale(affloat x, affloat y, affloat z)
+{
+	return Mat(x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1);
+}
+
+inline Mat scale(affloat s)
+{
+	return scale(s, s, s);
+}
+
 inline Mat q2m(const Quat& q)
 {
 #ifdef USE_DXMATH
@@ -289,9 +299,9 @@ inline Mat q2m(const Quat& q)
 #endif
 }
 
-inline Quat m2q(const Matrix& m_)
+inline Quat m2q(const Mat& m_)
 {
-	Mat m = m_ * Matrix::CreateScale(1.0f / length(Vec3(m_._11, m_._12, m_._13)));	// kill scaling if needed
+	Mat m = m_ * scale(1.0f / length(Vec3(m_._11, m_._12, m_._13)));	// kill scaling if needed
 #ifdef USE_DXMATH
 	return Quaternion::CreateFromRotationMatrix(m);
 #else
@@ -335,11 +345,6 @@ inline Mat translate(affloat x, affloat y, affloat z)
 	m._42 = y;
 	m._43 = z;
 	return m;
-}
-
-inline Mat scale(affloat s)
-{
-	return Mat(s, 0, 0, 0, 0, s, 0, 0, 0, 0, s, 0, 0, 0, 0, 1);
 }
 
 inline Mat v2m(const Vec3& v)
