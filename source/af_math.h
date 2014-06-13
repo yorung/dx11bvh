@@ -1,4 +1,5 @@
 //#define USE_DXMATH
+#define USE_SIMPLE_MATH
 
 typedef float affloat;
 
@@ -45,10 +46,10 @@ struct Vec2
 	affloat x, y;
 	Vec2() : Vec2(0, 0) {}
 	Vec2(affloat X, affloat Y) : x(X), y(Y) {}
-
+#ifdef USE_SIMPLE_MATH
 	Vec2(const Vector2& v) : Vec2(v.x, v.y) {}
 	operator Vector2() const { return Vector2(x, y); }
-
+#endif
 	Vec2 operator+(const Vec2& r) const { return Vec2(x + r.x, y + r.y); }
 	Vec2 operator-(const Vec2& r) const { return Vec2(x - r.x, y - r.y); }
 	Vec2 operator*(affloat r) const { return Vec2(x * r, y * r); }
@@ -65,12 +66,13 @@ struct Vec3
 	affloat x, y, z;
 	Vec3() : Vec3(0, 0, 0) {}
 	Vec3(affloat X, affloat Y, affloat Z) : x(X), y(Y), z(Z) {}
-
+#ifdef USE_SIMPLE_MATH
 	Vec3(const Vector3& v) : Vec3(v.x, v.y, v.z) {}
 	operator Vector3() const { return Vector3(x, y, z); }
-
+#endif
 	Vec3 operator+(const Vec3& r) const { return Vec3(x + r.x, y + r.y, z + r.z); }
 	Vec3 operator-(const Vec3& r) const { return Vec3(x - r.x, y - r.y, z - r.z); }
+	Vec3 operator*(const Vec3& r) const { return Vec3(x * r.x, y * r.y, z * r.z); }
 	Vec3 operator*(affloat r) const { return Vec3(x * r, y * r, z * r); }
 	Vec3 operator/(affloat r) const { return Vec3(x / r, y / r, z / r); }
 
@@ -87,11 +89,12 @@ struct Quat
 	Quat() : Quat(1, Vec3()) {}
 	Quat(affloat W, const Vec3& V) : w(W), v(V) {}
 	Quat(const Vec3& axis, affloat angle) { w = afcos(angle / 2); v = normalize(axis) * afsin(angle / 2); }
-
+#ifdef USE_SIMPLE_MATH
 	Quat(const Quaternion& q) : Quat(q.w, Vec3(q.x, q.y, q.z)) {}
 	operator Quaternion() const { return Quaternion(v.x, v.y, v.z, w); }
-
+#endif
 	Quat operator*(const Quat& r) const { return Quat(w * r.w - dot(v, r.v), r.v * w + v * r.w + cross(r.v, v)); }
+	Quat operator+(const Quat& r) const { return Quat(w + r.w, v + r.v); }
 	Quat operator*(affloat s) const { return Quat(w * s, v * s); }
 	const Quat& operator*=(const Quat& r) { *this = *this * r; return *this; }
 	Quat Conjugate() const { return Quat(w, -v); }
@@ -124,13 +127,14 @@ inline Quat slerp(const Quat& l, Quat r, affloat ratio)
 	}
 	affloat reciprocal = 1 / sinangle;
 	Quat afr = l * afsin((1 - ratio) * angle) * reciprocal + r * afsin(ratio * angle) * reciprocal;
-
+#ifdef USE_SIMPLE_MATH
 	Quat dx = Quaternion::Slerp(l, r, ratio);
 	assert(abs(afr.w - dx.w) < 0.01f);
 	assert(abs(afr.v.x - dx.v.x) < 0.01f);
 	assert(abs(afr.v.y - dx.v.y) < 0.01f);
 	assert(abs(afr.v.z - dx.v.z) < 0.01f);
 	return afr;
+#endif
 #endif
 }
 
@@ -176,7 +180,7 @@ struct Mat
 // http://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process
 inline Vec3 proj(Vec3 u, Vec3 v)
 {
-	return (dot(u, v) / dot(u, u)) * u;
+	return u * (dot(u, v) / dot(u, u));
 }
 
 inline Mat orthogonalize(Mat v)
