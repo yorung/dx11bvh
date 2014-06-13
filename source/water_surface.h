@@ -8,7 +8,7 @@ struct WaterVert
 struct WaterRipple
 {
 	double generatedTime;
-	float u, v;
+	Vec2 centerPos;
 };
 
 class WaterSurface

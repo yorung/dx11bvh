@@ -30,8 +30,7 @@ void WaterSurface::CreateRipple()
 {
 	WaterRipple r;
 	r.generatedTime = GetTime();
-	r.u = Random() * 2 - 1;
-	r.v = Random() * 2 - 1;
+	r.centerPos = Vec2(Random(), Random()) * 2 - Vec2(1, 1);
 	ripples.push_back(r);
 
 	if (ripples.size() > 10) {
@@ -49,10 +48,9 @@ void WaterSurface::UpdateVert(std::vector<WaterVert>& vert)
 		for (int x = 0; x <= tileMax; x++) {
 			std::for_each(ripples.begin(), ripples.end(),
 				[&](const WaterRipple& r) {
-					float u = (float)x / tileMax * 2 - 1;
-					float v = (float)z / tileMax * 2 - 1;
-					float uDist = u - r.u;
-					float vDist = v - r.v;
+					Vec2 pos = Vec2(x, z) / tileMax * 2 - Vec2(1, 1);
+					float uDist = pos.x - r.centerPos.x;
+					float vDist = pos.y - r.centerPos.y;
 					float l = sqrt(uDist * uDist + vDist * vDist);
 					float lifeTime = (float)(tm - r.generatedTime);
 					float timeAfterArrived = lifeTime - l;
