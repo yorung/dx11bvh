@@ -2,7 +2,6 @@ struct WaterVert
 {
 	Vec3 pos;
 	Vec3 normal;
-	DWORD color;
 };
 
 struct WaterRipple

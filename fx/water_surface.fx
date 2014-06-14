@@ -13,12 +13,10 @@ SamplerState samplerState : register(s0);
 struct VsInput {
 	float3 pos : POSITION;
 	float3 normal : NORMAL;
-	float4 col : COLOR;
 };
 
 struct VsToPs {
 	float4 pos : SV_POSITION;
-	float4 col : COLOR;
 	float3 normalInView : NORMAL;
 	float3 reflectDir : REFDIR;
 	float3 refractDir : REFRDIR;
@@ -41,7 +39,6 @@ VsToPs mainVS(VsInput inp)
 	outp.refractDir = refract(camDir, normalInWorld, 1 / 1.3333);
 
 	outp.pos = mul(float4(inp.pos, 1), wvp);
-	outp.col = inp.col * 0.5;
 	return outp;
 }
 
