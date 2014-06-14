@@ -4,8 +4,8 @@ TexMan11 texMan;
 
 TexMan11::TMID TexMan11::Create(const char *name, bool for3D)
 {
-	auto it = m_nameToId.find(name);
-	if (it != m_nameToId.end())
+	auto it = nameToId.find(name);
+	if (it != nameToId.end())
 	{
 		return it->second;
 	}
@@ -23,24 +23,24 @@ TexMan11::TMID TexMan11::Create(const char *name, bool for3D)
 	if (!tex) {
 		return -1;
 	}
-	m_texs.push_back(tex);
-	return m_nameToId[name] = m_texs.size() - 1;
+	texs.push_back(tex);
+	return nameToId[name] = texs.size() - 1;
 }
 
 void TexMan11::Destroy()
 {
-	for (auto it = m_texs.begin(); it != m_texs.end(); it++)
+	for (auto it = texs.begin(); it != texs.end(); it++)
 	{
 		(*it)->Release();
 	}
-	m_texs.clear();
+	texs.clear();
 }
 
 ID3D11ShaderResourceView* TexMan11::Get(TMID id)
 {
-	if (id >= 0 && id < (TMID)m_texs.size())
+	if (id >= 0 && id < (TMID)texs.size())
 	{
-		return m_texs[id];
+		return texs[id];
 	}
 	return nullptr;
 }
