@@ -25,7 +25,7 @@ inline double afacos(double s) { return acos(s); }
 struct Vec2
 {
 	affloat x, y;
-	Vec2() : Vec2(0, 0) {}
+	Vec2() : x(0), y(0) {}
 	Vec2(affloat X, affloat Y) : x(X), y(Y) {}
 #ifdef USE_SIMPLE_MATH
 	Vec2(const Vector2& v) : Vec2(v.x, v.y) {}
@@ -45,7 +45,7 @@ struct Vec2
 struct Vec3
 {
 	affloat x, y, z;
-	Vec3() : Vec3(0, 0, 0) {}
+	Vec3() : x(0), y(0), z(0) {}
 	Vec3(affloat X, affloat Y, affloat Z) : x(X), y(Y), z(Z) {}
 #ifdef USE_SIMPLE_MATH
 	Vec3(const Vector3& v) : Vec3(v.x, v.y, v.z) {}
@@ -92,7 +92,7 @@ struct Quat
 {
 	Vec3 v;
 	affloat w;
-	Quat() : Quat(1, Vec3()) {}
+	Quat() { *this = Quat(1, Vec3()); }
 	Quat(affloat W, const Vec3& V) : w(W), v(V) {}
 	Quat(const Vec3& axis, affloat angle) { w = afcos(angle / 2); v = normalize(axis) * afsin(angle / 2); }
 #ifdef USE_SIMPLE_MATH
@@ -165,7 +165,7 @@ struct Mat
 		_41(m41), _42(m42), _43(m43), _44(m44) {}
 
 	Mat operator*(const Mat& r) const {
-#define m(i,j) (_##i####1## * r._##1####j## + _##i####2## * r._##2####j## + _##i####3## * r._##3####j## +_##i####4## * r._##4####j##)
+#define m(i,j) (_##i##1 * r._##1##j + _##i##2 * r._##2##j + _##i##3 * r._##3##j +_##i##4 * r._##4##j)
 		return Mat(m(1,1), m(1,2), m(1,3), m(1,4), m(2,1), m(2,2), m(2,3), m(2,4), m(3,1), m(3,2), m(3,3), m(3,4), m(4,1), m(4,2), m(4,3), m(4,4));
 #undef m
 	}
@@ -333,7 +333,7 @@ inline Quat m2q(const Mat& m_)
 
 inline Vec3 transform(const Vec3& v, const Mat& m)
 {
-#define _(c) (m._1##c## * v.x + m._2##c## * v.y + m._3##c## * v.z + m._4##c##)
+#define _(c) (m._1##c * v.x + m._2##c * v.y + m._3##c * v.z + m._4##c)
 	return Vec3(_(1), _(2), _(3));
 #undef _
 }
