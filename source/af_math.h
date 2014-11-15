@@ -33,6 +33,7 @@ struct Vec2
 #endif
 	Vec2 operator+(const Vec2& r) const { return Vec2(x + r.x, y + r.y); }
 	Vec2 operator-(const Vec2& r) const { return Vec2(x - r.x, y - r.y); }
+	Vec2 operator*(const Vec2& r) const { return Vec2(x * r.x, y * r.y); }
 	Vec2 operator*(affloat r) const { return Vec2(x * r, y * r); }
 	Vec2 operator/(affloat r) const { return Vec2(x / r, y / r); }
 
@@ -60,6 +61,7 @@ struct Vec3
 	Vec3 operator-() const { return Vec3(-x, -y, -z); }
 
 	Vec3 operator-=(const Vec3& r) { return *this = *this - r; }
+	Vec3 operator+=(const Vec3& r) { return *this = *this + r; }
 	Vec3 operator*=(affloat r) { return *this = *this * r; }
 };
 
@@ -71,6 +73,41 @@ inline affloat dot(const Vec3& l, const Vec3& r)
 inline affloat dot(const Vec2& l, const Vec2& r)
 {
 	return l.x * r.x + l.y * r.y;
+}
+
+inline float frac(float v)
+{
+	float i;
+	return modff(v, &i);
+}
+
+inline double frac(double v)
+{
+	double i;
+	return modf(v, &i);
+}
+
+inline Vec2 frac(const Vec2& v)
+{
+	return Vec2(frac(v.x), frac(v.y));
+}
+
+inline Vec2 floor(const Vec2& v)
+{
+	return Vec2(floor(v.x), floor(v.y));
+}
+
+inline Vec2 ceil(const Vec2& v)
+{
+	return Vec2(ceil(v.x), ceil(v.y));
+}
+
+inline Vec2 max(const Vec2& a, const Vec2& b) {
+	return Vec2(std::max(a.x, b.x), std::max(a.y, b.y));
+}
+
+inline Vec2 min(const Vec2& a, const Vec2& b) {
+	return Vec2(std::min(a.x, b.x), std::min(a.y, b.y));
 }
 
 template <class V> inline affloat lengthSq(const V& v)
@@ -86,6 +123,11 @@ template <class V3> inline affloat length(const V3& v)
 template <class V> inline V normalize(const V& v)
 {
 	return v / length(v);
+}
+
+template <class T> inline T lerp(const T& x, const T& y, affloat s)
+{
+	return x + (y - x) * s;
 }
 
 struct Quat
@@ -139,8 +181,8 @@ inline Quat slerp(const Quat& l, Quat r, affloat ratio)
 	assert(abs(afr.v.x - dx.v.x) < 0.01f);
 	assert(abs(afr.v.y - dx.v.y) < 0.01f);
 	assert(abs(afr.v.z - dx.v.z) < 0.01f);
-	return afr;
 #endif
+	return afr;
 #endif
 }
 
@@ -336,6 +378,11 @@ inline Vec3 transform(const Vec3& v, const Mat& m)
 #define _(c) (m._1##c * v.x + m._2##c * v.y + m._3##c * v.z + m._4##c)
 	return Vec3(_(1), _(2), _(3));
 #undef _
+}
+
+inline Vec3 transform(const Vec3& v, const Quat& q)
+{
+	return (q.Conjugate() * Quat(0, v) * q).v;
 }
 
 inline Mat translate(affloat x, affloat y, affloat z)
