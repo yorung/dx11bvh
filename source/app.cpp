@@ -236,7 +236,7 @@ void App::Draw()
 	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, dist / 1000, dist * 1000));
 
 //	gridRenderer.Draw();
-	waterSurface.Draw();
+//	waterSurface.Draw();
 
 	sprite->Begin();
 
