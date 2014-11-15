@@ -18,13 +18,12 @@ SkyMan::~SkyMan()
 	assert(!depthStencilState);
 }
 
-void SkyMan::Create(const char *strCubeMapFile)
+void SkyMan::Create(const char *strCubeMapFile, const char *shader)
 {
 	Destroy();
 
-//	texId = texMan.Create(strCubeMapFile, true);
-	texId = texMan.Create("resource\\Tiny_skin.dds", true);
-	shaderId = shaderMan.Create("fx\\skybox11.fx", nullptr, 0);
+	texId = texMan.Create(strCubeMapFile, true);
+	shaderId = shaderMan.Create(shader, nullptr, 0);
 
 	if (constantBufferId < 0)
 	{
