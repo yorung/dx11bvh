@@ -13,7 +13,7 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), radius(1), lastX(INVALID_POS), lastY(INVALID_POS), sprite(nullptr), font(nullptr), animationNumber(0), trackTime(0), meshTiny(nullptr)
+App::App() : scale(1), radius(1), lastX(INVALID_POS), lastY(INVALID_POS), sprite(nullptr), font(nullptr), animationNumber(0), trackTime(0), meshTiny(nullptr), renderTargetView(nullptr), shaderResourceView(nullptr)
 {
 	ZeroMemory(mesh, sizeof(mesh));
 	lastTime = GetTime();
@@ -26,6 +26,15 @@ App::~App()
 void App::Init(const char* fileName)
 {
 	Destroy();
+
+	CD3D11_TEXTURE2D_DESC tDesc(DXGI_FORMAT_R8G8B8A8_TYPELESS, SCR_W, SCR_H, 1, 1, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
+	ID3D11Texture2D* tex;
+	HRESULT hr = deviceMan11.GetDevice()->CreateTexture2D(&tDesc, NULL, &tex);
+	CD3D11_RENDER_TARGET_VIEW_DESC rDesc(D3D11_RTV_DIMENSION_TEXTURE2D, tDesc.Format);
+	hr = deviceMan11.GetDevice()->CreateRenderTargetView(tex, &rDesc, &renderTargetView);
+	CD3D11_SHADER_RESOURCE_VIEW_DESC sDesc(D3D11_SRV_DIMENSION_TEXTURE2D, tDesc.Format);
+	hr = deviceMan11.GetDevice()->CreateShaderResourceView(tex, &sDesc, &shaderResourceView);
+	SAFE_RELEASE(tex);
 
 	debugRenderer.Init();
 	gridRenderer.Init();
@@ -219,6 +228,17 @@ void App::Update()
 
 void App::Draw()
 {
+	ID3D11DeviceContext* context = deviceMan11.GetContext();
+	ID3D11RenderTargetView* defaultRenderTarget;
+	context->OMGetRenderTargets(1, &defaultRenderTarget, NULL);
+	context->OMSetRenderTargets(1, &renderTargetView, NULL);
+
+	deviceMan11.BeginScene();
+
+	float clearColor[4] = { 0.0f, 0.0f, 0.2f, 0.0f };
+	context->ClearRenderTargetView(defaultRenderTarget, clearColor);
+	context->ClearRenderTargetView(renderTargetView, clearColor);
+
 	double currentTime = GetTime();
 	double deltaTime = currentTime - lastTime;
 	lastTime = currentTime;
@@ -271,6 +291,14 @@ void App::Draw()
 	DrawCameraParams();
 
 	sprite->End();
+
+	context->OMSetRenderTargets(1, &defaultRenderTarget, NULL);
+	context->PSSetShaderResources(0, 1, &shaderResourceView);
+	skyMan.Draw();
+
+	deviceMan11.EndScene();
+
+	SAFE_RELEASE(defaultRenderTarget);
 }
 
 void App::Destroy()
@@ -281,6 +309,8 @@ void App::Destroy()
 	SAFE_DELETE(meshTiny);
 	SAFE_DELETE(font);
 	SAFE_DELETE(sprite);
+	SAFE_RELEASE(renderTargetView);
+	SAFE_RELEASE(shaderResourceView);
 
 	debugRenderer.Destroy();
 	gridRenderer.Destroy();

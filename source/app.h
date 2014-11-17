@@ -11,6 +11,8 @@ class App {
 	float height;
 	SpriteBatch* sprite;
 	SpriteFont* font;
+	ID3D11RenderTargetView* renderTargetView;
+	ID3D11ShaderResourceView* shaderResourceView;
 	int animationNumber;
 	double trackTime;
 	double lastTime;

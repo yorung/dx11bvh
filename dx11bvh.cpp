@@ -92,10 +92,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE,
 			break;
 		}
 		app.Update();
-
-		deviceMan11.BeginScene();
 		app.Draw();
-		deviceMan11.EndScene();
 		Sleep(1);
 	}
 
