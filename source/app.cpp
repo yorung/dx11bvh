@@ -30,15 +30,16 @@ void App::Init(const char* fileName)
 	CD3D11_TEXTURE2D_DESC tDesc(DXGI_FORMAT_R8G8B8A8_TYPELESS, SCR_W, SCR_H, 1, 1, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
 	ID3D11Texture2D* tex;
 	HRESULT hr = deviceMan11.GetDevice()->CreateTexture2D(&tDesc, NULL, &tex);
-	CD3D11_RENDER_TARGET_VIEW_DESC rDesc(D3D11_RTV_DIMENSION_TEXTURE2D, tDesc.Format);
+	CD3D11_RENDER_TARGET_VIEW_DESC rDesc(D3D11_RTV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
 	hr = deviceMan11.GetDevice()->CreateRenderTargetView(tex, &rDesc, &renderTargetView);
-	CD3D11_SHADER_RESOURCE_VIEW_DESC sDesc(D3D11_SRV_DIMENSION_TEXTURE2D, tDesc.Format);
+	CD3D11_SHADER_RESOURCE_VIEW_DESC sDesc(D3D11_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
 	hr = deviceMan11.GetDevice()->CreateShaderResourceView(tex, &sDesc, &shaderResourceView);
 	SAFE_RELEASE(tex);
 
 	debugRenderer.Init();
 	gridRenderer.Init();
 	waterSurface.Init();
+	postEffectMan.Create("fx\\post_effect_mono.fx");
 
 	g_type = "mesh";
 
@@ -235,9 +236,10 @@ void App::Draw()
 
 	deviceMan11.BeginScene();
 
-	float clearColor[4] = { 0.0f, 0.0f, 0.2f, 0.0f };
+	float clearColor[4] = { 0.2f, 0.0f, 0.2f, 0.0f };
 	context->ClearRenderTargetView(defaultRenderTarget, clearColor);
-	context->ClearRenderTargetView(renderTargetView, clearColor);
+	float clearColor2[4] = { 0.0f, 0.2f, 0.0f, 0.0f };
+	context->ClearRenderTargetView(renderTargetView, clearColor2);
 
 	double currentTime = GetTime();
 	double deltaTime = currentTime - lastTime;
@@ -293,8 +295,8 @@ void App::Draw()
 	sprite->End();
 
 	context->OMSetRenderTargets(1, &defaultRenderTarget, NULL);
-	context->PSSetShaderResources(0, 1, &shaderResourceView);
-	skyMan.Draw();
+//	context->PSSetShaderResources(0, 1, &shaderResourceView);
+	postEffectMan.Draw(shaderResourceView);
 
 	deviceMan11.EndScene();
 
@@ -315,6 +317,7 @@ void App::Destroy()
 	debugRenderer.Destroy();
 	gridRenderer.Destroy();
 	waterSurface.Destroy();
+	postEffectMan.Destroy();
 }
 
 
