@@ -13,6 +13,7 @@ class App {
 	SpriteFont* font;
 	ID3D11RenderTargetView* renderTargetView;
 	ID3D11ShaderResourceView* shaderResourceView;
+	ID3D11UnorderedAccessView* unorderedAccessView;
 	int animationNumber;
 	double trackTime;
 	double lastTime;

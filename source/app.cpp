@@ -13,7 +13,7 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), radius(1), lastX(INVALID_POS), lastY(INVALID_POS), sprite(nullptr), font(nullptr), animationNumber(0), trackTime(0), meshTiny(nullptr), renderTargetView(nullptr), shaderResourceView(nullptr)
+App::App() : scale(1), radius(1), lastX(INVALID_POS), lastY(INVALID_POS), sprite(nullptr), font(nullptr), animationNumber(0), trackTime(0), meshTiny(nullptr), renderTargetView(nullptr), shaderResourceView(nullptr), unorderedAccessView(nullptr)
 {
 	ZeroMemory(mesh, sizeof(mesh));
 	lastTime = GetTime();
@@ -27,13 +27,15 @@ void App::Init(const char* fileName)
 {
 	Destroy();
 
-	CD3D11_TEXTURE2D_DESC tDesc(DXGI_FORMAT_R8G8B8A8_TYPELESS, SCR_W, SCR_H, 1, 1, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
+	CD3D11_TEXTURE2D_DESC tDesc(DXGI_FORMAT_R8G8B8A8_TYPELESS, SCR_W, SCR_H, 1, 1, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS);
 	ID3D11Texture2D* tex;
 	HRESULT hr = deviceMan11.GetDevice()->CreateTexture2D(&tDesc, NULL, &tex);
 	CD3D11_RENDER_TARGET_VIEW_DESC rDesc(D3D11_RTV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
 	hr = deviceMan11.GetDevice()->CreateRenderTargetView(tex, &rDesc, &renderTargetView);
 	CD3D11_SHADER_RESOURCE_VIEW_DESC sDesc(D3D11_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
 	hr = deviceMan11.GetDevice()->CreateShaderResourceView(tex, &sDesc, &shaderResourceView);
+	CD3D11_UNORDERED_ACCESS_VIEW_DESC uDesc(D3D11_UAV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
+	hr = deviceMan11.GetDevice()->CreateUnorderedAccessView(tex, &uDesc, &unorderedAccessView);
 	SAFE_RELEASE(tex);
 
 	debugRenderer.Init();
@@ -295,7 +297,6 @@ void App::Draw()
 	sprite->End();
 
 	context->OMSetRenderTargets(1, &defaultRenderTarget, NULL);
-//	context->PSSetShaderResources(0, 1, &shaderResourceView);
 	postEffectMan.Draw(shaderResourceView);
 
 	deviceMan11.EndScene();
@@ -313,6 +314,7 @@ void App::Destroy()
 	SAFE_DELETE(sprite);
 	SAFE_RELEASE(renderTargetView);
 	SAFE_RELEASE(shaderResourceView);
+	SAFE_RELEASE(unorderedAccessView);
 
 	debugRenderer.Destroy();
 	gridRenderer.Destroy();
