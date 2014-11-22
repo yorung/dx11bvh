@@ -8,7 +8,7 @@ static void Compile(const char* name, bool ps, ID3D10Blob*& blob)
 	ID3D10Blob* err = 0;
 	WCHAR wname[MAX_PATH];
 	MultiByteToWideChar(CP_ACP, 0, name, -1, wname, dimof(wname));
-	D3DCompileFromFile(wname, nullptr, nullptr, ps ? "mainPS" : "mainVS", ps ? "ps_4_0" : "vs_4_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, &blob, &err);
+	D3DCompileFromFile(wname, nullptr, nullptr, ps ? "mainPS" : "mainVS", ps ? "ps_5_0" : "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, &blob, &err);
 	if(err) {
 		MessageBoxA(nullptr, (const char*)err->GetBufferPointer(), name, MB_OK | MB_ICONERROR);
 		SAFE_RELEASE(err);
