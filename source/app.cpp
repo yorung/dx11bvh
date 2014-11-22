@@ -262,7 +262,7 @@ void App::Draw()
 
 //	gridRenderer.Draw();
 //	waterSurface.Draw();
-
+/*
 	sprite->Begin();
 
 	for (int i = 0; i < dimof(mesh); i++) {
@@ -290,12 +290,12 @@ void App::Draw()
 			DrawBoneNames(meshX, meshXAnimResult);
 		}
 	}
-
+	*/
 	skyMan.Draw();
 
-	DrawCameraParams();
+//	DrawCameraParams();
 
-	sprite->End();
+//	sprite->End();
 
 	computeShaderMan.Draw(shaderResourceView, unorderedAccessView);
 
