@@ -88,6 +88,7 @@
     <ClInclude Include="source\app.h" />
     <ClInclude Include="source\buffer_man11.h" />
     <ClInclude Include="source\bvh.h" />
+    <ClInclude Include="source\compute_shader_man.h" />
     <ClInclude Include="source\debug_renderer.h" />
     <ClInclude Include="source\device_man11.h" />
     <ClInclude Include="source\grid_renderer.h" />
@@ -110,6 +111,7 @@
     <ClCompile Include="source\app.cpp" />
     <ClCompile Include="source\buffer_man11.cpp" />
     <ClCompile Include="source\bvh.cpp" />
+    <ClCompile Include="source\compute_shader_man.cpp" />
     <ClCompile Include="source\debug_renderer.cpp" />
     <ClCompile Include="source\device_man11.cpp" />
     <ClCompile Include="source\grid_renderer.cpp" />

@@ -42,6 +42,7 @@ void App::Init(const char* fileName)
 	gridRenderer.Init();
 	waterSurface.Init();
 	postEffectMan.Create("fx\\post_effect_mono.fx");
+	computeShaderMan.Create("fx\\post_effect_cs.fx");
 
 	g_type = "mesh";
 
@@ -296,6 +297,8 @@ void App::Draw()
 
 	sprite->End();
 
+	computeShaderMan.Draw(shaderResourceView, unorderedAccessView);
+
 	context->OMSetRenderTargets(1, &defaultRenderTarget, NULL);
 	postEffectMan.Draw(shaderResourceView);
 
@@ -320,6 +323,7 @@ void App::Destroy()
 	gridRenderer.Destroy();
 	waterSurface.Destroy();
 	postEffectMan.Destroy();
+	computeShaderMan.Destroy();
 }
 
 
