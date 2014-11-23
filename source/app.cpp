@@ -80,6 +80,10 @@ void App::Init(const char* fileName)
 
 	height = radius / 2;
 
+	//	skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "fx\\sky_cubemap.fx");
+//	skyMan.Create("resource\\Tiny_skin.dds", "fx\\sky_spheremap.fx");
+	skyMan.Create("resource\\PANO_20141115_141959.dds", "fx\\sky_photosphere.fx");
+
 	lastTime = GetTime();
 }
 
