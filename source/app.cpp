@@ -13,7 +13,9 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), radius(1), lastX(INVALID_POS), lastY(INVALID_POS), sprite(nullptr), font(nullptr), animationNumber(0), trackTime(0), meshTiny(nullptr), renderTargetView(nullptr), shaderResourceView(nullptr), unorderedAccessView(nullptr)
+App::App() : scale(1), radius(1), lastX(INVALID_POS), lastY(INVALID_POS), sprite(nullptr), font(nullptr), animationNumber(0), trackTime(0), meshTiny(nullptr),
+	renderTargetView(nullptr), shaderResourceView(nullptr), unorderedAccessView(nullptr),
+	renderTargetView2(nullptr), shaderResourceView2(nullptr), unorderedAccessView2(nullptr)
 {
 	ZeroMemory(mesh, sizeof(mesh));
 	lastTime = GetTime();
@@ -29,14 +31,20 @@ void App::Init(const char* fileName)
 
 	CD3D11_TEXTURE2D_DESC tDesc(DXGI_FORMAT_R8G8B8A8_TYPELESS, SCR_W, SCR_H, 1, 1, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS);
 	ID3D11Texture2D* tex;
+	ID3D11Texture2D* tex2;
 	HRESULT hr = deviceMan11.GetDevice()->CreateTexture2D(&tDesc, NULL, &tex);
+	hr = deviceMan11.GetDevice()->CreateTexture2D(&tDesc, NULL, &tex2);
 	CD3D11_RENDER_TARGET_VIEW_DESC rDesc(D3D11_RTV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
 	hr = deviceMan11.GetDevice()->CreateRenderTargetView(tex, &rDesc, &renderTargetView);
+	hr = deviceMan11.GetDevice()->CreateRenderTargetView(tex2, &rDesc, &renderTargetView2);
 	CD3D11_SHADER_RESOURCE_VIEW_DESC sDesc(D3D11_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
 	hr = deviceMan11.GetDevice()->CreateShaderResourceView(tex, &sDesc, &shaderResourceView);
+	hr = deviceMan11.GetDevice()->CreateShaderResourceView(tex2, &sDesc, &shaderResourceView2);
 	CD3D11_UNORDERED_ACCESS_VIEW_DESC uDesc(D3D11_UAV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
 	hr = deviceMan11.GetDevice()->CreateUnorderedAccessView(tex, &uDesc, &unorderedAccessView);
+	hr = deviceMan11.GetDevice()->CreateUnorderedAccessView(tex2, &uDesc, &unorderedAccessView2);
 	SAFE_RELEASE(tex);
+	SAFE_RELEASE(tex2);
 
 	debugRenderer.Init();
 	gridRenderer.Init();
@@ -302,11 +310,11 @@ void App::Draw()
 //	sprite->End();
 
 //	auto shaderResourceView2 = texMan.Get(texMan.Create("resource\\PANO_20141115_141959.dds", true));
-	auto shaderResourceView2 = texMan.Get(texMan.Create("resource\\Tiny_skin.dds", true));
-	computeShaderMan.Draw(shaderResourceView2, unorderedAccessView);
-
+//	auto shaderResourceView2 = texMan.Get(texMan.Create("resource\\Tiny_skin.dds", true));
 	context->OMSetRenderTargets(1, &defaultRenderTarget, NULL);
-	postEffectMan.Draw(shaderResourceView);
+	computeShaderMan.Draw(shaderResourceView, unorderedAccessView2);
+
+	postEffectMan.Draw(shaderResourceView2);
 
 	deviceMan11.EndScene();
 
@@ -324,6 +332,9 @@ void App::Destroy()
 	SAFE_RELEASE(renderTargetView);
 	SAFE_RELEASE(shaderResourceView);
 	SAFE_RELEASE(unorderedAccessView);
+	SAFE_RELEASE(renderTargetView2);
+	SAFE_RELEASE(shaderResourceView2);
+	SAFE_RELEASE(unorderedAccessView2);
 
 	debugRenderer.Destroy();
 	gridRenderer.Destroy();

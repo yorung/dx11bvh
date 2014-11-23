@@ -56,10 +56,12 @@ void ComputeShaderMan::Draw(ID3D11ShaderResourceView* shaderResourceView, ID3D11
 	deviceMan11.GetContext()->CSSetShaderResources(0, 1, &shaderResourceView);
 	deviceMan11.GetContext()->CSSetUnorderedAccessViews(0, 1, &unorderedAccessView, nullptr);
 
-	deviceMan11.GetContext()->Dispatch(SCR_W / 32 / 2, SCR_H / 8 / 2, 1);
+	deviceMan11.GetContext()->Dispatch(SCR_W / 32, SCR_H / 8, 1);
 
 	ID3D11UnorderedAccessView* nullView = nullptr;
 	deviceMan11.GetContext()->CSSetUnorderedAccessViews(0, 1, &nullView, nullptr);
+	ID3D11ShaderResourceView* nullTex = nullptr;
+	deviceMan11.GetContext()->CSSetShaderResources(0, 1, &nullTex);
 }
 
 void ComputeShaderMan::Destroy()

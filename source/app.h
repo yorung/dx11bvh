@@ -14,6 +14,9 @@ class App {
 	ID3D11RenderTargetView* renderTargetView;
 	ID3D11ShaderResourceView* shaderResourceView;
 	ID3D11UnorderedAccessView* unorderedAccessView;
+	ID3D11RenderTargetView* renderTargetView2;
+	ID3D11ShaderResourceView* shaderResourceView2;
+	ID3D11UnorderedAccessView* unorderedAccessView2;
 	int animationNumber;
 	double trackTime;
 	double lastTime;
