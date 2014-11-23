@@ -246,10 +246,10 @@ void App::Draw()
 {
 	ID3D11DeviceContext* context = deviceMan11.GetContext();
 	ID3D11RenderTargetView* defaultRenderTarget;
-	context->OMGetRenderTargets(1, &defaultRenderTarget, NULL);
-	context->OMSetRenderTargets(1, &renderTargetView, NULL);
-
+	ID3D11DepthStencilView* defaultDepthStencil;
 	deviceMan11.BeginScene();
+	context->OMGetRenderTargets(1, &defaultRenderTarget, &defaultDepthStencil);
+	context->OMSetRenderTargets(1, &renderTargetView, defaultDepthStencil);
 
 	float clearColor[4] = { 0.2f, 0.0f, 0.2f, 0.0f };
 	context->ClearRenderTargetView(defaultRenderTarget, clearColor);
@@ -272,9 +272,10 @@ void App::Draw()
 	matrixMan.Set(MatrixMan::VIEW, fastInv(cam));
 	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, dist / 1000, dist * 1000));
 
-//	gridRenderer.Draw();
-//	waterSurface.Draw();
-/*
+	skyMan.Draw();
+	gridRenderer.Draw();
+	waterSurface.Draw();
+
 	sprite->Begin();
 
 	for (int i = 0; i < dimof(mesh); i++) {
@@ -302,12 +303,11 @@ void App::Draw()
 			DrawBoneNames(meshX, meshXAnimResult);
 		}
 	}
-	*/
-	skyMan.Draw();
 
-//	DrawCameraParams();
 
-//	sprite->End();
+	DrawCameraParams();
+
+	sprite->End();
 
 //	auto shaderResourceView2 = texMan.Get(texMan.Create("resource\\PANO_20141115_141959.dds", true));
 //	auto shaderResourceView2 = texMan.Get(texMan.Create("resource\\Tiny_skin.dds", true));
@@ -319,6 +319,7 @@ void App::Draw()
 	deviceMan11.EndScene();
 
 	SAFE_RELEASE(defaultRenderTarget);
+	SAFE_RELEASE(defaultDepthStencil);
 }
 
 void App::Destroy()
