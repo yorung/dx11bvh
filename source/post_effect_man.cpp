@@ -61,6 +61,10 @@ void PostEffectMan::Draw(ID3D11ShaderResourceView* shaderResourceView)
 	deviceMan11.GetContext()->OMSetDepthStencilState(depthStencilState, 0);
 	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	deviceMan11.GetContext()->Draw(4, 0);
+
+	buf = nullptr;
+	deviceMan11.GetContext()->VSSetConstantBuffers(0, 1, &buf);
+	deviceMan11.GetContext()->PSSetConstantBuffers(0, 1, &buf);
 }
 
 void PostEffectMan::Destroy()

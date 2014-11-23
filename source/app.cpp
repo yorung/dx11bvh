@@ -301,7 +301,9 @@ void App::Draw()
 
 //	sprite->End();
 
-	computeShaderMan.Draw(shaderResourceView, unorderedAccessView);
+//	auto shaderResourceView2 = texMan.Get(texMan.Create("resource\\PANO_20141115_141959.dds", true));
+	auto shaderResourceView2 = texMan.Get(texMan.Create("resource\\Tiny_skin.dds", true));
+	computeShaderMan.Draw(shaderResourceView2, unorderedAccessView);
 
 	context->OMSetRenderTargets(1, &defaultRenderTarget, NULL);
 	postEffectMan.Draw(shaderResourceView);

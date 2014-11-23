@@ -53,10 +53,10 @@ void ComputeShaderMan::Draw(ID3D11ShaderResourceView* shaderResourceView, ID3D11
 
 	deviceMan11.GetContext()->CSSetShader(computeShader, nullptr, 0);
 	deviceMan11.GetContext()->CSSetConstantBuffers(0, 1, &buf);
-//	deviceMan11.GetContext()->CSSetShaderResources(0, 1, &shaderResourceView);
+	deviceMan11.GetContext()->CSSetShaderResources(0, 1, &shaderResourceView);
 	deviceMan11.GetContext()->CSSetUnorderedAccessViews(0, 1, &unorderedAccessView, nullptr);
 
-	deviceMan11.GetContext()->Dispatch(SCR_W / 32 / 2, SCR_H / 8, 1);
+	deviceMan11.GetContext()->Dispatch(SCR_W / 32 / 2, SCR_H / 8 / 2, 1);
 
 	ID3D11UnorderedAccessView* nullView = nullptr;
 	deviceMan11.GetContext()->CSSetUnorderedAccessViews(0, 1, &nullView, nullptr);
