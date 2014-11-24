@@ -247,12 +247,10 @@ void App::Draw()
 	ID3D11DeviceContext* context = deviceMan11.GetContext();
 	ID3D11RenderTargetView* defaultRenderTarget;
 	ID3D11DepthStencilView* defaultDepthStencil;
-	deviceMan11.BeginScene();
 	context->OMGetRenderTargets(1, &defaultRenderTarget, &defaultDepthStencil);
 	context->OMSetRenderTargets(1, &renderTargetView, defaultDepthStencil);
+	context->ClearDepthStencilView(defaultDepthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	float clearColor[4] = { 0.2f, 0.0f, 0.2f, 0.0f };
-	context->ClearRenderTargetView(defaultRenderTarget, clearColor);
 	float clearColor2[4] = { 0.0f, 0.2f, 0.0f, 0.0f };
 	context->ClearRenderTargetView(renderTargetView, clearColor2);
 
@@ -273,11 +271,11 @@ void App::Draw()
 	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, dist / 1000, dist * 1000));
 
 	skyMan.Draw();
-	gridRenderer.Draw();
-	waterSurface.Draw();
+//	gridRenderer.Draw();
+//	waterSurface.Draw();
 
 	sprite->Begin();
-
+	
 	for (int i = 0; i < dimof(mesh); i++) {
 		Mesh* it = mesh[i];
 		MeshX* meshX = meshTiny;
@@ -304,19 +302,18 @@ void App::Draw()
 		}
 	}
 
-
 	DrawCameraParams();
 
 	sprite->End();
 
-//	auto shaderResourceView2 = texMan.Get(texMan.Create("resource\\PANO_20141115_141959.dds", true));
-//	auto shaderResourceView2 = texMan.Get(texMan.Create("resource\\Tiny_skin.dds", true));
-	context->OMSetRenderTargets(1, &defaultRenderTarget, NULL);
+	context->OMSetRenderTargets(1, &defaultRenderTarget, defaultDepthStencil);
+	float clearColor[4] = { 0.2f, 0.0f, 0.2f, 0.0f };
+	context->ClearRenderTargetView(defaultRenderTarget, clearColor);
+	context->ClearDepthStencilView(defaultDepthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	computeShaderMan.Draw(shaderResourceView, unorderedAccessView2);
-
 	postEffectMan.Draw(shaderResourceView2);
 
-	deviceMan11.EndScene();
+	deviceMan11.Present();
 
 	SAFE_RELEASE(defaultRenderTarget);
 	SAFE_RELEASE(defaultDepthStencil);

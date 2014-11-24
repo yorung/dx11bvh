@@ -57,12 +57,7 @@ void DeviceMan11::Create(HWND hWnd)
 	pImmediateContext->RSSetViewports(1, &vp);
 }
 
-void DeviceMan11::BeginScene()
-{
-	pImmediateContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-}
-
-void DeviceMan11::EndScene()
+void DeviceMan11::Present()
 {
 	pSwapChain->Present(0, 0);
 }

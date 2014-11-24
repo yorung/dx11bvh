@@ -12,8 +12,7 @@ public:
 	void Create(HWND hWnd);
 	void Destroy();
 
-	void BeginScene();
-	void EndScene();
+	void Present();
 
 	ID3D11Device* GetDevice() { return pDevice; }
 	ID3D11DeviceContext* GetContext() { return pImmediateContext; }
