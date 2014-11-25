@@ -2,11 +2,15 @@
 
 DebugRenderer debugRenderer;
 
-static void InitVertex(MeshVertex& v, BONE_ID boneId, DWORD color)
+static void InitSkin(MeshSkin& s, BONE_ID boneId)
 {
-	v.blendIndices.x = v.blendIndices.y = v.blendIndices.z = v.blendIndices.w = boneId;
+	s.blendIndices.x = s.blendIndices.y = s.blendIndices.z = s.blendIndices.w = boneId;
+	s.blendWeights.x = s.blendWeights.y = s.blendWeights.z = 0;
+}
+
+static void InitVertex(MeshVertex& v, DWORD color)
+{
 	v.color = color;
-	v.blendWeights.x = v.blendWeights.y = v.blendWeights.z = 0;
 	v.normal.x = 1;
 	v.normal.y = 0;
 	v.normal.z = 0;
@@ -27,9 +31,11 @@ void CreateCone(Block& b, const Vec3& v1, const Vec3& v2, BONE_ID boneId, DWORD 
 	static const int div = 10;
 	for (int j = 0; j < div; j++) {
 		MeshVertex vert[3];
+		MeshSkin skin;
 		for (auto& it : vert) {
-			InitVertex(it, boneId, color);
+			InitVertex(it, color);
 		}
+		InitSkin(skin, boneId);
 		float rad = XM_2PI / div * (j + 1);
 		Vec3 vRot = v1 + vRot0 * cosf(rad) + vRot90 * sinf(rad);
 		vert[0].xyz = vRotLast;
@@ -39,6 +45,7 @@ void CreateCone(Block& b, const Vec3& v1, const Vec3& v2, BONE_ID boneId, DWORD 
 		for (auto& it : vert) {
 			it.normal = normal;
 			b.vertices.push_back(it);
+			b.skin.push_back(skin);
 			b.indices.push_back(b.indices.size());
 		}
 		vRotLast = vRot;
@@ -54,9 +61,7 @@ void DebugRenderer::CreatePivotMesh()
 		CreateCone(pivots, Vec3(), Vec3(0, 0, len), i, 0xffff0000);
 	}
 
-	if (!pivots.vertices.empty() && !pivots.indices.empty()) {
-		pivotsRenderer.Init(pivots.vertices.size(), &pivots.vertices[0], pivots.indices.size(), &pivots.indices[0]);
-	}
+	pivotsRenderer.Init(pivots);
 
 	Material mat;
 	mat.faceColor.x = 0.6f;

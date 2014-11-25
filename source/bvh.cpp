@@ -357,8 +357,9 @@ void Bvh::CreateBoneMesh()
 		CreateCone(m_block, v1, v2, pId, depthToColor[depth % dimof(depthToColor)]);
 	}
 
+	m_block.Verify();
 	if (!m_block.vertices.empty() && !m_block.indices.empty()) {
-		m_meshRenderer.Init(m_block.vertices.size(), &m_block.vertices[0], m_block.indices.size(), &m_block.indices[0]);
+		m_meshRenderer.Init(m_block.vertices.size(), &m_block.vertices[0], &m_block.skin[0], m_block.indices.size(), &m_block.indices[0]);
 	}
 
 	Material mat;

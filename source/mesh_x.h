@@ -76,6 +76,10 @@ struct MeshVertex
 	Vec3 normal;
 	DWORD color;
 	Vector2 uv;
+};
+
+struct MeshSkin
+{
 	Vec3 blendWeights;
 	ubyte4 blendIndices;
 };
@@ -100,13 +104,19 @@ struct Frame
 struct Block
 {
 	std::vector<MeshVertex> vertices;
+	std::vector<MeshSkin> skin;
 	std::vector<unsigned> indices;
 	std::vector<MaterialMap> materialMaps;
 	void Clear()
 	{
 		vertices.clear();
+		skin.clear();
 		indices.clear();
 		materialMaps.clear();
+	}
+	void Verify() const
+	{
+		assert(vertices.size() == skin.size());
 	}
 };
 
@@ -137,7 +147,7 @@ private:
 	BONE_ID GetOrCreateFrameIdByName(const char* name);
 	BONE_ID GetFrameIdByName(const char* name) const;
 	void _linkFrame(BONE_ID parentFrameId, BONE_ID childFrameId);
-	void _storeWeight(MeshVertex& v, int frameId, float weight);
+	void _storeWeight(MeshSkin& v, int frameId, float weight);
 	void CalcFrameMatrices(MeshXAnimResult& animResult, const Mat localMats[BONE_MAX]) const;
 	void DumpFrames() const;
 	void CreateBoneMesh();
