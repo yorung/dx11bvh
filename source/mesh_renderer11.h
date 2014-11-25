@@ -1,4 +1,5 @@
 struct Block;
+struct MeshVertex;
 
 class MeshRenderer11
 {
@@ -12,7 +13,7 @@ public:
 	MeshRenderer11();
 	~MeshRenderer11();
 	void Destroy();
-	void Init(int sizeVertices, int sizeIndices, void* vertices, void* indices);
+	void Init(int numVertices, const MeshVertex* vertices, int numIndices, const unsigned* indices);
 	void Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Block& block) const;
 };
 

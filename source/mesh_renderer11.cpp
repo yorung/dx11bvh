@@ -36,7 +36,7 @@ void MeshRenderer11::Destroy()
 	SAFE_RELEASE(pDSState);
 }
 
-void MeshRenderer11::Init(int sizeVertices, int sizeIndices, void* vertices, void* indices)
+void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, int numIndices, const unsigned* indices)
 {
 	Destroy();
 
@@ -51,9 +51,9 @@ void MeshRenderer11::Init(int sizeVertices, int sizeIndices, void* vertices, voi
 	shaderId = shaderMan.Create("fx\\dx11mesh.fx", layout, dimof(layout));
 
 	D3D11_SUBRESOURCE_DATA subresData = { vertices, 0, 0 };
-	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeVertices, D3D11_BIND_VERTEX_BUFFER), &subresData, &pVertexBuffer);
+	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshVertex), D3D11_BIND_VERTEX_BUFFER), &subresData, &pVertexBuffer);
 	subresData.pSysMem = indices;
-	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeIndices, D3D11_BIND_INDEX_BUFFER), &subresData, &pIndexBuffer);
+	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numIndices * sizeof(unsigned), D3D11_BIND_INDEX_BUFFER), &subresData, &pIndexBuffer);
 	if (constantBufferId < 0) {
 		constantBufferId = bufferMan.Create(sizeof(MeshConstantBuffer));
 	}

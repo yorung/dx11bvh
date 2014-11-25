@@ -54,10 +54,8 @@ void DebugRenderer::CreatePivotMesh()
 		CreateCone(pivots, Vec3(), Vec3(0, 0, len), i, 0xffff0000);
 	}
 
-	int sizeVertices = pivots.vertices.size() * sizeof(pivots.vertices[0]);
-	int sizeIndices = pivots.indices.size() * sizeof(pivots.indices[0]);
-	if (sizeVertices && sizeIndices) {
-		pivotsRenderer.Init(sizeVertices, sizeIndices, &pivots.vertices[0], &pivots.indices[0]);
+	if (!pivots.vertices.empty() && !pivots.indices.empty()) {
+		pivotsRenderer.Init(pivots.vertices.size(), &pivots.vertices[0], pivots.indices.size(), &pivots.indices[0]);
 	}
 
 	Material mat;

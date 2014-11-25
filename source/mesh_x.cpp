@@ -353,10 +353,8 @@ void MeshX::CreateBoneMesh()
 		CreateCone(bones, v1, v2, pId, depthToColor[depth % dimof(depthToColor)]);
 	}
 
-	int sizeVertices = bones.vertices.size() * sizeof(bones.vertices[0]);
-	int sizeIndices = bones.indices.size() * sizeof(bones.indices[0]);
-	if (sizeVertices && sizeIndices) {
-		bonesRenderer.Init(sizeVertices, sizeIndices, &bones.vertices[0], &bones.indices[0]);
+	if (!bones.vertices.empty() && !bones.indices.empty()) {
+		bonesRenderer.Init(bones.vertices.size(), &bones.vertices[0], bones.indices.size(), &bones.indices[0]);
 	}
 
 	Material mat;
@@ -404,9 +402,7 @@ MeshX::MeshX(const char *fileName)
 	
     SetCurrentDirectoryA(strCWD);
 
-	int sizeVertices = m_block.vertices.size() * sizeof(m_block.vertices[0]);
-	int sizeIndices = m_block.indices.size() * sizeof(m_block.indices[0]);
-	m_meshRenderer.Init(sizeVertices, sizeIndices, &m_block.vertices[0], &m_block.indices[0]);
+	m_meshRenderer.Init(m_block.vertices.size(), &m_block.vertices[0], m_block.indices.size(), &m_block.indices[0]);
 
 	CreateBoneMesh();
 }
