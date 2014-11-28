@@ -74,6 +74,10 @@ struct MeshVertex
 {
 	Vec3 xyz;
 	Vec3 normal;
+};
+
+struct MeshColor
+{
 	DWORD color;
 	Vector2 uv;
 };
@@ -104,12 +108,14 @@ struct Frame
 struct Block
 {
 	std::vector<MeshVertex> vertices;
+	std::vector<MeshColor> color;
 	std::vector<MeshSkin> skin;
 	std::vector<unsigned> indices;
 	std::vector<MaterialMap> materialMaps;
 	void Clear()
 	{
 		vertices.clear();
+		color.clear();
 		skin.clear();
 		indices.clear();
 		materialMaps.clear();
@@ -117,6 +123,7 @@ struct Block
 	void Verify() const
 	{
 		assert(vertices.size() == skin.size());
+		assert(vertices.size() == color.size());
 	}
 };
 

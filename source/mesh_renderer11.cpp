@@ -17,7 +17,8 @@ struct MeshConstantBuffer
 
 MeshRenderer11::MeshRenderer11()
 {
-	pVertexBuffer = nullptr;
+	posBuffer = nullptr;
+	colorBuffer = nullptr;
 	skinBuffer = nullptr;
 	pIndexBuffer = nullptr;
 	pSamplerState = nullptr;
@@ -32,7 +33,8 @@ MeshRenderer11::~MeshRenderer11()
 void MeshRenderer11::Destroy()
 {
 	SAFE_RELEASE(pIndexBuffer);
-	SAFE_RELEASE(pVertexBuffer);
+	SAFE_RELEASE(posBuffer);
+	SAFE_RELEASE(colorBuffer);
 	SAFE_RELEASE(skinBuffer);
 	SAFE_RELEASE(pSamplerState);
 	SAFE_RELEASE(pDSState);
@@ -41,29 +43,31 @@ void MeshRenderer11::Destroy()
 void MeshRenderer11::Init(const Block& block)
 {
 	block.Verify();
-	if (!block.vertices.empty() && !block.indices.empty()) {
-		Init(block.vertices.size(), &block.vertices[0], &block.skin[0], block.indices.size(), &block.indices[0]);
+	if (!block.vertices.empty() && !block.indices.empty() && !block.color.empty()) {
+		Init(block.vertices.size(), &block.vertices[0], &block.color[0], &block.skin[0], block.indices.size(), &block.indices[0]);
 	}
 }
 
-void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const MeshSkin* skin, int numIndices, const unsigned* indices)
+void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const MeshColor* color, const MeshSkin* skin, int numIndices, const unsigned* indices)
 {
 	Destroy();
 
 	static D3D11_INPUT_ELEMENT_DESC layout[] = {
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "BLENDWEIGHTS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "BLENDINDICES", 0, DXGI_FORMAT_R8G8B8A8_UINT, 1, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 4, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "BLENDWEIGHTS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 2, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "BLENDINDICES", 0, DXGI_FORMAT_R8G8B8A8_UINT, 2, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	shaderId = shaderMan.Create("fx\\dx11mesh.fx", layout, dimof(layout));
 
 	D3D11_SUBRESOURCE_DATA subresData = { vertices, 0, 0 };
-	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshVertex), D3D11_BIND_VERTEX_BUFFER), &subresData, &pVertexBuffer);
+	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshVertex), D3D11_BIND_VERTEX_BUFFER), &subresData, &posBuffer);
 	subresData.pSysMem = skin;
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshSkin), D3D11_BIND_VERTEX_BUFFER), &subresData, &skinBuffer);
+	subresData.pSysMem = color;
+	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshColor), D3D11_BIND_VERTEX_BUFFER), &subresData, &colorBuffer);
 	subresData.pSysMem = indices;
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numIndices * sizeof(unsigned), D3D11_BIND_INDEX_BUFFER), &subresData, &pIndexBuffer);
 	if (constantBufferId < 0) {
@@ -90,9 +94,9 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
 
 	deviceMan11.GetContext()->IASetIndexBuffer(pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-	UINT strides[] = { sizeof(MeshVertex), sizeof(MeshSkin) };
-	UINT offsets[] = { 0, 0 };
-	ID3D11Buffer* vertexBuffers[] = { pVertexBuffer, skinBuffer };
+	UINT strides[] = { sizeof(MeshVertex), sizeof(MeshColor), sizeof(MeshSkin) };
+	UINT offsets[] = { 0, 0, 0 };
+	ID3D11Buffer* vertexBuffers[] = { posBuffer, colorBuffer, skinBuffer };
 	deviceMan11.GetContext()->IASetVertexBuffers(0, dimof(vertexBuffers), vertexBuffers, strides, offsets);
 
 	for (int j = 0; (unsigned)j < block.materialMaps.size(); j++) {

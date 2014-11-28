@@ -8,14 +8,18 @@ static void InitSkin(MeshSkin& s, BONE_ID boneId)
 	s.blendWeights.x = s.blendWeights.y = s.blendWeights.z = 0;
 }
 
-static void InitVertex(MeshVertex& v, DWORD color)
+static void InitVertex(MeshVertex& v)
 {
-	v.color = color;
 	v.normal.x = 1;
 	v.normal.y = 0;
 	v.normal.z = 0;
-	v.uv.x = v.uv.y = 0;
 	v.xyz.x = v.xyz.y = v.xyz.z = 0;
+}
+
+static void InitVertexColor(MeshColor& c, DWORD color)
+{
+	c.color = color;
+	c.uv.x = c.uv.y = 0;
 }
 
 void CreateCone(Block& b, const Vec3& v1, const Vec3& v2, BONE_ID boneId, DWORD color)
@@ -31,9 +35,11 @@ void CreateCone(Block& b, const Vec3& v1, const Vec3& v2, BONE_ID boneId, DWORD 
 	static const int div = 10;
 	for (int j = 0; j < div; j++) {
 		MeshVertex vert[3];
+		MeshColor col;
 		MeshSkin skin;
+		InitVertexColor(col, color);
 		for (auto& it : vert) {
-			InitVertex(it, color);
+			InitVertex(it);
 		}
 		InitSkin(skin, boneId);
 		float rad = XM_2PI / div * (j + 1);
@@ -42,10 +48,11 @@ void CreateCone(Block& b, const Vec3& v1, const Vec3& v2, BONE_ID boneId, DWORD 
 		vert[1].xyz = v2;
 		vert[2].xyz = vRot;
 		Vec3 normal = cross(vRotLast - v2, v2 - vRot);
-		for (auto& it : vert) {
-			it.normal = normal;
-			b.vertices.push_back(it);
+		for (int i = 0; i < 3; i++) {
+			vert[i].normal = normal;
+			b.vertices.push_back(vert[i]);
 			b.skin.push_back(skin);
+			b.color.push_back(col);
 			b.indices.push_back(b.indices.size());
 		}
 		vRotLast = vRot;

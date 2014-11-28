@@ -358,9 +358,7 @@ void Bvh::CreateBoneMesh()
 	}
 
 	m_block.Verify();
-	if (!m_block.vertices.empty() && !m_block.indices.empty()) {
-		m_meshRenderer.Init(m_block.vertices.size(), &m_block.vertices[0], &m_block.skin[0], m_block.indices.size(), &m_block.indices[0]);
-	}
+	m_meshRenderer.Init(m_block);
 
 	Material mat;
 	mat.faceColor.x = 0.6f;
