@@ -36,6 +36,7 @@ void MeshRenderer11::Destroy()
 	SAFE_RELEASE(posBuffer);
 	SAFE_RELEASE(colorBuffer);
 	SAFE_RELEASE(skinBuffer);
+	SAFE_RELEASE(skinnedPosBuffer);
 	SAFE_RELEASE(pSamplerState);
 	SAFE_RELEASE(pDSState);
 }
@@ -78,6 +79,10 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 	descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	deviceMan11.GetDevice()->CreateSamplerState(&descSamp, &pSamplerState);
 	deviceMan11.GetDevice()->CreateDepthStencilState(&CD3D11_DEPTH_STENCIL_DESC(D3D11_DEFAULT), &pDSState);
+}
+
+void MeshRenderer11::Calc(const Mat BoneMatrices[BONE_MAX], int nBones, const Block& block) const
+{
 }
 
 void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Block& block) const
