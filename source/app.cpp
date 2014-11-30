@@ -51,6 +51,7 @@ void App::Init(const char* fileName)
 	waterSurface.Init();
 	postEffectMan.Create("fx\\post_effect_mono.fx");
 	computeShaderMan.Create("fx\\post_effect_cs.fx");
+	computeShaderSkinning.Create("fx\\skin_cs.fx");
 
 	g_type = "mesh";
 
@@ -339,6 +340,7 @@ void App::Destroy()
 	waterSurface.Destroy();
 	postEffectMan.Destroy();
 	computeShaderMan.Destroy();
+	computeShaderSkinning.Destroy();
 }
 
 

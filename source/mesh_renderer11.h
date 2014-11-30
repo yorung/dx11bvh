@@ -20,7 +20,7 @@ public:
 	void Destroy();
 	void Init(int numVertices, const MeshVertex* vertices, const MeshColor* color, const MeshSkin* skin, int numIndices, const unsigned* indices);
 	void Init(const Block& block);
-	void Calc(const Mat BoneMatrices[BONE_MAX], int nBones, const Block& block) const;
+	void Calc(const Mat BoneMatrices[BONE_MAX], const Block& block) const;
 	void Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Block& block) const;
 };
 

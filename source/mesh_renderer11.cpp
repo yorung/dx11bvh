@@ -64,7 +64,7 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 	shaderId = shaderMan.Create("fx\\dx11mesh.fx", layout, dimof(layout));
 
 	D3D11_SUBRESOURCE_DATA subresData = { vertices, 0, 0 };
-	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshVertex), D3D11_BIND_VERTEX_BUFFER), &subresData, &posBuffer);
+	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshVertex), D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, sizeof(MeshVertex)), &subresData, &posBuffer);
 	subresData.pSysMem = skin;
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshSkin), D3D11_BIND_VERTEX_BUFFER), &subresData, &skinBuffer);
 	subresData.pSysMem = color;
@@ -81,12 +81,25 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 	deviceMan11.GetDevice()->CreateDepthStencilState(&CD3D11_DEPTH_STENCIL_DESC(D3D11_DEFAULT), &pDSState);
 }
 
-void MeshRenderer11::Calc(const Mat BoneMatrices[BONE_MAX], int nBones, const Block& block) const
+void MeshRenderer11::Calc(const Mat BoneMatrices[BONE_MAX], const Block& block) const
 {
+	ID3D11ShaderResourceView* shaderResourceView;
+	D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+	memset(&desc, 0, sizeof(desc));
+	desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFEREX;
+	desc.Format = DXGI_FORMAT_UNKNOWN;
+	desc.BufferEx.FirstElement = 0;
+	desc.BufferEx.NumElements = block.vertices.size();
+	HRESULT hr = deviceMan11.GetDevice()->CreateShaderResourceView(posBuffer, &desc, &shaderResourceView);
+
+//	computeShaderSkinning.Dispatch(BoneMatrices, , 
+	SAFE_RELEASE(shaderResourceView);
 }
 
 void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Block& block) const
 {
+	Calc(BoneMatrices, block);
+
 	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	shaderMan.Apply(shaderId);
 

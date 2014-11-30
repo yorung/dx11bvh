@@ -15,11 +15,11 @@ cbuffer perObject : register(b0)
 	row_major float4x4 bones[70];
 };
 
-StructedBuffer<Vertex> vertexIn : register(t0);
-StructedBuffer<Skin> skinIn : register(t1);
-RWStructedBuffer<Vertex> vertexOut : register(u0);
+StructuredBuffer<Vertex> vertexIn : register(t0);
+StructuredBuffer<Skin> skinIn : register(t1);
+RWStructuredBuffer<Vertex> vertexOut : register(u0);
 
-[numthreads(64, 1, 1)]
+[numthreads(70, 1, 1)]
 void mainCS(uint3 id : SV_DispatchThreadID)
 {
 	Vertex vIn = vertexIn[id.x];

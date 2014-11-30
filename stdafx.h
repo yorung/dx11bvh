@@ -59,6 +59,7 @@ static const int BONE_MAX = 70;
 #include "source/helper.h"
 #include "source/post_effect_man.h"
 #include "source/compute_shader_man.h"
+#include "source/compute_shader_skinning.h"
 
 #include "source/app.h"
 

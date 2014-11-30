@@ -87,6 +87,9 @@
     <ClInclude Include="source\compute_shader_man.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="source\compute_shader_skinning.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -147,6 +150,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\compute_shader_man.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\compute_shader_skinning.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
