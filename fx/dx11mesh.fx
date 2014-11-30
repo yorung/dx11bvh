@@ -47,7 +47,8 @@ VS_OUTPUT mainVS( VS_INPUT _In ) {
 		bones[_In.indices[1]] * _In.weights[1] +
 		bones[_In.indices[2]] * _In.weights[2] +
 		bones[_In.indices[3]] * (1 - _In.weights[0] - _In.weights[1] - _In.weights[2]);
-	float4x4 cw = mul(comb, matW);
+//	float4x4 cw = mul(comb, matW);
+	float4x4 cw = matW;
 	float4x4 cwv = mul(cw, matV);
 	float4x4 cwvp = mul(cwv, matP);
 	Out.Pos = mul(float4(_In.Pos, 1), cwvp);

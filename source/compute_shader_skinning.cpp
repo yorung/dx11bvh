@@ -45,22 +45,23 @@ void ComputeShaderSkinning::Create(const char *shader)
 	}
 }
 
-void ComputeShaderSkinning::Dispatch(const Mat bone[BONE_MAX], ID3D11ShaderResourceView* shaderResourceView, ID3D11UnorderedAccessView* unorderedAccessView)
+void ComputeShaderSkinning::Dispatch(const Mat bone[BONE_MAX], ID3D11ShaderResourceView* srvPos, ID3D11ShaderResourceView* srvSkin, ID3D11UnorderedAccessView* unorderedAccessView, int nVert)
 {
 	bufferMan.Write(constantBufferId, bone);
 	auto buf = bufferMan.Get(constantBufferId);
 
+	ID3D11ShaderResourceView* srvList[] = {srvPos, srvSkin};
 	deviceMan11.GetContext()->CSSetShader(computeShader, nullptr, 0);
 	deviceMan11.GetContext()->CSSetConstantBuffers(0, 1, &buf);
-	deviceMan11.GetContext()->CSSetShaderResources(0, 1, &shaderResourceView);
+	deviceMan11.GetContext()->CSSetShaderResources(0, 2, srvList);
 	deviceMan11.GetContext()->CSSetUnorderedAccessViews(0, 1, &unorderedAccessView, nullptr);
 
-	deviceMan11.GetContext()->Dispatch(1, 1, 1);
+	deviceMan11.GetContext()->Dispatch(nVert, 1, 1);
 
 	ID3D11UnorderedAccessView* nullView = nullptr;
 	deviceMan11.GetContext()->CSSetUnorderedAccessViews(0, 1, &nullView, nullptr);
-	ID3D11ShaderResourceView* nullTex = nullptr;
-	deviceMan11.GetContext()->CSSetShaderResources(0, 1, &nullTex);
+	ID3D11ShaderResourceView* nullTex[] = {nullptr, nullptr};
+	deviceMan11.GetContext()->CSSetShaderResources(0, 2, nullTex);
 }
 
 void ComputeShaderSkinning::Destroy()
