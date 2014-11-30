@@ -20,6 +20,7 @@ MeshRenderer11::MeshRenderer11()
 	posBuffer = nullptr;
 	colorBuffer = nullptr;
 	skinBuffer = nullptr;
+	skinnedPosBuffer = nullptr;
 	pIndexBuffer = nullptr;
 	pSamplerState = nullptr;
 	pDSState = nullptr;
@@ -63,8 +64,10 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 	};
 	shaderId = shaderMan.Create("fx\\dx11mesh.fx", layout, dimof(layout));
 
+	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshVertex), D3D11_BIND_UNORDERED_ACCESS, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, sizeof(MeshVertex)), nullptr, &skinnedPosBuffer);
 	D3D11_SUBRESOURCE_DATA subresData = { vertices, 0, 0 };
-	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshVertex), D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, sizeof(MeshVertex)), &subresData, &posBuffer);
+	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshVertex), D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, sizeof(MeshVertex)), &subresData, &posBuffer);
+//	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshVertex), D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, sizeof(MeshVertex)), &subresData, &posBuffer);
 	subresData.pSysMem = skin;
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshSkin), D3D11_BIND_VERTEX_BUFFER), &subresData, &skinBuffer);
 	subresData.pSysMem = color;
@@ -84,16 +87,30 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 void MeshRenderer11::Calc(const Mat BoneMatrices[BONE_MAX], const Block& block) const
 {
 	ID3D11ShaderResourceView* shaderResourceView;
-	D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-	memset(&desc, 0, sizeof(desc));
-	desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFEREX;
-	desc.Format = DXGI_FORMAT_UNKNOWN;
-	desc.BufferEx.FirstElement = 0;
-	desc.BufferEx.NumElements = block.vertices.size();
-	HRESULT hr = deviceMan11.GetDevice()->CreateShaderResourceView(posBuffer, &desc, &shaderResourceView);
+	{
+		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+		memset(&desc, 0, sizeof(desc));
+		desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFEREX;
+		desc.Format = DXGI_FORMAT_UNKNOWN;
+		desc.BufferEx.FirstElement = 0;
+		desc.BufferEx.NumElements = block.vertices.size();
+		HRESULT hr = deviceMan11.GetDevice()->CreateShaderResourceView(posBuffer, &desc, &shaderResourceView);
+	}
 
-//	computeShaderSkinning.Dispatch(BoneMatrices, , 
+	ID3D11UnorderedAccessView* uav;
+	{
+		D3D11_UNORDERED_ACCESS_VIEW_DESC desc;
+		memset(&desc, 0, sizeof(desc));
+		desc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+		desc.Format = DXGI_FORMAT_UNKNOWN;
+		desc.Buffer.FirstElement = 0;
+		desc.Buffer.NumElements = block.vertices.size();
+		HRESULT hr = deviceMan11.GetDevice()->CreateUnorderedAccessView(skinnedPosBuffer, &desc, &uav);
+	}
+
+	computeShaderSkinning.Dispatch(BoneMatrices, shaderResourceView, uav);
 	SAFE_RELEASE(shaderResourceView);
+	SAFE_RELEASE(uav);
 }
 
 void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Block& block) const

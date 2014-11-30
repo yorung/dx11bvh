@@ -45,7 +45,7 @@ void ComputeShaderSkinning::Create(const char *shader)
 	}
 }
 
-void ComputeShaderSkinning::Dispatch(Mat bone[BONE_MAX], ID3D11ShaderResourceView* shaderResourceView, ID3D11UnorderedAccessView* unorderedAccessView)
+void ComputeShaderSkinning::Dispatch(const Mat bone[BONE_MAX], ID3D11ShaderResourceView* shaderResourceView, ID3D11UnorderedAccessView* unorderedAccessView)
 {
 	bufferMan.Write(constantBufferId, bone);
 	auto buf = bufferMan.Get(constantBufferId);

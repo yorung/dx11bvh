@@ -6,7 +6,7 @@ public:
 	ComputeShaderSkinning();
 	~ComputeShaderSkinning();
 	void Create(const char *shader);
-	void Dispatch(Mat bone[BONE_MAX], ID3D11ShaderResourceView* shaderResourceView, ID3D11UnorderedAccessView* unorderedAccessView);
+	void Dispatch(const Mat bone[BONE_MAX], ID3D11ShaderResourceView* shaderResourceView, ID3D11UnorderedAccessView* unorderedAccessView);
 	void Destroy();
 };
 
