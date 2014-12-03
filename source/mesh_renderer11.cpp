@@ -145,6 +145,7 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 		HRESULT hr = deviceMan11.GetDevice()->CreateShaderResourceView(skinnedPosBuffer, &desc, &srvSkinnedPos);
 	}
 	deviceMan11.GetContext()->VSSetShaderResources(0, 1, &srvSkinnedPos);
+	SAFE_RELEASE(srvSkinnedPos);
 
 	for (int j = 0; (unsigned)j < block.materialMaps.size(); j++) {
 		const MaterialMap& matMap = block.materialMaps[j];
@@ -167,6 +168,5 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 
 		deviceMan11.GetContext()->DrawIndexed(matMap.faces * 3, matMap.faceStartIndex * 3, 0);
 	}
-	SAFE_RELEASE(srvSkinnedPos);
 }
 
