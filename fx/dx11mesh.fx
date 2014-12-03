@@ -7,8 +7,6 @@ cbuffer perMaterial : register(b0)
 	float4 emissive;
 	float3 camPos;
 	float padding1;
-	float4 padding2;
-	row_major float4x4 bones[70];
 };
 
 struct Vertex
@@ -28,8 +26,6 @@ float4 CalcColor(float3 normal)
 }
 
 struct VS_INPUT {
-	float3 Pos : POSITION;
-	float3 Normal : NORMAL;
 	float4 Col : COLOR;
 	float2 Tex0: TEXCOORD;
 	float3 weights : BLENDWEIGHTS;
@@ -47,14 +43,6 @@ struct VS_OUTPUT {
 
 VS_OUTPUT mainVS(VS_INPUT _In, uint id : SV_VertexID) {
 	VS_OUTPUT Out = (VS_OUTPUT)0;
-
-	float4x4 comb =
-		bones[_In.indices[0]] * _In.weights[0] +
-		bones[_In.indices[1]] * _In.weights[1] +
-		bones[_In.indices[2]] * _In.weights[2] +
-		bones[_In.indices[3]] * (1 - _In.weights[0] - _In.weights[1] - _In.weights[2]);
-//	float3 pos = mul(float4(_In.Pos, 1), comb).xyz;
-//	float3 norm = mul(float4(_In.Normal, 0), comb).xyz;
 
 	float3 pos = vertexIn[id].pos;
 	float3 norm = vertexIn[id].normal;
