@@ -55,8 +55,6 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 	static D3D11_INPUT_ELEMENT_DESC layout[] = {
 		{ "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 4, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "BLENDWEIGHTS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "BLENDINDICES", 0, DXGI_FORMAT_R8G8B8A8_UINT, 1, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	shaderId = shaderMan.Create("fx\\dx11mesh.fx", layout, dimof(layout));
 
@@ -129,9 +127,9 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
 
 	deviceMan11.GetContext()->IASetIndexBuffer(pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-	UINT strides[] = { sizeof(MeshColor), sizeof(MeshSkin) };
-	UINT offsets[] = { 0, 0 };
-	ID3D11Buffer* vertexBuffers[] = { colorBuffer, skinBuffer };
+	UINT strides[] = { sizeof(MeshColor) };
+	UINT offsets[] = { 0 };
+	ID3D11Buffer* vertexBuffers[] = { colorBuffer };
 	deviceMan11.GetContext()->IASetVertexBuffers(0, dimof(vertexBuffers), vertexBuffers, strides, offsets);
 
 	ID3D11ShaderResourceView* srvSkinnedPos;

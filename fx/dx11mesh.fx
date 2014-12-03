@@ -28,8 +28,6 @@ float4 CalcColor(float3 normal)
 struct VS_INPUT {
 	float4 Col : COLOR;
 	float2 Tex0: TEXCOORD;
-	float3 weights : BLENDWEIGHTS;
-	int4 indices : BLENDINDICES;
 };
 
 struct VS_OUTPUT {
