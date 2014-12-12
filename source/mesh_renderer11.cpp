@@ -129,8 +129,7 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 	deviceMan11.GetContext()->IASetIndexBuffer(pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 	UINT strides[] = { sizeof(MeshColor) };
 	UINT offsets[] = { 0 };
-	ID3D11Buffer* vertexBuffers[] = { colorBuffer };
-	deviceMan11.GetContext()->IASetVertexBuffers(0, dimof(vertexBuffers), vertexBuffers, strides, offsets);
+	deviceMan11.GetContext()->IASetVertexBuffers(0, 1, &colorBuffer, strides, offsets);
 
 	ID3D11ShaderResourceView* srvSkinnedPos;
 	{
