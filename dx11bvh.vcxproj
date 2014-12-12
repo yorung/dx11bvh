@@ -82,7 +82,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="dx11bvh.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="source\af_math.h" />
     <ClInclude Include="source\app.h" />
@@ -108,7 +107,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dx11bvh.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="source\app.cpp" />
     <ClCompile Include="source\buffer_man11.cpp" />
     <ClCompile Include="source\bvh.cpp" />
@@ -134,11 +133,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="dx11bvh.rc" />
+    <ResourceCompile Include="res.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="dx11bvh.ico" />
-    <Image Include="small.ico" />
+    <Image Include="icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

@@ -10,8 +10,7 @@
 #define IDD_ABOUTBOX			103
 #define IDM_ABOUT				104
 #define IDM_EXIT				105
-#define IDI_DX11BVH			107
-#define IDI_SMALL				108
+#define IDI_ICON			107
 #define IDC_DX11BVH			109
 #define IDM_RELOAD_SHADERS		1000
 #define IDC_MYICON				2
