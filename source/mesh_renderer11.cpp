@@ -7,8 +7,8 @@ struct MeshConstantBuffer
 	Mat matW;
 	Mat matV;
 	Mat matP;
-	XMFLOAT4 faceColor;
-	XMFLOAT4 emissive;
+	Vec4 faceColor;
+	Vec4 emissive;
 	Vec3 camPos;
 	float padding1;
 };

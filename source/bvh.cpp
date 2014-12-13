@@ -383,16 +383,6 @@ void Bvh::CreateBoneMesh()
 	m_block.materialMaps.push_back(map);
 }
 
-static DWORD _conv1To255(float f, int bit)
-{
-	return DWORD(f * 255) << bit;
-}
-
-static DWORD _convF4ToU32(XMFLOAT4 f)
-{
-	return _conv1To255(f.x, 24) | _conv1To255(f.y, 16) | _conv1To255(f.z, 8) | _conv1To255(f.w, 0);
-}
-
 BONE_ID Bvh::_getFrameIdByName(const char* name)
 {
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++) {

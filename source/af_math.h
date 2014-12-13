@@ -65,6 +65,16 @@ struct Vec3
 	Vec3 operator*=(affloat r) { return *this = *this * r; }
 };
 
+struct Vec4
+{
+	affloat x, y, z, w;
+	Vec4() : x(0), y(0), z(0), w(0) {}
+	Vec4(affloat X, affloat Y, affloat Z, affloat W) : x(X), y(Y), z(Z), w(W) {}
+#ifdef USE_SIMPLE_MATH
+	Vec4(const Vector4& v) : Vec4(v.x, v.y, v.z, v.w) {}
+#endif
+};
+
 inline affloat dot(const Vec3& l, const Vec3& r)
 {
 	return l.x * r.x + l.y * r.y + l.z * r.z;

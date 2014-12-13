@@ -410,7 +410,7 @@ static DWORD _conv1To255(float f, int bit)
 	return DWORD(f * 255) << bit;
 }
 
-static DWORD _convF4ToU32(XMFLOAT4 f)
+static DWORD _convF4ToU32(Vec4 f)
 {
 	return _conv1To255(f.x, 24) | _conv1To255(f.y, 16) | _conv1To255(f.z, 8) | _conv1To255(f.w, 0);
 }
@@ -617,7 +617,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 		c.uv = texCoords[i];
 		c.color = 0xffffffff;
 		if (i < nVertexColors) {
-			XMFLOAT4 f4 = vertexColors[i];
+			Vec4 f4 = vertexColors[i];
 			c.color = _convF4ToU32(f4);
 		}
 		color.push_back(c);

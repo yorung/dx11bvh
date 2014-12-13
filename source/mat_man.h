@@ -1,9 +1,9 @@
 struct Material
 {
-	XMFLOAT4 faceColor;
+	Vec4 faceColor;
 	float power;
-	XMFLOAT4 specular;
-	XMFLOAT4 emissive;
+	Vec4 specular;
+	Vec4 emissive;
 	TexMan::TMID tmid;
 	bool operator==(const Material& r) const;
 };
