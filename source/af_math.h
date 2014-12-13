@@ -75,6 +75,13 @@ struct Vec4
 #endif
 };
 
+struct ivec3
+{
+	int x, y, z;
+	ivec3() : x(0), y(0), z(0) {}
+	ivec3(int X, int Y, int Z) : x(X), y(Y), z(Z) {}
+};
+
 inline affloat dot(const Vec3& l, const Vec3& r)
 {
 	return l.x * r.x + l.y * r.y + l.z * r.z;
