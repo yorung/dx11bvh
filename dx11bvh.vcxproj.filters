@@ -104,9 +104,6 @@
     <ClCompile Include="source\mat_man.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="source\matirx_man.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="source\mesh_renderer11.cpp">
       <Filter>source</Filter>
     </ClCompile>
@@ -151,6 +148,9 @@
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\matrix_man.cpp">
+      <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
