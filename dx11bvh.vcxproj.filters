@@ -87,6 +87,9 @@
     <ClInclude Include="source\compute_shader_skinning.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="source\fps.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -150,6 +153,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\matrix_man.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\fps.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

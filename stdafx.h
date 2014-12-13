@@ -57,6 +57,7 @@ static const int BONE_MAX = 70;
 #include "source/grid_renderer.h"
 #include "source/water_surface.h"
 #include "source/helper.h"
+#include "source/fps.h"
 #include "source/post_effect_man.h"
 #include "source/compute_shader_man.h"
 #include "source/compute_shader_skinning.h"
