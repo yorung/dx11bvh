@@ -13,4 +13,4 @@ public:
 
 extern DebugRenderer debugRenderer;
 
-void CreateCone(Block& b, const Vec3& v1, const Vec3& v2, BONE_ID boneId, DWORD color);
+void CreateCone(Block& b, const Vec3& v1, const Vec3& v2, BONE_ID boneId, uint32_t color);

@@ -16,13 +16,13 @@ static void InitVertex(MeshVertex& v)
 	v.xyz.x = v.xyz.y = v.xyz.z = 0;
 }
 
-static void InitVertexColor(MeshColor& c, DWORD color)
+static void InitVertexColor(MeshColor& c, uint32_t color)
 {
 	c.color = color;
 	c.uv.x = c.uv.y = 0;
 }
 
-void CreateCone(Block& b, const Vec3& v1, const Vec3& v2, BONE_ID boneId, DWORD color)
+void CreateCone(Block& b, const Vec3& v1, const Vec3& v2, BONE_ID boneId, uint32_t color)
 {
 	float radius = 0.15f;
 	Vec3 boneDir = v2 - v1;

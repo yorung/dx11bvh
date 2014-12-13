@@ -9,7 +9,7 @@ public:
 
 struct TimedFloatKeys
 {
-	DWORD time;
+	uint32_t time;
 	Mat mat;
 };
 
@@ -78,7 +78,7 @@ struct MeshVertex
 
 struct MeshColor
 {
-	DWORD color;
+	uint32_t color;
 	Vec2 uv;
 };
 

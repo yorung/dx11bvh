@@ -392,7 +392,7 @@ BONE_ID Bvh::_getFrameIdByName(const char* name)
 	}
 	BvhFrame f;
 	assert(strlen(name) < sizeof(f.name));
-	strncpy(f.name, name, sizeof(f.name));
+	strcpy_s(f.name, sizeof(f.name), name);
 	f.parentId = -1;
 	f.childId = -1;
 	f.siblingId = -1;
