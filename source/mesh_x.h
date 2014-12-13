@@ -79,7 +79,7 @@ struct MeshVertex
 struct MeshColor
 {
 	DWORD color;
-	Vector2 uv;
+	Vec2 uv;
 };
 
 struct MeshSkin
