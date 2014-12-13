@@ -278,7 +278,7 @@ static MatMan::MMID _getMaterial(char*& p)
 	if (tx) {
 		textureFilename = _getString(tx);
 	}
-	mat.tmid = texMan.Create(textureFilename.c_str(), true);	// load it at current directory
+	mat.tmid = texMan.Create(textureFilename.c_str());	// load it at current directory
 	return matMan.Create(mat);
 }
 
@@ -369,7 +369,7 @@ void MeshX::CreateBoneMesh()
 	mat.emissive.y = 0.4f;
 	mat.emissive.z = 0.4f;
 	mat.emissive.w = 1.0f;
-	mat.tmid = texMan.Create("resource\\white.bmp", true);
+	mat.tmid = texMan.Create("resource\\white.bmp");
 
 	MaterialMap map;
 	map.materialId = matMan.Create(mat);

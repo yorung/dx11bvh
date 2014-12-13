@@ -2,7 +2,7 @@
 
 TexMan11 texMan;
 
-TexMan11::TMID TexMan11::Create(const char *name, bool for3D)
+TexMan11::TMID TexMan11::Create(const char *name)
 {
 	auto it = nameToId.find(name);
 	if (it != nameToId.end())

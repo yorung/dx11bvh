@@ -2,7 +2,7 @@ class TexMan11
 {
 public:
 	typedef int TMID;
-	TMID Create(const char *name, bool for3D);
+	TMID Create(const char *name);
 	void Destroy();
 	ID3D11ShaderResourceView* Get(TMID id);
 	SIZE GetSize(TMID id);
