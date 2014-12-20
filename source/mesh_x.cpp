@@ -79,20 +79,20 @@ static void _getFloat3Array(char*& p, std::vector<Vec3>& vertices, int nVertices
 	}
 }
 
-static void _getFloat2Array(char*& p, std::vector<Vector2>& vertices, int nVertices)
+static void _getFloat2Array(char*& p, std::vector<Vec2>& vertices, int nVertices)
 {
 	for (int i = 0; i < nVertices; i++) {
-		Vector2 f2;
+		Vec2 f2;
 		f2.x = _getF(p);
 		f2.y = _getF(p);
 		vertices.push_back(f2);
 	}
 }
 
-static void _getVertexColors(char*& p, std::vector<Vector4>& vertices, int nVertices)
+static void _getVertexColors(char*& p, std::vector<Vec4>& vertices, int nVertices)
 {
 	for (int i = 0; i < nVertices; i++) {
-		Vector4 f4;
+		Vec4 f4;
 		_getF(p);
 		f4.x = _getF(p);
 		f4.y = _getF(p);
@@ -440,7 +440,7 @@ BONE_ID MeshX::GetOrCreateFrameIdByName(const char* name)
 	}
 	Frame f;
 	assert(strlen(name) < sizeof(f.name));
-	strncpy(f.name, name, sizeof(f.name));
+	strcpy_s(f.name, sizeof(f.name), name);
 	f.parentId = -1;
 	f.childId = -1;
 	f.siblingId = -1;
@@ -514,7 +514,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 	p = _searchChildTag((char*)imgMesh, "MeshTextureCoords");
 	int nVerticesCoords = _getI(p);
 	assert(nVertices == nVerticesCoords || nVerticesCoords == 0);
-	std::vector<Vector2> texCoords;
+	std::vector<Vec2> texCoords;
 	_getFloat2Array(p, texCoords, nVerticesCoords);
 
 	if (nVertices > nVerticesCoords) {
@@ -523,7 +523,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 
 	p = _searchChildTag((char*)imgMesh, "MeshVertexColors");
 	int nVertexColors = _getI(p);
-	std::vector<Vector4> vertexColors;
+	std::vector<Vec4> vertexColors;
 	_getVertexColors(p, vertexColors, nVertexColors);
 
 	p = _searchChildTag((char*)imgMesh, "MeshNormals");
