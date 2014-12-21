@@ -1,13 +1,14 @@
 #include "stdafx.h"
 
-void *LoadFile(const char *fileName)
+#ifdef _MSC_VER
+void *LoadFile(const char *fileName, int* size)
 {
 	bool result = false;
-	FILE *f = fopen(fileName, "rb");
+	FILE *f = nullptr;
 	int _size;
 	void *ptr = NULL;
 
-	if (!f) {
+	if (fopen_s(&f, fileName, "rb")) {
 		return nullptr;
 	}
 
@@ -31,6 +32,9 @@ void *LoadFile(const char *fileName)
 		}
 	}
 	result = true;
+	if (size) {
+		*size = _size;
+	}
 DONE:
 	if (f) {
 		fclose(f);
@@ -44,7 +48,32 @@ DONE:
 		return nullptr;
 	}
 }
+#else
+void *LoadFile(const char *fileName, int* size)
+{
+	jclass myview = jniEnv->FindClass(boundJavaClass);
+	jmethodID method = jniEnv->GetStaticMethodID(myview, "loadIntoBytes", "(Ljava/lang/String;)[B");
+	if (method == 0) {
+		return nullptr;
+	}
 
+	jobject arrayAsJObject = jniEnv->CallStaticObjectMethod(myview, method, jniEnv->NewStringUTF(fileName));
+	jbyteArray array = (jbyteArray)arrayAsJObject;
+
+	jbyte* byteArray = jniEnv->GetByteArrayElements(array, NULL);
+	jsize arrayLen = jniEnv->GetArrayLength(array);
+
+	void* ptr = calloc(arrayLen + 1, 1);
+	memcpy(ptr, byteArray, arrayLen);
+	size = arrayLen;
+
+	jniEnv->ReleaseByteArrayElements(array, byteArray, 0);
+
+	return ptr;
+}
+#endif
+
+#ifdef _MSC_VER
 double GetTime()
 {
 	LARGE_INTEGER t, f;
@@ -52,6 +81,14 @@ double GetTime()
 	QueryPerformanceFrequency(&f);
 	return (double)t.QuadPart / f.QuadPart;
 }
+#else
+double GetTime()
+{
+	timespec t;
+	clock_gettime(CLOCK_MONOTONIC, &t);
+	return (double)t.tv_sec + (double)t.tv_nsec / 1000000000;
+}
+#endif
 
 float Random()
 {

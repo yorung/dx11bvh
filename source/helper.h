@@ -1,4 +1,4 @@
-void *LoadFile(const char *fileName);
+void *LoadFile(const char *fileName, int* size = nullptr);
 
 double GetTime();
 
