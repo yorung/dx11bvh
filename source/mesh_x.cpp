@@ -381,24 +381,24 @@ void MeshX::CreateBoneMesh()
 
 MeshX::MeshX(const char *fileName)
 {
-    char strPath[MAX_PATH];
-    strcpy_s(strPath, MAX_PATH, fileName);
+	char strPath[MAX_PATH];
+	strcpy_s(strPath, MAX_PATH, fileName);
 	std::for_each(strPath, strPath + strlen(strPath), [] (char& c) { c = c == '\\' ? '/' : c; });
-    const char* fileNameWithoutPath = fileName;
-    if (char* p = strrchr(strPath, '/')) {
-        *p = '\0';
+	const char* fileNameWithoutPath = fileName;
+	if (char* p = strrchr(strPath, '/')) {
+		*p = '\0';
 		fileNameWithoutPath = p + 1;
-    }
+	}
 
 	char strCWD[MAX_PATH];
-    GetCurrentDirectoryA(MAX_PATH, strCWD);
+	GetCurrentDirectoryA(MAX_PATH, strCWD);
 	if(!SetCurrentDirectoryA(strPath)) {
 		MessageBoxW(GetActiveWindow(), L"SetCurrentDirectoryA error", L"", MB_OK );
 	}
 
 	LoadSub(fileNameWithoutPath);
 	
-    SetCurrentDirectoryA(strCWD);
+	SetCurrentDirectoryA(strCWD);
 
 	m_meshRenderer.Init(m_block);
 
