@@ -3,6 +3,7 @@ class TexMan11
 public:
 	typedef int TMID;
 	TMID Create(const char *name);
+	TMID CreateWhiteTexture() { return Create("resource\\white.bmp"); }
 	void Destroy();
 	ID3D11ShaderResourceView* Get(TMID id);
 	SIZE GetSize(TMID id);
