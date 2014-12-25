@@ -269,7 +269,17 @@ void App::Draw()
 	float dist = 3 * scale;
 	Mat cam = translate(0, height, -dist) * q2m(Quat(Vec3(1,0,0), rotY)) * q2m(Quat(Vec3(0,1,0), rotX));
 	matrixMan.Set(MatrixMan::VIEW, fastInv(cam));
-	matrixMan.Set(MatrixMan::PROJ, XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, dist / 1000, dist * 1000));
+
+
+	Mat dx = XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, dist / 1000, dist * 1000);
+
+	float f = dist * 1000;
+	float n = dist / 1000;
+	Mat mine = Mat((float)1 / tanf(45 * XM_PI / 180 * 0.5f) / ((float)SCR_W / SCR_H), 0, 0, 0,
+		0, (float)1 / tanf(45 * XM_PI / 180 * 0.5f), 0, 0,
+		0, 0, f / (f - n), 1,
+		0, 0, -(n * f) / (f - n), 0);
+	matrixMan.Set(MatrixMan::PROJ, mine);
 
 	skyMan.Draw();
 //	gridRenderer.Draw();
