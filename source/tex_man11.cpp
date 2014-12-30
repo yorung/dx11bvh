@@ -27,6 +27,36 @@ TexMan11::TMID TexMan11::Create(const char *name)
 	return nameToId[name] = texs.size() - 1;
 }
 
+static ID3D11ShaderResourceView* CreateWhiteTexture()
+{
+//	CD3D11_TEXTURE2D_DESC desc(DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, 1, 1, D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
+	CD3D11_TEXTURE2D_DESC desc(DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1);
+	uint32_t white = 0xffffffff;
+	D3D11_SUBRESOURCE_DATA r = { &white, 4, 4 };
+	ID3D11Texture2D* tex = nullptr;
+	ID3D11ShaderResourceView* srv = nullptr;
+	deviceMan11.GetDevice()->CreateTexture2D(&desc, &r, &tex);
+	deviceMan11.GetDevice()->CreateShaderResourceView(tex, nullptr, &srv);
+	SAFE_RELEASE(tex);
+	return srv;
+}
+
+TexMan11::TMID TexMan11::CreateWhiteTexture()
+{
+	const std::string name = "$WHITE";
+	auto it = nameToId.find(name);
+	if (it != nameToId.end())
+	{
+		return it->second;
+	}
+	ID3D11ShaderResourceView* tex = ::CreateWhiteTexture();
+	if (!tex) {
+		return -1;
+	}
+	texs.push_back(tex);
+	return nameToId[name] = texs.size() - 1;
+}
+
 void TexMan11::Destroy()
 {
 	for (auto it = texs.begin(); it != texs.end(); it++)
