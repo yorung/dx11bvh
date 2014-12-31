@@ -76,6 +76,7 @@ void WaterSurface::UpdateVert(std::vector<WaterVert>& vert)
 
 WaterSurface::WaterSurface()
 {
+	texId = TexMan::INVALID_TMID;
 	pVertexBuffer = nullptr;
 	pIndexBuffer = nullptr;
 	pSamplerState = nullptr;

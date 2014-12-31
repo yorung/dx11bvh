@@ -2,6 +2,9 @@ class TexMan11
 {
 public:
 	typedef int TMID;
+	static const TMID INVALID_TMID = 0;
+	TexMan11();
+	~TexMan11();
 	TMID Create(const char *name);
 	TMID CreateWhiteTexture();
 	void Destroy();

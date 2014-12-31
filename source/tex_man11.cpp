@@ -2,6 +2,16 @@
 
 TexMan11 texMan;
 
+TexMan11::TexMan11()
+{
+	texs.push_back(nullptr);	// make ID 0 invalid
+}
+
+TexMan11::~TexMan11()
+{
+	Destroy();
+}
+
 TexMan11::TMID TexMan11::Create(const char *name)
 {
 	auto it = nameToId.find(name);
@@ -61,7 +71,7 @@ void TexMan11::Destroy()
 {
 	for (auto it = texs.begin(); it != texs.end(); it++)
 	{
-		(*it)->Release();
+		SAFE_RELEASE(*it);
 	}
 	texs.clear();
 }
