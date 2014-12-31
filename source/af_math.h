@@ -82,6 +82,17 @@ struct ivec3
 	ivec3(int X, int Y, int Z) : x(X), y(Y), z(Z) {}
 };
 
+struct ivec4
+{
+	int x, y, z, w;
+	ivec4() : x(0), y(0), z(0), w(0) {}
+	ivec4(int X, int Y, int Z, int W) : x(X), y(Y), z(Z), w(W) {}
+	ivec4 operator+(const ivec4& r) const { return ivec4(x + r.x, y + r.y, z + r.z, w + r.w); }
+	ivec4 operator+=(const ivec4& r) { return *this = *this + r; }
+	ivec4 operator/(int r) const { return ivec4(x / r, y / r, z / r, w / r); }
+	ivec4 operator/=(int r) { return *this = *this / r; }
+};
+
 inline affloat dot(const Vec3& l, const Vec3& r)
 {
 	return l.x * r.x + l.y * r.y + l.z * r.z;
@@ -430,4 +441,12 @@ inline Mat fastInv(const Mat& mtx)
 #undef m
 	r.SetRow(3, -transform(mtx.GetRow(3), r));
 	return r;
+}
+
+inline ivec4 uint32ToIvec4(uint32_t col) {
+	return ivec4(col >> 24, (col & 0x00ff0000) >> 16, (col & 0xff00) >> 8, col & 0xff);
+}
+
+inline uint32_t ivec4ToUint32(const ivec4& v) {
+	return (uint32_t(0xff && v.x) << 24) | (uint32_t(0xff & v.y) << 16) | (uint32_t(0xff & v.z) << 8) | (uint32_t(v.w) & 0xff);
 }

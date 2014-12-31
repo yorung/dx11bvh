@@ -42,10 +42,12 @@ static const int BONE_MAX = 70;
 
 // TODO: reference additional headers your program requires here
 #include "source/af_math.h"
+#include "source/dib.h"
 #include "source/device_man11.h"
 #include "source/buffer_man11.h"
 #include "source/tex_man11.h"
 #include "source/shader_man11.h"
+#include "source/font_man11.h"
 #include "source/sky_man11.h"
 #include "source/mat_man.h"
 #include "source/matrix_man.h"
