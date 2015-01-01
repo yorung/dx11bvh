@@ -53,3 +53,4 @@ AFbufObj afCreateIndexBuffer(const AFIndex* indi, int numIndi);
 AFbufObj afCreateQuadListIndexBuffer(int numQuads);
 AFbufObj afCreateDynamicVertexBuffer(int size);
 void afWriteBuffer(AFbufObj bo, const void* buf, int size);
+void afDrawIndexedTriangleList(AFbufObj ibo, int count, int start = 0);

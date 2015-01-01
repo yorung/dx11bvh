@@ -213,7 +213,7 @@ void FontMan11::Render()
 	UINT stride = sizeof(FontVertex);
 	UINT offset = 0;
 	deviceMan11.GetContext()->IASetVertexBuffers(0, 1, &vbo, &stride, &offset);
-//	afDrawIndexedTriangleList(ibo, )
+	afDrawIndexedTriangleList(ibo, numSprites * 6);
 }
 
 void FontMan11::DrawChar(Vec2& pos, int code)

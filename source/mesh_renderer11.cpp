@@ -160,11 +160,7 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 		const auto buf = bufferMan.Get(constantBufferId);
 		deviceMan11.GetContext()->VSSetConstantBuffers(0, 1, &buf);
 		deviceMan11.GetContext()->PSSetConstantBuffers(0, 1, &buf);
-
-		deviceMan11.GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		deviceMan11.GetContext()->IASetIndexBuffer(pIndexBuffer, AFIndexTypeToDevice, 0);
-		deviceMan11.GetContext()->DrawIndexed(matMap.faces * 3, matMap.faceStartIndex * 3, 0);
-//		afDrawIndexedTriangleList(ibo, )
+		afDrawIndexedTriangleList(pIndexBuffer, matMap.faces * 3, matMap.faceStartIndex * 3);
 	}
 }
 

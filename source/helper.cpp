@@ -154,3 +154,18 @@ AFbufObj afCreateQuadListIndexBuffer(int numQuads)
 	}
 	return afCreateIndexBuffer(&indi[0], numIndi);
 }
+
+#ifdef GL_TRUE
+void afDrawIndexedTriangleList(AFbufObj ibo, int count, int start)
+{
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glDrawElements(GL_TRIANGLES, matMap.faces * 3, GL_UNSIGNED_INT, (void*)(matMap.faceStartIndex * 3));
+}
+#else
+void afDrawIndexedTriangleList(AFbufObj ibo, int count, int start)
+{
+	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	deviceMan11.GetContext()->IASetIndexBuffer(ibo, AFIndexTypeToDevice, 0);
+	deviceMan11.GetContext()->DrawIndexed(count, start, 0);
+}
+#endif
