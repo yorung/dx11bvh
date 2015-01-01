@@ -15,12 +15,13 @@ class DIB {
 	bool Create(int w, int h);
 	bool Create(int w, int h, int bits);
 	bool LoadFromBmp(const char *file);
-	bool blt(HDC hdc, int x, int y);
-	bool blt(DIB *target, int x, int y, int w, int h, int srcX, int srcY);
-	bool blt(DIB& target, int dstX, int dstY);
-	bool applySoftAA(DIB& target);
+	bool Blt(HDC hdc, int x, int y);
+	bool Blt(DIB *target, int x, int y, int w, int h, int srcX, int srcY);
+	bool Blt(DIB& target, int dstX, int dstY);
+	bool ApplySoftAA(DIB& target);
 	void DibToGL();
 	void DibToGLFont();
+	void DibToDXFont();
 	void Clear();
 	HDC getDC() { return m_hdc; }
 	int getW() { return m_w; }

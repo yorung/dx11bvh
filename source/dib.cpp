@@ -117,6 +117,17 @@ void DIB::DibToGLFont()
 	}
 }
 
+void DIB::DibToDXFont()
+{
+	for (int y = 0; y < getH(); y++) {
+		for (int x = 0; x < getW(); x++) {
+			pixel px = getPixel(x, y);
+			px |= 0xffffff00;
+			setPixel(x, y, px);
+		}
+	}
+}
+
 void DIB::FillAlpha()
 {
 	for (int y = 0; y < getH(); y++) {
@@ -161,7 +172,6 @@ bool DIB::LoadFromBmp(const char *file)
 	BITMAPINFO *bi;
 	void *bits;
 	void *tmp = NULL;
-	int from;
 
 	int size;
 	tmp = LoadFile(file, &size);
@@ -195,7 +205,7 @@ end:
 	return result;
 }
 
-bool DIB::blt(DIB& target, int dstX, int dstY)
+bool DIB::Blt(DIB& target, int dstX, int dstY)
 {
 	if (dstX < 0 || dstY < 0) {
 		return false;
@@ -214,7 +224,7 @@ bool DIB::blt(DIB& target, int dstX, int dstY)
 	return true;
 }
 
-bool DIB::applySoftAA(DIB& target)
+bool DIB::ApplySoftAA(DIB& target)
 {
 	if (getW() != target.getW() * 2) {
 		return false;
