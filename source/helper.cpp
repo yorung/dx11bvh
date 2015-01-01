@@ -65,7 +65,9 @@ void *LoadFile(const char *fileName, int* size)
 
 	void* ptr = calloc(arrayLen + 1, 1);
 	memcpy(ptr, byteArray, arrayLen);
-	size = arrayLen;
+	if (size) {
+		*size = arrayLen;
+	}
 
 	jniEnv->ReleaseByteArrayElements(array, byteArray, 0);
 
@@ -93,4 +95,45 @@ double GetTime()
 float Random()
 {
 	return (float)rand() / RAND_MAX;
+}
+
+#ifdef GL_TRUE
+GLuint afCreateIndexBuffer(const unsigned short* indi, int numIndi)
+{
+	GLuint ibo;
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndi * sizeof(unsigned short), &indi[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	return ibo;
+}
+#else
+ID3D11Buffer* afCreateIndexBuffer(const unsigned short* indi, int numIndi)
+{
+	ID3D11Buffer* indexBuffer;
+	D3D11_SUBRESOURCE_DATA subresData = { indi, 0, 0 };
+	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numIndi * sizeof(unsigned short), D3D11_BIND_INDEX_BUFFER), &subresData, &indexBuffer);
+	return indexBuffer;
+}
+ID3D11Buffer* afCreateDynamicVertexBuffer(int size)
+{
+	ID3D11Buffer* vbo;
+	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(size, D3D11_BIND_VERTEX_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE), nullptr, &vbo);
+	return vbo;
+}
+#endif
+
+AFbufObj afCreateQuadListIndexBuffer(int numQuads)
+{
+	std::vector<unsigned short> indi;
+	int numIndi = numQuads * 6;
+	indi.resize(numIndi);
+	for (int i = 0; i < numIndi; i++)
+	{
+		int rectIdx = i / 6;
+		int odd = (i / 3) & 1;
+		int vertIdx = i % 3;
+		indi[i] = rectIdx * 4 + odd + vertIdx;
+	}
+	return afCreateIndexBuffer(&indi[0], numIndi);
 }

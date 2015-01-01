@@ -2,6 +2,7 @@ class ShaderMan11
 {
 public:
 	typedef int SMID;
+	static const SMID INVALID_SMID = -1;
 private:
 	struct Effect
 	{

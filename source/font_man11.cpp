@@ -11,6 +11,19 @@
 #define TEX_W		512
 #define TEX_H		512
 
+struct FontVertex {
+	Vec2 pos;
+	Vec2 coord;
+};
+
+static Vec2 fontVertAlign[] =
+{
+	Vec2(0, 0),
+	Vec2(0, 1),
+	Vec2(1, 0),
+	Vec2(1, 1),
+};
+
 static BOOL isKorean(int code)
 {
 	return IS_HANGUL2(code) || code < 0x80;
@@ -43,6 +56,7 @@ FontMan11::FontMan11()
 	memset(uniToIndex, 0, sizeof(uniToIndex));
 	cursor = curX = curY = 0;
 	texture = TexMan::INVALID_TMID;
+	shader = ShaderMan::INVALID_SMID;
 	dirty = false;
 }
 
@@ -58,6 +72,16 @@ bool FontMan11::Init()
 		goto DONE;
 	}
 	texture = texMan.CreateDynamicTexture("$FontMan", TEX_W, TEX_H);
+
+	static D3D11_INPUT_ELEMENT_DESC elements[] = {
+		{ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 8, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+	shader = shaderMan.Create("font", elements, dimof(elements));
+
+	ibo = afCreateQuadListIndexBuffer(SPRITE_MAX);
+	vbo = afCreateDynamicVertexBuffer(SPRITE_MAX * sizeof(FontVertex));
+
 	result = true;
 DONE:
 	return result;
@@ -69,7 +93,12 @@ void FontMan11::Destroy()
 //	texMan.Delete(texture);
 //	texture = TexMan::INVALID_TMID;
 
+//  shaderMan.Delete(shader);
+//	shader = ShaderMan::INVALID_SMID;
+
 	texSrc.Destroy();
+	afSafeDeleteBuffer(ibo);
+	afSafeDeleteBuffer(vbo);
 }
 
 bool FontMan11::Build(int index, int code)
@@ -154,7 +183,7 @@ int FontMan11::Cache(int code)
 	return index;
 }
 
-void FontMan11::FlushTexture()
+void FontMan11::FlushToTexture()
 {
 	if (!dirty) {
 		return;
@@ -163,55 +192,49 @@ void FontMan11::FlushTexture()
 	texMan.Write(texture, texSrc.ReferPixels());
 }
 
-/*
-void FontMan11::DrawChar(int code)
+void FontMan11::Render()
 {
-	int index = Cache(code);
-	double x_size = code < 256 ? 0.5 : 1;
-	if (dirty) {
-		ogCreateTexture(texture, &texSrc, OG_FILTER_NONE, TRUE);
-		dirty = false;
+	for (int i = 0; i < numSprites; i++) {
+		Cache(charSprites[i].code);
 	}
+	FlushToTexture();
 
-	glBindTexture(GL_TEXTURE_2D, texture);
-	ogAlpha(TRUE);
+	static FontVertex verts[4 * SPRITE_MAX];
+	for (int i = 0; i < numSprites; i++) {
+		CharSprite& c = charSprites[i];
+		float xSize = c.code < 256 ? 0.5f : 1.0f;
 
-	glEnable(GL_TEXTURE_2D);
-	glDisable(GL_CULL_FACE);
-
-	glBegin(GL_QUADS);
-	glNormal3d(0, 0, 1);
-	{
-		const CharCache& c = charCache[index];
-		double coordx[] = { (double)c.x / TEX_W, (double)(c.x + c.w) / TEX_W, (double)(c.x + c.w) / TEX_W, (double)c.x / TEX_W };
-		//		double coordy[] = { (double)c.y / TEX_H, (double)c.y / TEX_H, (double)(c.y + c.h) / TEX_H, (double)(c.y + c.h) / TEX_H };
-		double coordy[] = { (double)(c.y + c.h) / TEX_H, (double)(c.y + c.h) / TEX_H, (double)c.y / TEX_H, (double)c.y / TEX_H };
-		double vertx[] = { 0, 1, 1, 0 };
-		double verty[] = { 0, 0, 1, 1 };
-		for (int i = 0; i < 4; i++){
-			glTexCoord2d(coordx[i], coordy[i]);
-			//	glTexCoord2d(vertx[i], 1 - verty[i]);
-			glVertex3d(vertx[i], 1 - verty[i], 0);
+		for (int j = 0; j < dimof(fontVertAlign); j++) {
+			verts[i * 4 + j].pos = c.pos + fontVertAlign[j] * Vec2(xSize, 1.0f) * Vec2(FONT_MAN_CHAR_W, FONT_MAN_CHAR_H);
 		}
 	}
-	glEnd();
-	glTranslated(x_size, 0, 0);
-	ogAlpha(FALSE);
+	
+
 }
 
-void FontMan11::DrawText(const WCHAR *text)
+void FontMan11::DrawChar(Vec2& pos, int code)
 {
-	int len = wcslen(text);
-	for (int i = 0; i < len; i++) {
-		Cache(text[i]);
+	int index = Cache(code);
+	float xSize = code < 256 ? 0.5f : 1.0f;
+
+	if (numSprites >= SPRITE_MAX) {
+		return;
 	}
 
-	glPushMatrix();
-	glScalef(FONT_MAN_CHAR_W, FONT_MAN_CHAR_W, 1);
-	for (int i = 0; i < len; i++)
-		fontMan.DrawChar(text[i]);
-	glPopMatrix();
+	CharSprite& c = charSprites[numSprites++];
+	c.code = code;
+	c.pos = pos;
+
+	pos.x += xSize;
 }
-*/
+
+void FontMan11::DrawText(Vec2 pos, const WCHAR *text)
+{
+	int len = wcslen(text);
+	for (int i = 0; i < len; i++)
+	{
+		DrawChar(pos, text[i]);
+	}
+}
 
 extern FontMan11 fontMan11;
