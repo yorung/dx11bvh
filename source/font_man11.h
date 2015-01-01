@@ -12,10 +12,14 @@ class FontMan11
 	TexMan::TMID texture;
 	DIB texSrc;
 	bool dirty;
+	bool Build(int index, int code);
+	int Cache(int code);
 public:
 	FontMan11();
-	int Cache(int code);
-	bool Build(int index, int code);
+	~FontMan11();
+	bool Init();
+	void Destroy();
+	void FlushTexture();
 };
 
 extern FontMan11 fontMan11;

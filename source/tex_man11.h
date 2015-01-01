@@ -7,9 +7,11 @@ public:
 	~TexMan11();
 	TMID Create(const char *name);
 	TMID CreateWhiteTexture();
+	TMID CreateDynamicTexture(const char* name, int w, int h);
 	void Destroy();
 	ID3D11ShaderResourceView* Get(TMID id);
 	SIZE GetSize(TMID id);
+	void Write(TMID id, const void* buf);
 private:
 	std::map<std::string, TMID> nameToId;
 	std::vector<ID3D11ShaderResourceView*> texs;

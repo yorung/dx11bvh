@@ -46,6 +46,32 @@ FontMan11::FontMan11()
 	dirty = false;
 }
 
+FontMan11::~FontMan11()
+{
+	Destroy();
+}
+
+bool FontMan11::Init()
+{
+	bool result = false;
+	if (!texSrc.Create(TEX_W, TEX_H)) {
+		goto DONE;
+	}
+	texture = texMan.CreateDynamicTexture("$FontMan", TEX_W, TEX_H);
+	result = true;
+DONE:
+	return result;
+}
+
+void FontMan11::Destroy()
+{
+	// TODO: delete texture
+//	texMan.Delete(texture);
+//	texture = TexMan::INVALID_TMID;
+
+	texSrc.Destroy();
+}
+
 bool FontMan11::Build(int index, int code)
 {
 	HFONT font = NULL, fontOld = NULL;
@@ -127,6 +153,16 @@ int FontMan11::Cache(int code)
 	}
 	return index;
 }
+
+void FontMan11::FlushTexture()
+{
+	if (!dirty) {
+		return;
+	}
+	dirty = false;
+	texMan.Write(texture, texSrc.ReferPixels());
+}
+
 /*
 void FontMan11::DrawChar(int code)
 {

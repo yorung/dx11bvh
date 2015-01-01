@@ -39,7 +39,6 @@ TexMan11::TMID TexMan11::Create(const char *name)
 
 static ID3D11ShaderResourceView* CreateWhiteTexture()
 {
-//	CD3D11_TEXTURE2D_DESC desc(DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, 1, 1, D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
 	CD3D11_TEXTURE2D_DESC desc(DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1);
 	uint32_t white = 0xffffffff;
 	D3D11_SUBRESOURCE_DATA r = { &white, 4, 4 };
@@ -51,6 +50,33 @@ static ID3D11ShaderResourceView* CreateWhiteTexture()
 	return srv;
 }
 
+static ID3D11ShaderResourceView* CreateDynamicTexture(int w, int h)
+{
+	CD3D11_TEXTURE2D_DESC desc(DXGI_FORMAT_R8G8B8A8_UNORM, w, h, 1, 1, D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
+	ID3D11Texture2D* tex = nullptr;
+	ID3D11ShaderResourceView* srv = nullptr;
+	deviceMan11.GetDevice()->CreateTexture2D(&desc, nullptr, &tex);
+	deviceMan11.GetDevice()->CreateShaderResourceView(tex, nullptr, &srv);
+	SAFE_RELEASE(tex);
+	return srv;
+}
+
+TexMan11::TMID TexMan11::CreateDynamicTexture(const char* name, int w, int h)
+{
+	auto it = nameToId.find(name);
+	if (it != nameToId.end())
+	{
+		return it->second;
+	}
+	ID3D11ShaderResourceView* tex = ::CreateDynamicTexture(w, h);
+	if (!tex) {
+		return INVALID_TMID;
+	}
+	texs.push_back(tex);
+	return nameToId[name] = texs.size() - 1;
+}
+
+
 TexMan11::TMID TexMan11::CreateWhiteTexture()
 {
 	const std::string name = "$WHITE";
@@ -61,7 +87,7 @@ TexMan11::TMID TexMan11::CreateWhiteTexture()
 	}
 	ID3D11ShaderResourceView* tex = ::CreateWhiteTexture();
 	if (!tex) {
-		return -1;
+		return INVALID_TMID;
 	}
 	texs.push_back(tex);
 	return nameToId[name] = texs.size() - 1;
@@ -106,4 +132,27 @@ SIZE TexMan11::GetSize(TMID id)
 	sz.cy = (int)desc.Height;
 
 	return sz;
+}
+
+void TexMan11::Write(TMID id, const void* buf)
+{
+	ID3D11ShaderResourceView* view = Get(id);
+	assert(view);
+	ID3D11Resource* res;
+	view->GetResource(&res);
+	assert(res);
+	ID3D11Texture2D* tx;
+	res->QueryInterface(__uuidof(ID3D11Texture2D), (void**)(&tx));
+	assert(tx);
+	SAFE_RELEASE(res);
+
+	D3D11_TEXTURE2D_DESC desc;
+	tx->GetDesc(&desc);
+
+	D3D11_MAPPED_SUBRESOURCE m;
+	HRESULT hr = deviceMan11.GetContext()->Map(tx, 0, D3D11_MAP_WRITE_DISCARD, 0, &m);
+	memcpy(m.pData, buf, desc.Width * desc.Height * 4);
+	deviceMan11.GetContext()->Unmap(tx, 0);
+
+	SAFE_RELEASE(tx);
 }

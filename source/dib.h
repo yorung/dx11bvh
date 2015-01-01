@@ -29,5 +29,5 @@ class DIB {
 	pixel getPixel(int x, int y){ return *referPixel(x, y); }
 	void setPixel(int x, int y, pixel px){ *referPixel(x, y) = px; }
 	pixel *referPixel(int x, int y){ return (pixel*)((BYTE*)m_p + x * sizeof(pixel) + y * m_pitch); }
-	pixel *referPixels(){ return (pixel*)m_p; }
+	pixel *ReferPixels(){ return (pixel*)m_p; }
 };
