@@ -283,7 +283,7 @@ void App::Draw()
 
 	skyMan.Draw();
 //	gridRenderer.Draw();
-//	waterSurface.Draw();
+	waterSurface.Draw();
 
 	sprite->Begin();
 	

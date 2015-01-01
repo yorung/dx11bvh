@@ -90,8 +90,8 @@ WaterSurface::~WaterSurface()
 
 void WaterSurface::Destroy()
 {
-	SAFE_RELEASE(pIndexBuffer);
-	SAFE_RELEASE(pVertexBuffer);
+	afSafeDeleteBuffer(pIndexBuffer);
+	afSafeDeleteBuffer(pVertexBuffer);
 	SAFE_RELEASE(pSamplerState);
 	SAFE_RELEASE(pDSState);
 }
@@ -100,7 +100,7 @@ void WaterSurface::Init()
 {
 	Destroy();
 
-	std::vector<DWORD> indi;
+	std::vector<unsigned short> indi;
 	std::vector<WaterVert> vert;
 	UpdateVert(vert);
 
@@ -122,7 +122,7 @@ void WaterSurface::Init()
 	int sizeVertices = vert.size() * sizeof(WaterVert);
 	int sizeIndices = indi.size() * sizeof(DWORD);
 	void* vertices = &vert[0];
-	void* indices = &indi[0];
+	unsigned short* indices = &indi[0];
 	lines = indi.size() / 2;
 
 	static D3D11_INPUT_ELEMENT_DESC layout[] = {
@@ -132,10 +132,8 @@ void WaterSurface::Init()
 	texId = texMan.Create("resource\\Tiny_skin.dds");
 	shaderId = shaderMan.Create("fx\\water_surface.fx", layout, dimof(layout));
 
-	D3D11_SUBRESOURCE_DATA subresData = { vertices, 0, 0 };
-	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeVertices, D3D11_BIND_VERTEX_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE), &subresData, &pVertexBuffer);
-	subresData.pSysMem = indices;
-	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeIndices, D3D11_BIND_INDEX_BUFFER), &subresData, &pIndexBuffer);
+	pVertexBuffer = afCreateDynamicVertexBuffer(sizeVertices);
+	pIndexBuffer = afCreateIndexBuffer(indices, indi.size());
 	if (constantBufferId < 0) {
 		constantBufferId = bufferMan.Create(sizeof(WaterConstantBuffer));
 	}
@@ -171,7 +169,7 @@ void WaterSurface::Draw()
 
 	UINT strides[] = { sizeof(WaterVert) };
 	UINT offsets[] = { 0 };
-	deviceMan11.GetContext()->IASetIndexBuffer(pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	deviceMan11.GetContext()->IASetIndexBuffer(pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 	deviceMan11.GetContext()->IASetVertexBuffers(0, 1, &pVertexBuffer, strides, offsets);
 
 	WaterConstantBuffer cBuf;
