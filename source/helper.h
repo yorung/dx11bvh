@@ -49,3 +49,4 @@ inline void afSafeDeleteBuffer(AFbufObj& b)
 AFbufObj afCreateIndexBuffer(const unsigned short* indi, int numIndi);
 AFbufObj afCreateQuadListIndexBuffer(int numQuads);
 AFbufObj afCreateDynamicVertexBuffer(int size);
+void afWriteBuffer(AFbufObj bo, const void* buf, int size);

@@ -115,12 +115,29 @@ ID3D11Buffer* afCreateIndexBuffer(const unsigned short* indi, int numIndi)
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numIndi * sizeof(unsigned short), D3D11_BIND_INDEX_BUFFER), &subresData, &indexBuffer);
 	return indexBuffer;
 }
+
 ID3D11Buffer* afCreateDynamicVertexBuffer(int size)
 {
 	ID3D11Buffer* vbo;
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(size, D3D11_BIND_VERTEX_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE), nullptr, &vbo);
 	return vbo;
 }
+
+void afWriteBuffer(ID3D11Buffer* p, const void* buf, int size)
+{
+#ifdef _DEBUG
+	D3D11_BUFFER_DESC desc;
+	p->GetDesc(&desc);
+	if (size > (int)desc.ByteWidth) {
+		return;
+	}
+#endif
+	D3D11_MAPPED_SUBRESOURCE m;
+	HRESULT hr = deviceMan11.GetContext()->Map(p, 0, D3D11_MAP_WRITE_DISCARD, 0, &m);
+	memcpy(m.pData, buf, size);
+	deviceMan11.GetContext()->Unmap(p, 0);
+}
+
 #endif
 
 AFbufObj afCreateQuadListIndexBuffer(int numQuads)

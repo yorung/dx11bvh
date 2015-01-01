@@ -148,10 +148,7 @@ void WaterSurface::Update()
 {
 	std::vector<WaterVert> vert;
 	UpdateVert(vert);
-	D3D11_MAPPED_SUBRESOURCE r;
-	deviceMan11.GetContext()->Map(pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &r);
-	memcpy(r.pData, &vert[0], vert.size() * sizeof(WaterVert));
-	deviceMan11.GetContext()->Unmap(pVertexBuffer, 0);
+	afWriteBuffer(pVertexBuffer, &vert[0], vert.size() * sizeof(WaterVert));
 }
 
 void WaterSurface::Draw()

@@ -36,9 +36,5 @@ void BufferMan::Write(BMID id, const void* buf)
 	auto p = Get(id);
 	D3D11_BUFFER_DESC desc;
 	p->GetDesc(&desc);
-
-	D3D11_MAPPED_SUBRESOURCE m;
-	HRESULT hr = deviceMan11.GetContext()->Map(p, 0, D3D11_MAP_WRITE_DISCARD, 0, &m);
-	memcpy(m.pData, buf, desc.ByteWidth);
-	deviceMan11.GetContext()->Unmap(p, 0);
+	afWriteBuffer(p, buf, desc.ByteWidth);
 }
