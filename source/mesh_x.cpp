@@ -338,7 +338,7 @@ void MeshX::CreateBoneMesh()
 			continue;
 		}
 
-		static const DWORD depthToColor[] = {
+		static const uint32_t depthToColor[] = {
 			0xffffffff,
 			0xffffff00,
 			0xffff00ff,
@@ -405,12 +405,12 @@ MeshX::MeshX(const char *fileName)
 	CreateBoneMesh();
 }
 
-static DWORD _conv1To255(float f, int bit)
+static uint32_t _conv1To255(float f, int bit)
 {
-	return DWORD(f * 255) << bit;
+	return uint32_t(f * 255) << bit;
 }
 
-static DWORD _convF4ToU32(Vec4 f)
+static uint32_t _convF4ToU32(Vec4 f)
 {
 	return _conv1To255(f.x, 24) | _conv1To255(f.y, 16) | _conv1To255(f.z, 8) | _conv1To255(f.w, 0);
 }
@@ -804,7 +804,7 @@ bool MeshX::UnlinkFrame(BONE_ID id)
 	f.parentId = -1;
 
 	for (auto& i : m_animationSets) {
-		auto& j = i.animations.find(id);
+		const auto& j = i.animations.find(id);
 		if (j != i.animations.end()) {
 			i.animations.erase(j);
 		}
@@ -881,7 +881,7 @@ static void ParseAnimationKeys(char* p, Animation& animation)
 		int num = _getI(key);
 		for (int i = 0; i < num; i++) {
 			TimedFloatKeys k;
-			k.time = (DWORD)_getI(key);
+			k.time = (uint32_t)_getI(key);
 			int nValues = _getI(key);
 			switch(keys.keyType) {
 			case 0:		// rotation

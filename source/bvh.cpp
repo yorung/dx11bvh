@@ -296,24 +296,7 @@ void Bvh::CreateBoneTypeToIdTbl()
 
 Bvh::Bvh(const char *fileName)
 {
-    char strPath[MAX_PATH];
-    strcpy_s(strPath, MAX_PATH, fileName);
-	std::for_each(strPath, strPath + strlen(strPath), [] (char& c) { c = c == '\\' ? '/' : c; });
-    const char* fileNameWithoutPath = fileName;
-    if (char* p = strrchr(strPath, '/')) {
-        *p = '\0';
-		fileNameWithoutPath = p + 1;
-    }
-
-	char strCWD[MAX_PATH];
-    GetCurrentDirectoryA(MAX_PATH, strCWD);
-	if(!SetCurrentDirectoryA(strPath)) {
-		MessageBoxW(GetActiveWindow(), L"SetCurrentDirectoryA error", L"", MB_OK );
-	}
-
-	LoadSub(fileNameWithoutPath);
-	
-    SetCurrentDirectoryA(strCWD);
+	LoadSub(fileName);
 
 	CalcCombinedOffsets();
 	for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++) {
@@ -344,7 +327,7 @@ void Bvh::CreateBoneMesh()
 		Vec3 v1 = f1.offsetCombined;
 		Vec3 v2 = f2.offsetCombined;
 
-		static const DWORD depthToColor[] = {
+		static const uint32_t depthToColor[] = {
 			0xffffffff,
 			0xffffff00,
 			0xffff00ff,
