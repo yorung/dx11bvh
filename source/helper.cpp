@@ -98,21 +98,21 @@ float Random()
 }
 
 #ifdef GL_TRUE
-GLuint afCreateIndexBuffer(const unsigned short* indi, int numIndi)
+GLuint afCreateIndexBuffer(const AFIndex* indi, int numIndi)
 {
 	GLuint ibo;
 	glGenBuffers(1, &ibo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndi * sizeof(unsigned short), &indi[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndi * sizeof(AFIndex), &indi[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	return ibo;
 }
 #else
-ID3D11Buffer* afCreateIndexBuffer(const unsigned short* indi, int numIndi)
+ID3D11Buffer* afCreateIndexBuffer(const AFIndex* indi, int numIndi)
 {
 	ID3D11Buffer* indexBuffer;
 	D3D11_SUBRESOURCE_DATA subresData = { indi, 0, 0 };
-	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numIndi * sizeof(unsigned short), D3D11_BIND_INDEX_BUFFER), &subresData, &indexBuffer);
+	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numIndi * sizeof(AFIndex), D3D11_BIND_INDEX_BUFFER), &subresData, &indexBuffer);
 	return indexBuffer;
 }
 
@@ -142,7 +142,7 @@ void afWriteBuffer(ID3D11Buffer* p, const void* buf, int size)
 
 AFbufObj afCreateQuadListIndexBuffer(int numQuads)
 {
-	std::vector<unsigned short> indi;
+	std::vector<AFIndex> indi;
 	int numIndi = numQuads * 6;
 	indi.resize(numIndi);
 	for (int i = 0; i < numIndi; i++)

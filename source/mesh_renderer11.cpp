@@ -48,7 +48,7 @@ void MeshRenderer11::Init(const Block& block)
 	}
 }
 
-void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const MeshColor* color, const MeshSkin* skin, int numIndices, const unsigned* indices)
+void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const MeshColor* color, const MeshSkin* skin, int numIndices, const AFIndex* indices)
 {
 	Destroy();
 
@@ -68,7 +68,7 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 	subresData.pSysMem = color;
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshColor), D3D11_BIND_VERTEX_BUFFER), &subresData, &colorBuffer);
 	subresData.pSysMem = indices;
-	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numIndices * sizeof(unsigned), D3D11_BIND_INDEX_BUFFER), &subresData, &pIndexBuffer);
+	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numIndices * sizeof(AFIndex), D3D11_BIND_INDEX_BUFFER), &subresData, &pIndexBuffer);
 	if (constantBufferId < 0) {
 		constantBufferId = bufferMan.Create(sizeof(MeshConstantBuffer));
 	}
@@ -115,7 +115,6 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 {
 	Calc(BoneMatrices, block);
 
-	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	shaderMan.Apply(shaderId);
 
 	Mat matWorld, matView, matProj;
@@ -126,7 +125,6 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 	deviceMan11.GetContext()->OMSetDepthStencilState(pDSState, 1);
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
 
-	deviceMan11.GetContext()->IASetIndexBuffer(pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 	UINT strides[] = { sizeof(MeshColor) };
 	UINT offsets[] = { 0 };
 	deviceMan11.GetContext()->IASetVertexBuffers(0, 1, &colorBuffer, strides, offsets);
@@ -163,7 +161,10 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 		deviceMan11.GetContext()->VSSetConstantBuffers(0, 1, &buf);
 		deviceMan11.GetContext()->PSSetConstantBuffers(0, 1, &buf);
 
+		deviceMan11.GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		deviceMan11.GetContext()->IASetIndexBuffer(pIndexBuffer, AFIndexTypeToDevice, 0);
 		deviceMan11.GetContext()->DrawIndexed(matMap.faces * 3, matMap.faceStartIndex * 3, 0);
+//		afDrawIndexedTriangleList(ibo, )
 	}
 }
 

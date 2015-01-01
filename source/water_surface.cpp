@@ -100,7 +100,7 @@ void WaterSurface::Init()
 {
 	Destroy();
 
-	std::vector<unsigned short> indi;
+	std::vector<AFIndex> indi;
 	std::vector<WaterVert> vert;
 	UpdateVert(vert);
 
@@ -120,9 +120,9 @@ void WaterSurface::Init()
 	}
 
 	int sizeVertices = vert.size() * sizeof(WaterVert);
-	int sizeIndices = indi.size() * sizeof(DWORD);
+	int sizeIndices = indi.size() * sizeof(AFIndex);
 	void* vertices = &vert[0];
-	unsigned short* indices = &indi[0];
+	AFIndex* indices = &indi[0];
 	lines = indi.size() / 2;
 
 	static D3D11_INPUT_ELEMENT_DESC layout[] = {
@@ -155,8 +155,6 @@ void WaterSurface::Draw()
 {
 	Update();
 
-	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-//	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
 	shaderMan.Apply(shaderId);
 
 	deviceMan11.GetContext()->OMSetDepthStencilState(pDSState, 1);
@@ -166,7 +164,8 @@ void WaterSurface::Draw()
 
 	UINT strides[] = { sizeof(WaterVert) };
 	UINT offsets[] = { 0 };
-	deviceMan11.GetContext()->IASetIndexBuffer(pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	deviceMan11.GetContext()->IASetIndexBuffer(pIndexBuffer, AFIndexTypeToDevice, 0);
 	deviceMan11.GetContext()->IASetVertexBuffers(0, 1, &pVertexBuffer, strides, offsets);
 
 	WaterConstantBuffer cBuf;

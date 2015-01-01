@@ -208,8 +208,12 @@ void FontMan11::Render()
 			verts[i * 4 + j].pos = c.pos + fontVertAlign[j] * Vec2(xSize, 1.0f) * Vec2(FONT_MAN_CHAR_W, FONT_MAN_CHAR_H);
 		}
 	}
-	
-
+	afWriteBuffer(vbo, verts, 4 * numSprites * sizeof(FontVertex));
+	shaderMan.Apply(shader);
+	UINT stride = sizeof(FontVertex);
+	UINT offset = 0;
+	deviceMan11.GetContext()->IASetVertexBuffers(0, 1, &vbo, &stride, &offset);
+//	afDrawIndexedTriangleList(ibo, )
 }
 
 void FontMan11::DrawChar(Vec2& pos, int code)

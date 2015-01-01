@@ -25,9 +25,12 @@ template <class T> inline void SAFE_RELEASE(T& p)
 #define XM_2PI (XM_PI * 2)
 #endif
 
+typedef unsigned short AFIndex;
 #ifdef GL_TRUE
+#define AFIndexTypeToDevice GL_UNSIGNED_SHORT
 typedef GLuint AFbufObj;
 #else
+#define AFIndexTypeToDevice DXGI_FORMAT_R16_UINT
 typedef ID3D11Buffer* AFbufObj;
 #endif
 
@@ -46,7 +49,7 @@ inline void afSafeDeleteBuffer(AFbufObj& b)
 }
 #endif
 
-AFbufObj afCreateIndexBuffer(const unsigned short* indi, int numIndi);
+AFbufObj afCreateIndexBuffer(const AFIndex* indi, int numIndi);
 AFbufObj afCreateQuadListIndexBuffer(int numQuads);
 AFbufObj afCreateDynamicVertexBuffer(int size);
 void afWriteBuffer(AFbufObj bo, const void* buf, int size);

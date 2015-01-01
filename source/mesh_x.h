@@ -110,7 +110,7 @@ struct Block
 	std::vector<MeshVertex> vertices;
 	std::vector<MeshColor> color;
 	std::vector<MeshSkin> skin;
-	std::vector<unsigned> indices;
+	std::vector<AFIndex> indices;
 	std::vector<MaterialMap> materialMaps;
 	void Clear()
 	{

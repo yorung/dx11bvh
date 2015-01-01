@@ -126,7 +126,7 @@ static void _getMatrix(char*& p, Mat& m)
 	m._44 = _getF(p);
 }
 
-static int _getIndices(char*& p, std::vector<unsigned>& indices, int nOrgFaces, std::vector<bool>& isOrgFace4Vertices)
+static int _getIndices(char*& p, std::vector<AFIndex>& indices, int nOrgFaces, std::vector<bool>& isOrgFace4Vertices)
 {
 	int nDividedTotalFaces = 0;
 	for (int i = 0; i < nOrgFaces; i++) {
@@ -532,7 +532,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 	_getFloat3Array(p, normals, nNormals);
 	int nOrgNormalFaces = _getI(p);
 	std::vector<bool> isOrgFace4VerticesNormal;
-	std::vector<unsigned> normalIndices;
+	std::vector<AFIndex> normalIndices;
 	int nDividedTotalFacesNormal = _getIndices(p, normalIndices, nOrgNormalFaces, isOrgFace4VerticesNormal);
 	if (p) {
 		assert(nDividedTotalFacesNormal == nDividedTotalFaces);
