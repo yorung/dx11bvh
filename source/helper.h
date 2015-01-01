@@ -28,10 +28,10 @@ template <class T> inline void SAFE_RELEASE(T& p)
 typedef unsigned short AFIndex;
 #ifdef GL_TRUE
 #define AFIndexTypeToDevice GL_UNSIGNED_SHORT
-typedef GLuint AFbufObj;
+typedef GLuint AFBufObj;
 #else
 #define AFIndexTypeToDevice DXGI_FORMAT_R16_UINT
-typedef ID3D11Buffer* AFbufObj;
+typedef ID3D11Buffer* AFBufObj;
 #endif
 
 #ifdef GL_TRUE
@@ -43,14 +43,15 @@ inline void afSafeDeleteBuffer(GLuint& b)
 	}
 }
 #else
-inline void afSafeDeleteBuffer(AFbufObj& b)
+inline void afSafeDeleteBuffer(AFBufObj& b)
 {
 	SAFE_RELEASE(b);
 }
 #endif
 
-AFbufObj afCreateIndexBuffer(const AFIndex* indi, int numIndi);
-AFbufObj afCreateQuadListIndexBuffer(int numQuads);
-AFbufObj afCreateDynamicVertexBuffer(int size);
-void afWriteBuffer(AFbufObj bo, const void* buf, int size);
-void afDrawIndexedTriangleList(AFbufObj ibo, int count, int start = 0);
+AFBufObj afCreateIndexBuffer(const AFIndex* indi, int numIndi);
+AFBufObj afCreateQuadListIndexBuffer(int numQuads);
+AFBufObj afCreateVertexBuffer(int size, const void* buf);
+AFBufObj afCreateDynamicVertexBuffer(int size);
+void afWriteBuffer(AFBufObj bo, const void* buf, int size);
+void afDrawIndexedTriangleList(AFBufObj ibo, int count, int start = 0);

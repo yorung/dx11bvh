@@ -107,6 +107,27 @@ GLuint afCreateIndexBuffer(const AFIndex* indi, int numIndi)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	return ibo;
 }
+
+AFBufObj afCreateVertexBuffer(int size, const void* buf)
+{
+	GLuint vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, size, buf, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	return vbo;
+}
+
+AFBufObj afCreateDynamicVertexBuffer(int size)
+{
+	GLuint vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	return vbo;
+}
+
 #else
 ID3D11Buffer* afCreateIndexBuffer(const AFIndex* indi, int numIndi)
 {
@@ -140,7 +161,7 @@ void afWriteBuffer(ID3D11Buffer* p, const void* buf, int size)
 
 #endif
 
-AFbufObj afCreateQuadListIndexBuffer(int numQuads)
+AFBufObj afCreateQuadListIndexBuffer(int numQuads)
 {
 	std::vector<AFIndex> indi;
 	int numIndi = numQuads * 6;
@@ -156,13 +177,14 @@ AFbufObj afCreateQuadListIndexBuffer(int numQuads)
 }
 
 #ifdef GL_TRUE
-void afDrawIndexedTriangleList(AFbufObj ibo, int count, int start)
+void afDrawIndexedTriangleList(AFBufObj ibo, int count, int start)
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glDrawElements(GL_TRIANGLES, matMap.faces * 3, GL_UNSIGNED_INT, (void*)(matMap.faceStartIndex * 3));
+	glDrawElements(GL_TRIANGLES, count, AFIndexTypeToDevice, (void*)(start));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, NULL);
 }
 #else
-void afDrawIndexedTriangleList(AFbufObj ibo, int count, int start)
+void afDrawIndexedTriangleList(AFBufObj ibo, int count, int start)
 {
 	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	deviceMan11.GetContext()->IASetIndexBuffer(ibo, AFIndexTypeToDevice, 0);

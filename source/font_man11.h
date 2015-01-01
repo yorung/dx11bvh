@@ -21,8 +21,8 @@ class FontMan11
 	CharSprite charSprites[SPRITE_MAX];
 	int numSprites;
 	ShaderMan::SMID shader;
-	AFbufObj ibo;
-	AFbufObj vbo;
+	AFBufObj ibo;
+	AFBufObj vbo;
 
 	bool dirty;
 	bool Build(int index, int code);
