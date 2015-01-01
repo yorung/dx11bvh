@@ -23,6 +23,8 @@ class FontMan11
 	ShaderMan::SMID shader;
 	AFBufObj ibo;
 	AFBufObj vbo;
+	ID3D11SamplerState* pSamplerState;
+	ID3D11DepthStencilState* pDSState;
 
 	bool dirty;
 	bool Build(int index, int code);
@@ -34,8 +36,8 @@ public:
 	bool Init();
 	void Destroy();
 	void FlushToTexture();
-	void DrawText(Vec2 pos, const WCHAR *text);
+	void DrawString(Vec2 pos, const WCHAR *text);
 	void Render();
 };
 
-extern FontMan11 fontMan11;
+extern FontMan11 fontMan;

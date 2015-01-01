@@ -46,6 +46,7 @@ void App::Init(const char* fileName)
 	SAFE_RELEASE(tex);
 	SAFE_RELEASE(tex2);
 
+	fontMan.Init();
 	debugRenderer.Init();
 	gridRenderer.Init();
 	waterSurface.Init();
@@ -245,6 +246,8 @@ void App::Update()
 
 void App::Draw()
 {
+	fontMan.DrawString(Vec2(0, 0), L"TEXT SPRITE TEST!!!!!!!!!!!!!");
+
 	ID3D11DeviceContext* context = deviceMan11.GetContext();
 	ID3D11RenderTargetView* defaultRenderTarget;
 	ID3D11DepthStencilView* defaultDepthStencil;
@@ -313,6 +316,7 @@ void App::Draw()
 		}
 	}
 
+	fontMan.Render();
 	DrawCameraParams();
 
 	char buf[20];
@@ -355,6 +359,7 @@ void App::Destroy()
 	SAFE_RELEASE(shaderResourceView2);
 	SAFE_RELEASE(unorderedAccessView2);
 
+	fontMan.Destroy();
 	debugRenderer.Destroy();
 	gridRenderer.Destroy();
 	waterSurface.Destroy();

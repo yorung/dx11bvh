@@ -11,6 +11,8 @@
 #define TEX_W		512
 #define TEX_H		512
 
+FontMan11 fontMan;
+
 struct FontVertex {
 	Vec2 pos;
 	Vec2 coord;
@@ -77,10 +79,17 @@ bool FontMan11::Init()
 		{ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 8, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	shader = shaderMan.Create("font", elements, dimof(elements));
+	shader = shaderMan.Create("fx\\font.fx", elements, dimof(elements));
 
 	ibo = afCreateQuadListIndexBuffer(SPRITE_MAX);
 	vbo = afCreateDynamicVertexBuffer(SPRITE_MAX * sizeof(FontVertex));
+
+	{
+		CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
+		descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		deviceMan11.GetDevice()->CreateSamplerState(&descSamp, &pSamplerState);
+		deviceMan11.GetDevice()->CreateDepthStencilState(&CD3D11_DEPTH_STENCIL_DESC(D3D11_DEFAULT), &pDSState);
+	}
 
 	result = true;
 DONE:
@@ -99,6 +108,10 @@ void FontMan11::Destroy()
 	texSrc.Destroy();
 	afSafeDeleteBuffer(ibo);
 	afSafeDeleteBuffer(vbo);
+
+	SAFE_RELEASE(pSamplerState);
+	SAFE_RELEASE(pDSState);
+
 }
 
 bool FontMan11::Build(int index, int code)
@@ -194,26 +207,44 @@ void FontMan11::FlushToTexture()
 
 void FontMan11::Render()
 {
+	if (!numSprites) {
+		return;
+	}
+	static int index[SPRITE_MAX];
 	for (int i = 0; i < numSprites; i++) {
-		Cache(charSprites[i].code);
+		index[i] = Cache(charSprites[i].code);
 	}
 	FlushToTexture();
 
 	static FontVertex verts[4 * SPRITE_MAX];
 	for (int i = 0; i < numSprites; i++) {
-		CharSprite& c = charSprites[i];
-		float xSize = c.code < 256 ? 0.5f : 1.0f;
+		CharSprite& cs = charSprites[i];
+		CharCache& cc = charCache[index[i]];
+		float xSize = cs.code < 256 ? 0.5f : 1.0f;
 
 		for (int j = 0; j < dimof(fontVertAlign); j++) {
-			verts[i * 4 + j].pos = c.pos + fontVertAlign[j] * Vec2(xSize, 1.0f) * Vec2(FONT_MAN_CHAR_W, FONT_MAN_CHAR_H);
+			verts[i * 4 + j].pos = (((cs.pos + fontVertAlign[j] * Vec2(xSize, 1.0f) * Vec2(FONT_MAN_CHAR_W, FONT_MAN_CHAR_H))) * Vec2(2, 2)) / Vec2(SCR_W, SCR_H);
+			verts[i * 4 + j].coord = (Vec2((float)cc.x, (float)cc.y) + fontVertAlign[j] * Vec2(xSize, 1.0f) * Vec2(FONT_MAN_CHAR_W, FONT_MAN_CHAR_H)) / Vec2(TEX_W, TEX_H);
 		}
 	}
 	afWriteBuffer(vbo, verts, 4 * numSprites * sizeof(FontVertex));
 	shaderMan.Apply(shader);
+
+	deviceMan11.GetContext()->OMSetDepthStencilState(pDSState, 1);
+	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
+
 	UINT stride = sizeof(FontVertex);
 	UINT offset = 0;
 	deviceMan11.GetContext()->IASetVertexBuffers(0, 1, &vbo, &stride, &offset);
+
+	ID3D11ShaderResourceView* tx = texMan.Get(texture);
+	deviceMan11.GetContext()->PSSetShaderResources(0, 1, &tx);
 	afDrawIndexedTriangleList(ibo, numSprites * 6);
+
+	tx = nullptr;
+	deviceMan11.GetContext()->PSSetShaderResources(0, 1, &tx);
+
+	numSprites = 0;
 }
 
 void FontMan11::DrawChar(Vec2& pos, int code)
@@ -229,10 +260,10 @@ void FontMan11::DrawChar(Vec2& pos, int code)
 	c.code = code;
 	c.pos = pos;
 
-	pos.x += xSize;
+	pos.x += xSize * FONT_MAN_CHAR_W;
 }
 
-void FontMan11::DrawText(Vec2 pos, const WCHAR *text)
+void FontMan11::DrawString(Vec2 pos, const WCHAR *text)
 {
 	int len = wcslen(text);
 	for (int i = 0; i < len; i++)
@@ -241,4 +272,4 @@ void FontMan11::DrawText(Vec2 pos, const WCHAR *text)
 	}
 }
 
-extern FontMan11 fontMan11;
+extern FontMan11 fontMan;

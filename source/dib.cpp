@@ -122,7 +122,8 @@ void DIB::DibToDXFont()
 	for (int y = 0; y < getH(); y++) {
 		for (int x = 0; x < getW(); x++) {
 			pixel px = getPixel(x, y);
-			px |= 0xffffff00;
+			px = (px << 8) | 0x00ffffff;
+//			px |= 0xffffff00;
 			setPixel(x, y, px);
 		}
 	}
