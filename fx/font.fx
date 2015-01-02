@@ -28,5 +28,6 @@ float4 mainPS(VsToPs psIn) : SV_TARGET
 //	return 1;
 //	return gTexture.Sample(gSampler, psIn.coord);
 	float v = gTexture.Sample(gSampler, psIn.coord).w;
-	return float4(v, v, v, 1);
+//	return float4(v, v, v, 1);
+	return float4(0.5, 1, 1, v);
 }

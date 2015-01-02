@@ -25,6 +25,7 @@ class FontMan11
 	AFBufObj vbo;
 	ID3D11SamplerState* pSamplerState;
 	ID3D11DepthStencilState* pDSState;
+	ID3D11BlendState* blendState;
 
 	bool dirty;
 	bool Build(int index, int code);

@@ -89,6 +89,16 @@ bool FontMan11::Init()
 		descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 		deviceMan11.GetDevice()->CreateSamplerState(&descSamp, &pSamplerState);
 		deviceMan11.GetDevice()->CreateDepthStencilState(&CD3D11_DEPTH_STENCIL_DESC(D3D11_DEFAULT), &pDSState);
+		CD3D11_BLEND_DESC bdesc(D3D11_DEFAULT);
+		bdesc.RenderTarget[0].BlendEnable = TRUE;
+		bdesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		bdesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		bdesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		bdesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		bdesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		bdesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		bdesc.RenderTarget[0].RenderTargetWriteMask = D3D10_COLOR_WRITE_ENABLE_ALL;
+		deviceMan11.GetDevice()->CreateBlendState(&bdesc, &blendState);
 	}
 
 	result = true;
@@ -111,7 +121,7 @@ void FontMan11::Destroy()
 
 	SAFE_RELEASE(pSamplerState);
 	SAFE_RELEASE(pDSState);
-
+	SAFE_RELEASE(blendState);
 }
 
 bool FontMan11::Build(int index, int code)
@@ -230,7 +240,9 @@ void FontMan11::Render()
 	afWriteBuffer(vbo, verts, 4 * numSprites * sizeof(FontVertex));
 	shaderMan.Apply(shader);
 
+	float factor[] = { 0, 0, 0, 0 };
 	deviceMan11.GetContext()->OMSetDepthStencilState(pDSState, 1);
+	deviceMan11.GetContext()->OMSetBlendState(blendState, factor, 0xffffffff);
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
 
 	UINT stride = sizeof(FontVertex);
@@ -243,6 +255,7 @@ void FontMan11::Render()
 
 	tx = nullptr;
 	deviceMan11.GetContext()->PSSetShaderResources(0, 1, &tx);
+	deviceMan11.GetContext()->OMSetBlendState(nullptr, nullptr, 0xffffffff);
 
 	numSprites = 0;
 }
