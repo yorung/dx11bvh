@@ -40,7 +40,7 @@ static HFONT CreateAsianFont(int code, int height)
 		0,								// Width Of Font
 		0,								// Angle Of Escapement
 		0,								// Orientation Angle
-		FW_BOLD,						// Font Weight
+		FW_MEDIUM,						// Font Weight
 		FALSE,							// Italic
 		FALSE,							// Underline
 		FALSE,							// Strikeout
@@ -83,7 +83,6 @@ bool FontMan11::Init()
 
 	ibo = afCreateQuadListIndexBuffer(SPRITE_MAX);
 	vbo = afCreateDynamicVertexBuffer(SPRITE_MAX * sizeof(FontVertex) * 4);
-	vbo = afCreateDynamicVertexBuffer(SPRITE_MAX * sizeof(FontVertex));
 
 	{
 		CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
@@ -133,7 +132,8 @@ bool FontMan11::Build(int index, int code)
 	bool result = false;
 	DIB	dib;
 
-	const BOOL applySoftAA = (code <= 0x80) || !isKorean(code);
+//	const BOOL applySoftAA = (code > 0x80) && !isKorean(code);
+	const BOOL applySoftAA = false;
 	int size = applySoftAA ? 2 : 1;
 
 	if (!dib.Create(FONT_MAN_CHAR_W * size, FONT_MAN_CHAR_H * size)) {

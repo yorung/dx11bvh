@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 static float INVALID_POS = -99999.f;
 
@@ -212,18 +212,21 @@ void App::DrawCameraParams()
 	sprintf(buf, "cam pos(via inv view):%f, %f, %f dir:%f, %f, %f", mInv._41, mInv._42, mInv._43, mInv._31, mInv._32, mInv._33);
 	MultiByteToWideChar(CP_ACP, 0, buf, -1, wBuf, dimof(wBuf));
 	Vec2 pos = {5, 25};
-	font->DrawString(sprite, wBuf, pos, Colors::White, 0, origin, 1.0f);
+//	font->DrawString(sprite, wBuf, pos, Colors::White, 0, origin, 1.0f);
+	fontMan.DrawString(pos, wBuf);
 
 	mInv = fastInv(v);
 	sprintf(buf, "cam pos(by fastInv):%f, %f, %f dir:%f, %f, %f", mInv._41, mInv._42, mInv._43, mInv._31, mInv._32, mInv._33);
 	MultiByteToWideChar(CP_ACP, 0, buf, -1, wBuf, dimof(wBuf));
 	pos.y = 45;
-	font->DrawString(sprite, wBuf, pos, Colors::White, 0, origin, 1.0f);
+//	font->DrawString(sprite, wBuf, pos, Colors::White, 0, origin, 1.0f);
+	fontMan.DrawString(pos, wBuf);
 
 	sprintf(buf, "cam dir(view mtx direct): %f, %f, %f", v._13, v._23, v._33);
 	MultiByteToWideChar(CP_ACP, 0, buf, -1, wBuf, dimof(wBuf));
 	pos.y = 65;
-	font->DrawString(sprite, wBuf, pos, Colors::White, 0, origin, 1.0f);
+//	font->DrawString(sprite, wBuf, pos, Colors::White, 0, origin, 1.0f);
+	fontMan.DrawString(pos, wBuf);
 }
 
 void App::Update()
@@ -246,7 +249,9 @@ void App::Update()
 
 void App::Draw()
 {
-	fontMan.DrawString(Vec2(0, 0), L"TEXT SPRITE TEST!!!!!!!!!!!!!");
+	fontMan.DrawString(Vec2(0, 80), L"TEXT SPRITE TEST!!!!!!!!!!!!!text sprite 1234567890!@#$%^&*()가나다あいうえお");
+	fontMan.DrawString(Vec2(100, 100), L"text sprite 1234567890!@#$%^&*()한");
+	fontMan.DrawString(Vec2(100, 120), L"Zあいうえお峨眉山月半輪秋");
 
 	ID3D11DeviceContext* context = deviceMan11.GetContext();
 	ID3D11RenderTargetView* defaultRenderTarget;
