@@ -75,9 +75,9 @@ bool FontMan11::Init()
 	}
 	texture = texMan.CreateDynamicTexture("$FontMan", TEX_W, TEX_H);
 
-	static D3D11_INPUT_ELEMENT_DESC elements[] = {
-		{ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 8, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	static InputElement elements[] = {
+		CInputElement(0, "POSITION", SF_R32G32_FLOAT, 0),
+		CInputElement(0, "TEXCOORD", SF_R32G32_FLOAT, 8),
 	};
 	shader = shaderMan.Create("fx\\font.fx", elements, dimof(elements));
 
