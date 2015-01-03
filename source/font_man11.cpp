@@ -21,8 +21,8 @@ struct FontVertex {
 static Vec2 fontVertAlign[] =
 {
 	Vec2(0, 0),
-	Vec2(0, 1),
 	Vec2(1, 0),
+	Vec2(0, 1),
 	Vec2(1, 1),
 };
 
@@ -233,7 +233,7 @@ void FontMan11::Render()
 		float xSize = cs.code < 256 ? 0.5f : 1.0f;
 
 		for (int j = 0; j < dimof(fontVertAlign); j++) {
-			verts[i * 4 + j].pos = (((cs.pos + fontVertAlign[j] * Vec2(xSize, 1.0f) * Vec2(FONT_MAN_CHAR_W, FONT_MAN_CHAR_H))) * Vec2(2, 2)) / Vec2(SCR_W, SCR_H);
+			verts[i * 4 + j].pos = (((cs.pos + fontVertAlign[j] * Vec2(xSize, 1.0f) * Vec2(FONT_MAN_CHAR_W, FONT_MAN_CHAR_H))) * Vec2(2, 2)) / Vec2(SCR_W, -SCR_H) + Vec2(-1, 1);
 			verts[i * 4 + j].coord = (Vec2((float)cc.x, (float)cc.y) + fontVertAlign[j] * Vec2(xSize, 1.0f) * Vec2(FONT_MAN_CHAR_W, FONT_MAN_CHAR_H)) / Vec2(TEX_W, TEX_H);
 		}
 	}
