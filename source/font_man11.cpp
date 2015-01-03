@@ -88,7 +88,9 @@ bool FontMan11::Init()
 		CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
 		descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 		deviceMan11.GetDevice()->CreateSamplerState(&descSamp, &pSamplerState);
-		deviceMan11.GetDevice()->CreateDepthStencilState(&CD3D11_DEPTH_STENCIL_DESC(D3D11_DEFAULT), &pDSState);
+		CD3D11_DEPTH_STENCIL_DESC dsdesc(D3D11_DEFAULT);
+		dsdesc.DepthEnable = FALSE;
+		deviceMan11.GetDevice()->CreateDepthStencilState(&dsdesc, &pDSState);
 		CD3D11_BLEND_DESC bdesc(D3D11_DEFAULT);
 		bdesc.RenderTarget[0].BlendEnable = TRUE;
 		bdesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
