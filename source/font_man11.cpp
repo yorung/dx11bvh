@@ -82,6 +82,7 @@ bool FontMan11::Init()
 	shader = shaderMan.Create("fx\\font.fx", elements, dimof(elements));
 
 	ibo = afCreateQuadListIndexBuffer(SPRITE_MAX);
+	vbo = afCreateDynamicVertexBuffer(SPRITE_MAX * sizeof(FontVertex) * 4);
 	vbo = afCreateDynamicVertexBuffer(SPRITE_MAX * sizeof(FontVertex));
 
 	{
