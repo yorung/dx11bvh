@@ -47,6 +47,7 @@ static const int BONE_MAX = 70;
 #include "source/buffer_man11.h"
 #include "source/tex_man11.h"
 #include "source/shader_man11.h"
+#include "source/helper_text.h"
 #include "source/helper.h"
 #include "source/font_man11.h"
 #include "source/sky_man11.h"

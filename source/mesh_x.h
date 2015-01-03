@@ -148,7 +148,7 @@ private:
 	void ParseFrame(char* p, BONE_ID parentFrameId);
 	void ParseAnimationSets(char* p);
 	void ParseAnimations(char* p, AnimationSet& animationSet);
-	void LoadSub(const char* fileName);
+	void LoadSub();
 	void _pushMaterialMap(Block& block, const MaterialMap& map);
 	void _mergeBlocks(Block& d, const Block& s);
 	BONE_ID GetOrCreateFrameIdByName(const char* name);
@@ -166,6 +166,8 @@ private:
 	bool UnlinkFrame(BONE_ID id);
 	void ApplyBvhInitialStance(const Bvh* bvh, MeshXBvhBinding& bind) const;
 
+	std::string meshFileName;
+	std::string meshPath;
 	std::vector<Frame> m_frames;
 	std::vector<AnimationSet> m_animationSets;
 	Block m_block;

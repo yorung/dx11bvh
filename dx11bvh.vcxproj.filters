@@ -96,6 +96,9 @@
     <ClInclude Include="source\dib.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="source\helper_text.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

@@ -257,7 +257,7 @@ static char* _searchChildTag(char* from, const char *tag, std::string* name = nu
 	return nullptr;
 }
 
-static MatMan::MMID _getMaterial(char*& p)
+static MatMan::MMID _getMaterial(char*& p, const std::string path)
 {
 	Material mat;
 	mat.faceColor.x = _getF(p);
@@ -273,12 +273,13 @@ static MatMan::MMID _getMaterial(char*& p)
 	mat.emissive.y = _getF(p);
 	mat.emissive.z = _getF(p);
 	mat.emissive.w = 1.0f;
-	std::string textureFilename = "resource\\white.bmp";
 	char *tx = _searchChildTag(p, "TextureFilename");
 	if (tx) {
-		textureFilename = _getString(tx);
+		std::string txFull = (path.length() ? path + '/' : std::string("")) + _getString(tx);
+		mat.tmid = texMan.Create(txFull.c_str());
+	} else {
+		mat.tmid = texMan.CreateWhiteTexture();
 	}
-	mat.tmid = texMan.Create(textureFilename.c_str());	// load it at current directory
 	return matMan.Create(mat);
 }
 
@@ -381,25 +382,19 @@ void MeshX::CreateBoneMesh()
 
 MeshX::MeshX(const char *fileName)
 {
-	char strPath[MAX_PATH];
-	strcpy_s(strPath, MAX_PATH, fileName);
+	char strPath[256];
+	strcpy_s(strPath, dimof(strPath), fileName);
 	std::for_each(strPath, strPath + strlen(strPath), [] (char& c) { c = c == '\\' ? '/' : c; });
-	const char* fileNameWithoutPath = fileName;
 	if (char* p = strrchr(strPath, '/')) {
 		*p = '\0';
-		fileNameWithoutPath = p + 1;
+	} else {
+		strcpy_s(strPath, dimof(strPath), "");
 	}
 
-	char strCWD[MAX_PATH];
-	GetCurrentDirectoryA(MAX_PATH, strCWD);
-	if(!SetCurrentDirectoryA(strPath)) {
-		MessageBoxW(GetActiveWindow(), L"SetCurrentDirectoryA error", L"", MB_OK );
-	}
-
-	LoadSub(fileNameWithoutPath);
+	meshFileName = fileName;
+	meshPath = strPath;
+	LoadSub();
 	
-	SetCurrentDirectoryA(strCWD);
-
 	m_meshRenderer.Init(m_block);
 
 	CreateBoneMesh();
@@ -551,7 +546,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 	materialIds.resize(nMaterials);
 	for (int i = 0; i < nMaterials; i++) {
 		p = _searchChildTag(p, "Material");
-		materialIds[i] = _getMaterial(p);
+		materialIds[i] = _getMaterial(p, meshPath);
 		p = _leaveBrace(p);
 	}
 
@@ -774,7 +769,7 @@ void MeshX::PrintStatistics() const
 	for (BONE_ID i = 0; i < (BONE_ID)m_frames.size(); i++)
 	{
 		const Frame& f = m_frames[i];
-		printf("v=%d a=%d, parentId=%d, childId=%d, %s(%d)\n", vCnts[i], aCnts[i], f.parentId, f.childId, f.name, i);
+		aflog("v=%d a=%d, parentId=%d, childId=%d, %s(%d)\n", vCnts[i], aCnts[i], f.parentId, f.childId, f.name, i);
 	}
 }
 
@@ -846,23 +841,24 @@ void MeshX::DumpFrames() const
 	for (FrameIterator it(m_frames); it.GetCurrent() >= 0; ++it) {
 		const Frame& f = m_frames[it.GetCurrent()];
 
+		char buf[256] = "";
 		for (int i = 0; i < GetDepth(it.GetCurrent()); i++) {
-			printf(" ");
+			strcat_s(buf, sizeof(buf), " ");
 		}
-	//	printf("%s(%d) p=%d s=%d c=%d\n", f.name, frameId, f.parentId, f.siblingId, f.childId);
-		printf("%s: ", f.name);
+	//	aflog("%s(%d) p=%d s=%d c=%d\n", f.name, frameId, f.parentId, f.siblingId, f.childId);
+		strcat_s(buf, sizeof(buf), SPrintf("%s: ", f.name));
 		for (int r = 0; r < 4; r++) {
 			for (int c = 0; c < 4; c++) {
 				float m = f.initialMatrix.m[r][c];
 				if (m - int(m)) {
-					printf("%.2f,", m);
+					strcat_s(buf, sizeof(buf), SPrintf("%.2f,", m));
 				}else{
-					printf("%d,", (int)m);
+					strcat_s(buf, sizeof(buf), SPrintf("%d,", (int)m));
 				}
 			}
-			printf(" ");
+			strcat_s(buf, sizeof(buf), " ");
 		}
-		printf("\n");
+		aflog("%s\n", buf);
 	}
 }
 
@@ -956,9 +952,9 @@ void MeshX::ParseAnimationSets(char* p)
 	}
 }
 
-void MeshX::LoadSub(const char *fileName)
+void MeshX::LoadSub()
 {
-	void *img = LoadFile(fileName);
+	void *img = LoadFile(meshFileName.c_str());
 	if (!img) {
 		return;
 	}
@@ -996,13 +992,13 @@ void MeshX::LoadSub(const char *fileName)
 		m_frames.resize(1);
 	}
 
-	printf("===============DumpFrames begin\n");
+	aflog("===============DumpFrames begin\n");
 	DumpFrames();
-	printf("===============DumpFrames end\n");
+	aflog("===============DumpFrames end\n");
 
-	printf("===============DumpStatistics begin\n");
+	aflog("===============DumpStatistics begin\n");
 	PrintStatistics();
-	printf("===============DumpStatistics end\n");
+	aflog("===============DumpStatistics end\n");
 }
 
 MeshX::~MeshX()

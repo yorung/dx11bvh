@@ -96,6 +96,7 @@
     <ClInclude Include="source\fps.h" />
     <ClInclude Include="source\grid_renderer.h" />
     <ClInclude Include="source\helper.h" />
+    <ClInclude Include="source\helper_text.h" />
     <ClInclude Include="source\joint_db.h" />
     <ClInclude Include="source\matrix_man.h" />
     <ClInclude Include="source\mat_man.h" />

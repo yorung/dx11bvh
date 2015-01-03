@@ -181,7 +181,7 @@ void afDrawIndexedTriangleList(AFBufObj ibo, int count, int start)
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glDrawElements(GL_TRIANGLES, count, AFIndexTypeToDevice, (void*)(start));
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, NULL);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 #else
 void afDrawIndexedTriangleList(AFBufObj ibo, int count, int start)
