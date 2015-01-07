@@ -321,8 +321,8 @@ void App::Draw()
 		}
 	}
 
-	fontMan.Render();
 	DrawCameraParams();
+	fontMan.Render();
 
 	char buf[20];
 	WCHAR wBuf[20];
