@@ -84,6 +84,7 @@ bool FontMan11::Init()
 	ibo = afCreateQuadListIndexBuffer(SPRITE_MAX);
 	vbo = afCreateDynamicVertexBuffer(SPRITE_MAX * sizeof(FontVertex) * 4);
 
+#ifndef GL_TRUE
 	{
 		CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
 		descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -102,7 +103,7 @@ bool FontMan11::Init()
 		bdesc.RenderTarget[0].RenderTargetWriteMask = D3D10_COLOR_WRITE_ENABLE_ALL;
 		deviceMan11.GetDevice()->CreateBlendState(&bdesc, &blendState);
 	}
-
+#endif
 	result = true;
 DONE:
 	return result;
