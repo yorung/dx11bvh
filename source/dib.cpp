@@ -5,10 +5,12 @@ DIB::DIB()
 	m_w = m_h = 0;
 	m_pitch = 0;
 	m_p = 0;
+#ifdef _MSC_VER
 	m_hbm = NULL;
 	m_hdc = NULL;
 	m_hbmOld = NULL;
 	memset(&m_ds, 0, sizeof(m_ds));
+#endif
 }
 
 DIB::~DIB()
@@ -18,6 +20,7 @@ DIB::~DIB()
 
 void DIB::Destroy()
 {
+#ifdef _MSC_VER
 	if (m_hbmOld) {
 		SelectObject(m_hdc, m_hbmOld);
 		m_hbmOld = NULL;
@@ -30,6 +33,10 @@ void DIB::Destroy()
 		DeleteObject(m_hbm);
 		m_hbm = NULL;
 	}
+#else
+	free(m_p);
+	m_p = nullptr;
+#endif
 }
 
 bool DIB::Create(int w, int h)
@@ -37,7 +44,19 @@ bool DIB::Create(int w, int h)
 	return Create(w, h, 32);
 }
 
-bool DIB::Create(int w, int h, int bits)
+#ifndef _MSC_VER
+bool DIB::Create(int w, int h, int bits, int)
+{
+	Destroy();
+	m_w = w;
+	m_h = h;
+	m_pitch = (w * (bits / 8) + 3) & ~3;
+	m_p = malloc(m_pitch * h);
+}
+#endif
+
+#ifdef _MSC_VER
+bool DIB::Create(int w, int h, int bits, int level)
 {
 	Destroy();
 
@@ -65,9 +84,10 @@ bool DIB::Create(int w, int h, int bits)
 
 	if (bits == 8) {
 		for (int i = 0; i < 256; i++) {
-			bmi.bmiColors[i].rgbRed = i;
-			bmi.bmiColors[i].rgbGreen = i;
-			bmi.bmiColors[i].rgbBlue = i;
+			int v = std::min(i * 255 / level, 255);
+			bmi.bmiColors[i].rgbRed = v;
+			bmi.bmiColors[i].rgbGreen = v;
+			bmi.bmiColors[i].rgbBlue = v;
 			bmi.bmiColors[i].rgbReserved = 0;
 		}
 	}
@@ -94,13 +114,14 @@ bool DIB::Create(int w, int h, int bits)
 	ReleaseDC(hWnd, hdc);
 	return true;
 }
+#endif
 
 void DIB::DibToGL()
 {
 	for(int y = 0; y < getH(); y++) {
 		for (int x = 0; x < getW(); x++) {
 			pixel px = getPixel(x, y);
-			std::swap(*((BYTE*)(&px) + 0), *((BYTE*)(&px) + 2));
+			std::swap(*((char*)(&px) + 0), *((char*)(&px) + 2));
 			setPixel(x, y, px);
 		}
 	}
@@ -138,15 +159,16 @@ void DIB::FillAlpha()
 	}
 }
 
-void DIB::Clear()
+void DIB::Clear(pixel color)
 {
 	for (int y = 0; y < getH(); y++) {
 		for (int x = 0; x < getW(); x++) {
-			setPixel(x, y, 0);
+			setPixel(x, y, color);
 		}
 	}
 }
 
+#ifdef _MSC_VER
 static bool dibCopy32(DIB *dib, BITMAPINFO *bi, void *bits)
 {
 	int srcH = bi->bmiHeader.biHeight;
@@ -166,7 +188,9 @@ static bool dibCopy32(DIB *dib, BITMAPINFO *bi, void *bits)
 	}
 	return true;
 }
+#endif
 
+#ifdef _MSC_VER
 bool DIB::LoadFromBmp(const char *file)
 {
 	bool result = false;
@@ -205,6 +229,13 @@ end:
 	}
 	return result;
 }
+
+bool DIB::Blt(HDC target, int dstX, int dstY, int w, int h)
+{
+	return !!BitBlt(target, dstX, dstY, w, h, m_hdc, 0, 0, SRCCOPY);
+}
+
+#endif
 
 bool DIB::Blt(DIB& target, int dstX, int dstY)
 {

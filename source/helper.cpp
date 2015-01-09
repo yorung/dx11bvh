@@ -128,6 +128,13 @@ AFBufObj afCreateDynamicVertexBuffer(int size)
 	return vbo;
 }
 
+void afWriteBuffer(GLuint bufName, const void* buf, int size)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, bufName);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, size, buf);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 #else
 ID3D11Buffer* afCreateIndexBuffer(const AFIndex* indi, int numIndi)
 {
