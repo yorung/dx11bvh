@@ -90,13 +90,13 @@
     <ClInclude Include="source\fps.h">
       <Filter>source</Filter>
     </ClInclude>
-    <ClInclude Include="source\font_man11.h">
-      <Filter>source</Filter>
-    </ClInclude>
     <ClInclude Include="source\dib.h">
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="source\helper_text.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="source\font_man.h">
       <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
@@ -167,10 +167,10 @@
     <ClCompile Include="source\fps.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="source\font_man11.cpp">
+    <ClCompile Include="source\dib.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="source\dib.cpp">
+    <ClCompile Include="source\font_man.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
