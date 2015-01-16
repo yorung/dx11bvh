@@ -11,7 +11,7 @@
 #define TEX_W		512
 #define TEX_H		512
 
-FontMan11 fontMan;
+FontMan fontMan;
 
 struct FontVertex {
 	Vec2 pos;
@@ -52,7 +52,7 @@ static HFONT CreateAsianFont(int code, int height)
 		fontName);						// Font Name
 }
 
-FontMan11::FontMan11()
+FontMan::FontMan()
 {
 	memset(charCache, 0, sizeof(charCache));
 	memset(uniToIndex, 0, sizeof(uniToIndex));
@@ -62,12 +62,12 @@ FontMan11::FontMan11()
 	dirty = false;
 }
 
-FontMan11::~FontMan11()
+FontMan::~FontMan()
 {
 	Destroy();
 }
 
-bool FontMan11::Init()
+bool FontMan::Init()
 {
 	bool result = false;
 	if (!texSrc.Create(TEX_W, TEX_H)) {
@@ -109,7 +109,7 @@ DONE:
 	return result;
 }
 
-void FontMan11::Destroy()
+void FontMan::Destroy()
 {
 	// TODO: delete texture
 //	texMan.Delete(texture);
@@ -127,7 +127,7 @@ void FontMan11::Destroy()
 	SAFE_RELEASE(blendState);
 }
 
-bool FontMan11::Build(int index, int code)
+bool FontMan::Build(int index, int code)
 {
 	HFONT font = NULL, fontOld = NULL;
 	bool result = false;
@@ -192,7 +192,7 @@ DONE:
 	return result;
 }
 
-int FontMan11::Cache(int code)
+int FontMan::Cache(int code)
 {
 	assert(code >= 0 && code <= 0xffff);
 	int listIndex = uniToIndex[code];
@@ -210,7 +210,7 @@ int FontMan11::Cache(int code)
 	return index;
 }
 
-void FontMan11::FlushToTexture()
+void FontMan::FlushToTexture()
 {
 	if (!dirty) {
 		return;
@@ -219,7 +219,7 @@ void FontMan11::FlushToTexture()
 	texMan.Write(texture, texSrc.ReferPixels());
 }
 
-void FontMan11::Render()
+void FontMan::Render()
 {
 	if (!numSprites) {
 		return;
@@ -264,7 +264,7 @@ void FontMan11::Render()
 	numSprites = 0;
 }
 
-void FontMan11::DrawChar(Vec2& pos, int code)
+void FontMan::DrawChar(Vec2& pos, int code)
 {
 	int index = Cache(code);
 	float xSize = code < 256 ? 0.5f : 1.0f;
@@ -280,7 +280,7 @@ void FontMan11::DrawChar(Vec2& pos, int code)
 	pos.x += xSize * FONT_MAN_CHAR_W;
 }
 
-void FontMan11::DrawString(Vec2 pos, const WCHAR *text)
+void FontMan::DrawString(Vec2 pos, const WCHAR *text)
 {
 	int len = wcslen(text);
 	for (int i = 0; i < len; i++)
@@ -289,4 +289,4 @@ void FontMan11::DrawString(Vec2 pos, const WCHAR *text)
 	}
 }
 
-extern FontMan11 fontMan;
+extern FontMan fontMan;

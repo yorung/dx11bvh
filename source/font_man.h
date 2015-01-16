@@ -1,4 +1,4 @@
-class FontMan11
+class FontMan
 {
 	struct CharCache {
 		int x, y, w, h;
@@ -33,8 +33,8 @@ class FontMan11
 	int Cache(int code);
 	void DrawChar(Vec2& pos, int code);
 public:
-	FontMan11();
-	~FontMan11();
+	FontMan();
+	~FontMan();
 	bool Init();
 	void Destroy();
 	void FlushToTexture();
@@ -42,4 +42,4 @@ public:
 	void Render();
 };
 
-extern FontMan11 fontMan;
+extern FontMan fontMan;
