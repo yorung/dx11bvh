@@ -34,6 +34,7 @@ struct Vec2
 	Vec2 operator+(const Vec2& r) const { return Vec2(x + r.x, y + r.y); }
 	Vec2 operator-(const Vec2& r) const { return Vec2(x - r.x, y - r.y); }
 	Vec2 operator*(const Vec2& r) const { return Vec2(x * r.x, y * r.y); }
+	Vec2 operator/(const Vec2& r) const { return Vec2(x / r.x, y / r.y); }
 	Vec2 operator*(affloat r) const { return Vec2(x * r, y * r); }
 	Vec2 operator/(affloat r) const { return Vec2(x / r, y / r); }
 

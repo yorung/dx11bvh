@@ -1,18 +1,25 @@
 class FontMan
 {
-	struct CharCache {
-		int x, y, w, h;
+	struct CharSignature {
 		int code;
+		int fontSize;
+		inline int GetOrder() const { return (code << 8) | fontSize;}
+		bool operator < (const CharSignature& r) const { return GetOrder() < r.GetOrder(); }
+		bool operator == (const CharSignature& r) const { return GetOrder() == r.GetOrder(); }
+	};
+	struct CharCache {
+		Vec2 srcPos;
+		Vec2 srcWidth;
+		Vec2 distDelta;
+		float step;
 	};
 	struct CharSprite {
 		Vec2 pos;
-		int code;
+		CharSignature signature;
 	};
-	static const int LIST_MAX = 1024;		// number of characters containable in the ring buffer
-	CharCache charCache[LIST_MAX];
-	int uniToIndex[65536];			// Unicode to cache index table
-	int cursor;						// current index
-	int curX, curY;
+	typedef std::map<CharSignature, CharCache> Caches;
+	Caches caches;
+	int curX, curY, curLineMaxH;
 	TexMan::TMID texture;
 	DIB texSrc;
 
@@ -23,22 +30,27 @@ class FontMan
 	ShaderMan::SMID shader;
 	AFBufObj ibo;
 	AFBufObj vbo;
+
+	int screenW, screenH;
 #ifndef GL_TRUE
 	ID3D11SamplerState* pSamplerState;
 	ID3D11DepthStencilState* pDSState;
 	ID3D11BlendState* blendState;
 #endif
 	bool dirty;
-	bool Build(int index, int code);
-	int Cache(int code);
-	void DrawChar(Vec2& pos, int code);
+	bool Build(const CharSignature& signature);
+	bool Cache(const CharSignature& code);
+	void DrawChar(Vec2& pos, const CharSignature& sig);
+	void ClearCache();
+	void MakeFontBitmap(const char* fontName, const CharSignature& code, DIB& dib, CharCache& cache) const;
 public:
 	FontMan();
 	~FontMan();
-	bool Init();
+	bool Init(int scrW, int scrH);
 	void Destroy();
 	void FlushToTexture();
-	void DrawString(Vec2 pos, const WCHAR *text);
+	void DrawString(Vec2 pos, int fontSize, const wchar_t *text);
+	void DrawString(Vec2 pos, int fontSize, const char *text);
 	void Render();
 };
 

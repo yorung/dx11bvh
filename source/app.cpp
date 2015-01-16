@@ -1,5 +1,12 @@
 ﻿#include "stdafx.h"
 
+#ifndef _MSC_VER
+static int GetKeyState(char) {
+	return 0x01;
+}
+#define VK_RETURN 0x0D
+#endif
+
 static float INVALID_POS = -99999.f;
 
 static float CalcRadius(const Mesh* m)
@@ -46,7 +53,7 @@ void App::Init(const char* fileName)
 	SAFE_RELEASE(tex);
 	SAFE_RELEASE(tex2);
 
-	fontMan.Init();
+	fontMan.Init(SCR_W, SCR_H);
 	debugRenderer.Init();
 	gridRenderer.Init();
 	waterSurface.Init();
@@ -206,27 +213,18 @@ void App::DrawCameraParams()
 	Mat mInv = inv(v);
 
 	char buf[128];
-	WCHAR wBuf[128];
-	XMFLOAT2 origin = {0, 0};
-
-	sprintf(buf, "cam pos(via inv view):%f, %f, %f dir:%f, %f, %f", mInv._41, mInv._42, mInv._43, mInv._31, mInv._32, mInv._33);
-	MultiByteToWideChar(CP_ACP, 0, buf, -1, wBuf, dimof(wBuf));
-	Vec2 pos = {5, 25};
-//	font->DrawString(sprite, wBuf, pos, Colors::White, 0, origin, 1.0f);
-	fontMan.DrawString(pos, wBuf);
+	Vec2 pos = { 5, 55 };
+	snprintf(buf, sizeof(buf), "cam pos(via inv view):%f, %f, %f dir:%f, %f, %f", mInv._41, mInv._42, mInv._43, mInv._31, mInv._32, mInv._33);
+	fontMan.DrawString(pos, 16, buf);
 
 	mInv = fastInv(v);
-	sprintf(buf, "cam pos(by fastInv):%f, %f, %f dir:%f, %f, %f", mInv._41, mInv._42, mInv._43, mInv._31, mInv._32, mInv._33);
-	MultiByteToWideChar(CP_ACP, 0, buf, -1, wBuf, dimof(wBuf));
-	pos.y = 45;
-//	font->DrawString(sprite, wBuf, pos, Colors::White, 0, origin, 1.0f);
-	fontMan.DrawString(pos, wBuf);
+	snprintf(buf, sizeof(buf), "cam pos(by fastInv):%f, %f, %f dir:%f, %f, %f", mInv._41, mInv._42, mInv._43, mInv._31, mInv._32, mInv._33);
+	pos.y = 75;
+	fontMan.DrawString(pos, 16, buf);
 
-	sprintf(buf, "cam dir(view mtx direct): %f, %f, %f", v._13, v._23, v._33);
-	MultiByteToWideChar(CP_ACP, 0, buf, -1, wBuf, dimof(wBuf));
-	pos.y = 65;
-//	font->DrawString(sprite, wBuf, pos, Colors::White, 0, origin, 1.0f);
-	fontMan.DrawString(pos, wBuf);
+	snprintf(buf, sizeof(buf), "cam dir(view mtx direct): %f, %f, %f", v._13, v._23, v._33);
+	pos.y = 95;
+	fontMan.DrawString(pos, 16, buf);
 }
 
 void App::Update()
@@ -240,8 +238,9 @@ void App::Update()
 	if (GetKeyState('B') & 0x80) {
 		g_type = "bone";
 	}
-	for (auto& i : {'0', '1', '2', '3', '4', '9'}) {
-		if (GetKeyState(i) & 0x80) {
+	static char v[] = "012349";
+	for (auto& i : v) {
+		if (i && GetKeyState(i) & 0x80) {
 			animationNumber = i - '0';
 		}
 	}
@@ -249,9 +248,9 @@ void App::Update()
 
 void App::Draw()
 {
-	fontMan.DrawString(Vec2(0, 80), L"TEXT SPRITE TEST!!!!!!!!!!!!!text sprite 1234567890!@#$%^&*()가나다あいうえお");
-	fontMan.DrawString(Vec2(100, 100), L"text sprite 1234567890!@#$%^&*()한");
-	fontMan.DrawString(Vec2(100, 120), L"Zあいうえお峨眉山月半輪秋");
+	fontMan.DrawString(Vec2(0, 110), 16, "TEXT SPRITE TEST!!!!!!!!!!!!!text sprite 1234567890");
+	fontMan.DrawString(Vec2(10, 130), 32, "@#$%^&*()");
+	fontMan.DrawString(Vec2(10, 170), 40, L"あいうえお한글漢字");
 
 	ID3D11DeviceContext* context = deviceMan11.GetContext();
 	ID3D11RenderTargetView* defaultRenderTarget;
