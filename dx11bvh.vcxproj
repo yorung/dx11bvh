@@ -124,6 +124,7 @@
     <ClCompile Include="source\fps.cpp" />
     <ClCompile Include="source\grid_renderer.cpp" />
     <ClCompile Include="source\helper.cpp" />
+    <ClCompile Include="source\helper_win.cpp" />
     <ClCompile Include="source\joint_db.cpp" />
     <ClCompile Include="source\matrix_man.cpp" />
     <ClCompile Include="source\mat_man.cpp" />

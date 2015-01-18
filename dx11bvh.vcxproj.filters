@@ -173,6 +173,9 @@
     <ClCompile Include="source\font_man.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="source\helper_win.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon.ico">

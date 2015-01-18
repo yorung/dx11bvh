@@ -42,19 +42,6 @@ static BOOL ProcessWindowMessage(){
 	}
 }
 
-static void GoMyDir()
-{
-	char dir[MAX_PATH];
-	GetModuleFileNameA(GetModuleHandleA(nullptr), dir, MAX_PATH);
-	char* p = strrchr(dir, '\\');
-	assert(p);
-	*p = '\0';
-	p = strrchr(dir, '\\');
-	assert(p);
-	*p = '\0';
-	SetCurrentDirectoryA(dir);
-}
-
 #ifdef _DEBUG
 int main(int, char**)
 #else
