@@ -68,7 +68,7 @@ void GridRenderer::Init()
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	shaderId = shaderMan.Create("fx\\solid.fx", layout, dimof(layout));
+	shaderId = shaderMan.Create("solid", layout, dimof(layout));
 
 	D3D11_SUBRESOURCE_DATA subresData = { vertices, 0, 0 };
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeVertices, D3D11_BIND_VERTEX_BUFFER), &subresData, &pVertexBuffer);

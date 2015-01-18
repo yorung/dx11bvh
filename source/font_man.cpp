@@ -147,7 +147,7 @@ bool FontMan::Init(int scrW, int scrH)
 		CInputElement(0, "POSITION", SF_R32G32_FLOAT, 0),
 		CInputElement(0, "TEXCOORD", SF_R32G32_FLOAT, 8),
 	};
-	shader = shaderMan.Create("fx/font.fx", elements, dimof(elements));
+	shader = shaderMan.Create("font", elements, dimof(elements));
 
 	ibo = afCreateQuadListIndexBuffer(SPRITE_MAX);
 	vbo = afCreateDynamicVertexBuffer(SPRITE_MAX * sizeof(FontVertex) * 4);

@@ -4,10 +4,13 @@ ShaderMan11 shaderMan;
 
 static void Compile(const char* name, bool ps, ID3D10Blob*& blob)
 {
+	char path[MAX_PATH];
+	sprintf_s(path, sizeof(path), "fx/%s.fx", name);
+
 	blob = nullptr;
 	ID3D10Blob* err = 0;
 	WCHAR wname[MAX_PATH];
-	MultiByteToWideChar(CP_ACP, 0, name, -1, wname, dimof(wname));
+	MultiByteToWideChar(CP_ACP, 0, path, -1, wname, dimof(wname));
 	D3DCompileFromFile(wname, nullptr, nullptr, ps ? "mainPS" : "mainVS", ps ? "ps_5_0" : "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, &blob, &err);
 	if(err) {
 		MessageBoxA(nullptr, (const char*)err->GetBufferPointer(), name, MB_OK | MB_ICONERROR);

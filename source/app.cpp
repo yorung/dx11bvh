@@ -57,7 +57,7 @@ void App::Init(const char* fileName)
 	debugRenderer.Init();
 	gridRenderer.Init();
 	waterSurface.Init();
-	postEffectMan.Create("fx\\post_effect_mono.fx");
+	postEffectMan.Create("post_effect_mono");
 	computeShaderMan.Create("fx\\post_effect_cs.fx");
 	computeShaderSkinning.Create("fx\\skin_cs.fx");
 
@@ -97,9 +97,9 @@ void App::Init(const char* fileName)
 
 	height = radius / 2;
 
-	//	skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "fx\\sky_cubemap.fx");
-//	skyMan.Create("resource\\Tiny_skin.dds", "fx\\sky_spheremap.fx");
-	skyMan.Create("resource\\PANO_20141115_141959.dds", "fx\\sky_photosphere.fx");
+	//	skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "sky_cubemap");
+//	skyMan.Create("resource\\Tiny_skin.dds", "sky_spheremap");
+	skyMan.Create("resource\\PANO_20141115_141959.dds", "sky_photosphere");
 
 	lastTime = GetTime();
 }
