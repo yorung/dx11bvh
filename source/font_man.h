@@ -23,7 +23,7 @@ class FontMan
 	TexMan::TMID texture;
 	DIB texSrc;
 
-	static const int SPRITE_MAX = 512;
+	static const int SPRITE_MAX = 4096;
 	static const int SPRITE_VERTS = SPRITE_MAX * 4;
 	CharSprite charSprites[SPRITE_MAX];
 	int numSprites;
