@@ -20,6 +20,7 @@ class DIB {
 	bool LoadFromBmp(const char *file);
 	HDC getDC() const { return m_hdc; }
 	bool Blt(HDC target, int dstX, int dstY, int w, int h);
+	void Save(const char* fileName);
 #endif
 	bool Blt(DIB *target, int x, int y, int w, int h, int srcX, int srcY);
 	bool Blt(DIB& target, int dstX, int dstY);

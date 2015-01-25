@@ -1,5 +1,26 @@
 #include "stdafx.h"
 
+bool SaveFile(const char *fileName, const uint8_t* buf, int size)
+{
+	bool result = false;
+	FILE *f = nullptr;
+	void *ptr = NULL;
+
+	if (fopen_s(&f, fileName, "wb")) {
+		return false;
+	}
+	if (!fwrite(buf, size, 1, f)) {
+		goto DONE;
+	}
+	result = !fclose(f);
+	f = nullptr;
+DONE:
+	if (f) {
+		fclose(f);
+	}
+	return result;
+}
+
 void *LoadFile(const char *fileName, int* size)
 {
 	bool result = false;

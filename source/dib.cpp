@@ -235,6 +235,34 @@ bool DIB::Blt(HDC target, int dstX, int dstY, int w, int h)
 	return !!BitBlt(target, dstX, dstY, w, h, m_hdc, 0, 0, SRCCOPY);
 }
 
+void DIB::Save(const char* fileName)
+{
+	if (m_ds.dsBm.bmBitsPixel != 32) {
+		return;
+	}
+
+	int pixSize =  + getW() * getH() * 4;
+	int fileSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + pixSize;
+	BYTE* img = (BYTE*)calloc(fileSize, 1);
+	int ofs = 0;
+	BITMAPFILEHEADER& fh = *(BITMAPFILEHEADER*)img;
+	ofs += sizeof(BITMAPFILEHEADER);
+	BITMAPINFOHEADER& ih = *(BITMAPINFOHEADER*)(img + ofs);
+	ofs += sizeof(BITMAPINFOHEADER);
+	DWORD* pxs = (DWORD*)(img + ofs);
+
+	fh.bfType = 'MB';
+	fh.bfSize = fileSize;
+	fh.bfOffBits = ofs;
+	ih = m_ds.dsBmih;
+	memcpy(pxs, m_p, pixSize);
+	if (ih.biHeight > 0) {
+		ih.biHeight = -ih.biHeight;	// top down
+	}
+	SaveFile(fileName, img, fileSize);
+	free(img);
+}
+
 #endif
 
 bool DIB::Blt(DIB& target, int dstX, int dstY)
