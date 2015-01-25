@@ -52,6 +52,7 @@ public:
 	void DrawString(Vec2 pos, int fontSize, const wchar_t *text);
 	void DrawString(Vec2 pos, int fontSize, const char *text);
 	void Render();
+	Vec2 MeasureString(int fontSize, const char *text);
 };
 
 extern FontMan fontMan;

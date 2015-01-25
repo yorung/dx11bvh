@@ -166,19 +166,10 @@ void App::DrawBoneNames(Bvh* bvh)
 		if (it.childId < 0) {
 			continue;
 		}
+		Vec2 size = fontMan.MeasureString(12, it.name);
 		Vec2 pos = GetScreenPos(it.result);
-
-		WCHAR wname[MAX_PATH];
-		MultiByteToWideChar(CP_ACP, 0, it.name, -1, wname, dimof(wname));
-
-		XMVECTOR size = font->MeasureString(wname);
-		pos.x -= XMVectorGetX(size) / 2;
-		pos.y -= XMVectorGetY(size) / 2;
-		XMFLOAT2 origin = {0, 0};
-		font->DrawString(sprite, wname, pos, Colors::Black, 0, origin, 0.7f);
-		pos.x += 1.0f;
-		pos.y += 1.0f;
-		font->DrawString(sprite, wname, pos, Colors::White, 0, origin, 0.7f);
+		pos -= size / 2;
+		fontMan.DrawString(floor(pos), 12, it.name);
 	}
 }
 
@@ -187,22 +178,8 @@ void App::DrawBoneNames(const MeshX* meshX, const MeshXAnimResult& result)
 	const std::vector<Frame>& frames = meshX->GetFrames();
 	for (BONE_ID id = 0; id < (BONE_ID)frames.size(); id++) {
 		const Frame& f = frames[id];
-		Vec2 pos = GetScreenPos(result.boneMat[id]);
-
-		WCHAR wname[MAX_PATH];
-		MultiByteToWideChar(CP_ACP, 0, f.name, -1, wname, dimof(wname));
-		if (wname[0] == '\0') {
-			wcscpy(wname, L"[NO NAME]");
-		}
-
-		XMVECTOR size = font->MeasureString(wname);
-		pos.x -= XMVectorGetX(size) / 2;
-		pos.y -= XMVectorGetY(size) / 2;
-		XMFLOAT2 origin = {0, 0};
-		font->DrawString(sprite, wname, pos, Colors::Black, 0, origin, 0.7f);
-		pos.x += 1.0f;
-		pos.y += 1.0f;
-		font->DrawString(sprite, wname, pos, Colors::White, 0, origin, 0.7f);
+		Vec2 pos = floor(GetScreenPos(result.boneMat[id]));
+		fontMan.DrawString(pos, 12, f.name[0] == '\0' ? "[NO NAME]" : f.name);
 	}
 }
 
@@ -321,15 +298,14 @@ void App::Draw()
 	}
 
 	DrawCameraParams();
-	fontMan.Render();
 
 	char buf[20];
-	WCHAR wBuf[20];
 	sprintf(buf, "FPS: %f", fps.Get());
-	MultiByteToWideChar(CP_ACP, 0, buf, -1, wBuf, dimof(wBuf));
-	Vec2 pos = { 5, 5 };
-	XMFLOAT2 origin = { 0, 0 };
-	font->DrawString(sprite, wBuf, pos, Colors::White, 0, origin, 1.0f);
+	Vec2 pos = { 5, 15 };
+	fontMan.DrawString(pos, 16, buf);
+
+	fontMan.Render();
+
 
 	sprite->End();
 

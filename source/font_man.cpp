@@ -375,6 +375,27 @@ void FontMan::DrawChar(Vec2& pos, const CharSignature& sig)
 	}
 }
 
+Vec2 FontMan::MeasureString(int fontSize, const char *text)
+{
+	int len = strlen(text);
+	Vec2 pos(0, 0);
+	Vec2 size(0, 0);
+	for (int i = 0; i < len; i++)
+	{
+		CharSignature sig;
+		sig.code = text[i];
+		sig.fontSize = fontSize;
+		Cache(sig);
+		Caches::iterator it = caches.find(sig);
+		if (it != caches.end()) {
+			size.y = std::max(size.y, it->second.srcWidth.y);
+			size.x = pos.x + it->second.distDelta.x + it->second.srcWidth.x;
+			pos.x += it->second.step;
+		}
+	}
+	return size;
+}
+
 void FontMan::DrawString(Vec2 pos, int fontSize, const wchar_t *text)
 {
 	int len = wcslen(text);
