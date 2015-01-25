@@ -1,5 +1,5 @@
 //#define USE_DXMATH
-#define USE_SIMPLE_MATH
+//#define USE_SIMPLE_MATH
 
 typedef float affloat;
 
