@@ -9,8 +9,6 @@ class App {
 	float rotX;
 	float rotY;
 	float height;
-	SpriteBatch* sprite;
-	SpriteFont* font;
 	ID3D11RenderTargetView* renderTargetView;
 	ID3D11ShaderResourceView* shaderResourceView;
 	ID3D11UnorderedAccessView* unorderedAccessView;

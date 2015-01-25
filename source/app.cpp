@@ -20,7 +20,7 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), radius(1), lastX(INVALID_POS), lastY(INVALID_POS), sprite(nullptr), font(nullptr), animationNumber(0), trackTime(0), meshTiny(nullptr),
+App::App() : scale(1), radius(1), lastX(INVALID_POS), lastY(INVALID_POS), animationNumber(0), trackTime(0), meshTiny(nullptr),
 	renderTargetView(nullptr), shaderResourceView(nullptr), unorderedAccessView(nullptr),
 	renderTargetView2(nullptr), shaderResourceView2(nullptr), unorderedAccessView2(nullptr)
 {
@@ -69,8 +69,6 @@ void App::Init(const char* fileName)
 		meshFileName = fileName;
 	}
 
-	sprite = new SpriteBatch(deviceMan11.GetContext());
-	font = new SpriteFont(deviceMan11.GetDevice(), L"resource\\font.spritefont");
 	meshTiny = new MeshX(meshFileName);
 
 	if (ext && !_stricmp(ext, ".bvh")) {
@@ -269,8 +267,6 @@ void App::Draw()
 //	gridRenderer.Draw();
 	waterSurface.Draw();
 
-	sprite->Begin();
-	
 	for (int i = 0; i < dimof(mesh); i++) {
 		Mesh* it = mesh[i];
 		MeshX* meshX = meshTiny;
@@ -306,9 +302,6 @@ void App::Draw()
 
 	fontMan.Render();
 
-
-	sprite->End();
-
 	context->OMSetRenderTargets(1, &defaultRenderTarget, defaultDepthStencil);
 	float clearColor[4] = { 0.2f, 0.0f, 0.2f, 0.0f };
 	context->ClearRenderTargetView(defaultRenderTarget, clearColor);
@@ -330,8 +323,6 @@ void App::Destroy()
 		SAFE_DELETE(it);
 	}
 	SAFE_DELETE(meshTiny);
-	SAFE_DELETE(font);
-	SAFE_DELETE(sprite);
 	SAFE_RELEASE(renderTargetView);
 	SAFE_RELEASE(shaderResourceView);
 	SAFE_RELEASE(unorderedAccessView);
