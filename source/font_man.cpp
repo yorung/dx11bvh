@@ -225,6 +225,7 @@ void FontMan::MakeFontBitmap(const char* fontName, const CharSignature& sig, DIB
 	//	SetBkColor(hdc, RGB(0, 0, 0));
 	//	TextOutW(hdc, 0, 0, buf, wcslen(buf));
 		dib3.Blt(dib.getDC(), 0, 0, dib3.getW(), dib3.getH());
+		dib.Save(SPrintf("ScreenShot\\$dib_%d_%d.bmp", sig.code, sig.fontSize));
 		dib.DibToDXFont();
 	}
 	SelectObject(hdc, (HGDIOBJ)oldFont);
