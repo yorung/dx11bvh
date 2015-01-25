@@ -131,8 +131,8 @@ void App::MouseMove(float x, float y)
 	if (lastX <= INVALID_POS || lastY <= INVALID_POS) {
 		return;
 	}
-	rotX += (x - lastX) * XM_PI * 2.0f;
-	rotY += (y - lastY) * XM_PI * 2.0f;
+	rotX += (x - lastX) * M_PI * 2.0f;
+	rotY += (y - lastY) * M_PI * 2.0f;
 
 	lastX = x;
 	lastY = y;
@@ -252,13 +252,14 @@ void App::Draw()
 	Mat cam = translate(0, height, -dist) * q2m(Quat(Vec3(1,0,0), rotY)) * q2m(Quat(Vec3(0,1,0), rotX));
 	matrixMan.Set(MatrixMan::VIEW, fastInv(cam));
 
-
-	Mat dx = XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, dist / 1000, dist * 1000);
+	//if (GetKeyState(VK_RETURN) & 0x01) {
+	//	Mat dx = XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, dist / 1000, dist * 1000);
+	//}
 
 	float f = dist * 1000;
 	float n = dist / 1000;
-	Mat mine = Mat((float)1 / tanf(45 * XM_PI / 180 * 0.5f) / ((float)SCR_W / SCR_H), 0, 0, 0,
-		0, (float)1 / tanf(45 * XM_PI / 180 * 0.5f), 0, 0,
+	Mat mine = Mat((float)1 / tanf(45 * M_PI / 180 * 0.5f) / ((float)SCR_W / SCR_H), 0, 0, 0,
+		0, (float)1 / tanf(45 * M_PI / 180 * 0.5f), 0, 0,
 		0, 0, f / (f - n), 1,
 		0, 0, -(n * f) / (f - n), 0);
 	matrixMan.Set(MatrixMan::PROJ, mine);

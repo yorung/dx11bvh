@@ -20,11 +20,6 @@ template <class T> inline void SAFE_RELEASE(T& p)
 	}
 }
 
-#ifndef DIRECTX_MATH_VERSION
-#define XM_PI 3.14159265359f
-#define XM_2PI (XM_PI * 2)
-#endif
-
 typedef unsigned short AFIndex;
 #ifdef GL_TRUE
 #define AFIndexTypeToDevice GL_UNSIGNED_SHORT

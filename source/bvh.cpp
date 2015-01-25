@@ -505,13 +505,13 @@ void Bvh::PreCalculateMotion()
 			Quat q[3];
 			int idxMin = std::min((uint32_t)it.rotIndices.x, std::min((uint32_t)it.rotIndices.y, (uint32_t)it.rotIndices.z));
 			if (it.rotIndices.x >= 0) {
-				q[it.rotIndices.x - idxMin] = Quat(Vec3(1,0,0), -mot[it.rotIndices.x] * XM_PI / 180);
+				q[it.rotIndices.x - idxMin] = Quat(Vec3(1,0,0), -mot[it.rotIndices.x] * M_PI / 180);
 			}
 			if (it.rotIndices.y >= 0) {
-				q[it.rotIndices.y - idxMin] = Quat(Vec3(0,1,0), -mot[it.rotIndices.y] * XM_PI / 180);
+				q[it.rotIndices.y - idxMin] = Quat(Vec3(0,1,0), -mot[it.rotIndices.y] * M_PI / 180);
 			}
 			if (it.rotIndices.z >= 0) {
-				q[it.rotIndices.z - idxMin] = Quat(Vec3(0,0,1), mot[it.rotIndices.z] * XM_PI / 180);
+				q[it.rotIndices.z - idxMin] = Quat(Vec3(0,0,1), mot[it.rotIndices.z] * M_PI / 180);
 			}
 			pose.quats.push_back(q[2] * q[1] * q[0]);
 		}
