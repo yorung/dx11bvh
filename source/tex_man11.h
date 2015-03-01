@@ -1,7 +1,7 @@
 class TexMan11
 {
 public:
-	typedef int TMID;
+	typedef unsigned int TMID;
 	static const TMID INVALID_TMID = 0;
 	TexMan11();
 	~TexMan11();

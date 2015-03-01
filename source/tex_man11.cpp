@@ -31,7 +31,7 @@ TexMan11::TMID TexMan11::Create(const char *name)
 		CreateWICTextureFromFileEx(deviceMan11.GetDevice(), deviceMan11.GetContext(), wname, 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false, nullptr, &tex);
 	}
 	if (!tex) {
-		return -1;
+		return INVALID_TMID;
 	}
 	texs.push_back(tex);
 	return nameToId[name] = texs.size() - 1;
