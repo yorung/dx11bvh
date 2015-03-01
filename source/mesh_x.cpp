@@ -1170,7 +1170,7 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh, MeshXBvhBinding& bind) const
 
 	BONE_ID idPelvis = GetFrameIdByName("Bip01_Pelvis");
 	if (idPelvis >= 0) {
-		bind.boneAlignQuats[idPelvis] = Quat(Vec3(0,1,0), M_PI);
+		bind.boneAlignQuats[idPelvis] = Quat(Vec3(0,1,0), (float)M_PI);
 	}
 
 	const char* xBoneNames[] = {

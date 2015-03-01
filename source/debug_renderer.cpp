@@ -42,7 +42,7 @@ void CreateCone(Block& b, const Vec3& v1, const Vec3& v2, BONE_ID boneId, uint32
 			InitVertex(it);
 		}
 		InitSkin(skin, boneId);
-		float rad = (M_PI * 2) / div * (j + 1);
+		float rad = ((float)M_PI * 2) / div * (j + 1);
 		Vec3 vRot = v1 + vRot0 * cosf(rad) + vRot90 * sinf(rad);
 		vert[0].xyz = vRotLast;
 		vert[1].xyz = v2;

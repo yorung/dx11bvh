@@ -82,7 +82,7 @@ void App::Init(const char* fileName)
 			"D:\\github\\kashiyuka.bvh",
 			"D:\\github\\nocchi.bvh",
 		};
-		for (int i = 0; i < dimof(bvhNames); i++) {
+		for (int i = 0; i < (int)dimof(bvhNames); i++) {
 			Bvh* bvh = new Bvh(bvhNames[i]);
 			mesh[i] = bvh;
 			bvh->ResetAnim();
@@ -131,8 +131,8 @@ void App::MouseMove(float x, float y)
 	if (lastX <= INVALID_POS || lastY <= INVALID_POS) {
 		return;
 	}
-	rotX += (x - lastX) * M_PI * 2.0f;
-	rotY += (y - lastY) * M_PI * 2.0f;
+	rotX += (x - lastX) * (float)M_PI * 2.0f;
+	rotY += (y - lastY) * (float)M_PI * 2.0f;
 
 	lastX = x;
 	lastY = y;
@@ -258,8 +258,8 @@ void App::Draw()
 
 	float f = dist * 1000;
 	float n = dist / 1000;
-	Mat mine = Mat((float)1 / tanf(45 * M_PI / 180 * 0.5f) / ((float)SCR_W / SCR_H), 0, 0, 0,
-		0, (float)1 / tanf(45 * M_PI / 180 * 0.5f), 0, 0,
+	Mat mine = Mat((float)1 / tanf(45 * (float)M_PI / 180 * 0.5f) / ((float)SCR_W / SCR_H), 0, 0, 0,
+		0, (float)1 / tanf(45 * (float)M_PI / 180 * 0.5f), 0, 0,
 		0, 0, f / (f - n), 1,
 		0, 0, -(n * f) / (f - n), 0);
 	matrixMan.Set(MatrixMan::PROJ, mine);
@@ -268,7 +268,7 @@ void App::Draw()
 //	gridRenderer.Draw();
 	waterSurface.Draw();
 
-	for (int i = 0; i < dimof(mesh); i++) {
+	for (int i = 0; i < (int)dimof(mesh); i++) {
 		Mesh* it = mesh[i];
 		MeshX* meshX = meshTiny;
 		MeshXAnimResult meshXAnimResult;

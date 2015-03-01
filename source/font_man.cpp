@@ -313,7 +313,7 @@ void FontMan::Render()
 			continue;
 		}
 		const CharCache& cc = it->second;
-		for (int j = 0; j < dimof(fontVertAlign); j++) {
+		for (int j = 0; j < (int)dimof(fontVertAlign); j++) {
 			verts[i * 4 + j].pos = (((cs.pos + cc.distDelta + fontVertAlign[j] * cc.srcWidth)) * Vec2(2, -2)) / Vec2((float)screenW, (float)screenH) + Vec2(-1, 1);
 			verts[i * 4 + j].coord = (cc.srcPos + fontVertAlign[j] * cc.srcWidth) / Vec2(TEX_W, TEX_H);
 		}

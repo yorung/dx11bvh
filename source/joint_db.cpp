@@ -30,7 +30,7 @@ static const char *xBones[] =
 BONE_ID GetBvhBoneIdByTinyBoneName(const char* tinyBoneName, const Bvh* bvh)
 {
 	BoneType boneType = BT_INVALID;
-	for (int i = 0; i < dimof(xBones); i++) {
+	for (int i = 0; i < (int)dimof(xBones); i++) {
 		if (!strcmp(xBones[i], tinyBoneName)) {
 			boneType = (BoneType)i;
 			break;
