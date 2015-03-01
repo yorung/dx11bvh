@@ -7,7 +7,7 @@ BufferMan::BMID SkyMan::constantBufferId = -1;
 SkyMan::SkyMan()
 {
 	texId = TexMan::INVALID_TMID;
-	shaderId = -1;
+	shaderId = ShaderMan::INVALID_SMID;
 	sampler = nullptr;
 	depthStencilState = nullptr;
 }

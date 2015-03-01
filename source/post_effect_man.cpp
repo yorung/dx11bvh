@@ -6,7 +6,7 @@ BufferMan::BMID PostEffectMan::constantBufferId = -1;
 
 PostEffectMan::PostEffectMan()
 {
-	shaderId = -1;
+	shaderId = ShaderMan::INVALID_SMID;
 	sampler = nullptr;
 	depthStencilState = nullptr;
 }

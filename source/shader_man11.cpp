@@ -18,6 +18,16 @@ static void Compile(const char* name, bool ps, ID3D10Blob*& blob)
 	}
 }
 
+ShaderMan11::ShaderMan11()
+{
+	m_effects.push_back(Effect());	// make ID 0 invalid
+}
+
+ShaderMan11::~ShaderMan11()
+{
+	Destroy();
+}
+
 ShaderMan11::SMID ShaderMan11::Create(const char *name, const D3D11_INPUT_ELEMENT_DESC elements[], int numElements)
 {
 	auto it = m_nameToId.find(name);
