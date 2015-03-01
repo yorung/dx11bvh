@@ -190,10 +190,11 @@ void FontMan::Destroy()
 	texSrc.Destroy();
 	afSafeDeleteBuffer(ibo);
 	afSafeDeleteBuffer(vbo);
-
+#ifndef GL_TRUE
 	SAFE_RELEASE(pSamplerState);
 	SAFE_RELEASE(pDSState);
 	SAFE_RELEASE(blendState);
+#endif
 	ClearCache();
 }
 
