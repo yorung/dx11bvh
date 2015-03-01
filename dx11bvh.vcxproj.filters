@@ -99,6 +99,9 @@
     <ClInclude Include="source\font_man.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="source\system_metrics.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -174,6 +177,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\helper_win.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\system_metrics.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

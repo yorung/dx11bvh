@@ -30,8 +30,6 @@ class FontMan
 	ShaderMan::SMID shader;
 	AFBufObj ibo;
 	AFBufObj vbo;
-
-	int screenW, screenH;
 #ifndef GL_TRUE
 	ID3D11SamplerState* pSamplerState;
 	ID3D11DepthStencilState* pDSState;
@@ -46,7 +44,7 @@ class FontMan
 public:
 	FontMan();
 	~FontMan();
-	bool Init(int scrW, int scrH);
+	bool Init();
 	void Destroy();
 	void FlushToTexture();
 	void DrawString(Vec2 pos, int fontSize, const wchar_t *text);

@@ -24,7 +24,7 @@ App::App() : scale(1), radius(1), lastX(INVALID_POS), lastY(INVALID_POS), animat
 	renderTargetView(nullptr), shaderResourceView(nullptr), unorderedAccessView(nullptr),
 	renderTargetView2(nullptr), shaderResourceView2(nullptr), unorderedAccessView2(nullptr)
 {
-	ZeroMemory(mesh, sizeof(mesh));
+	memset(mesh, 0, sizeof(mesh));
 	lastTime = GetTime();
 }
 
@@ -53,7 +53,7 @@ void App::Init(const char* fileName)
 	SAFE_RELEASE(tex);
 	SAFE_RELEASE(tex2);
 
-	fontMan.Init(SCR_W, SCR_H);
+	fontMan.Init();
 	debugRenderer.Init();
 	gridRenderer.Init();
 	waterSurface.Init();

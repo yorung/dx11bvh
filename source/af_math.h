@@ -76,6 +76,14 @@ struct Vec4
 #endif
 };
 
+struct ivec2
+{
+	int x, y;
+	ivec2() : x(0), y(0) {}
+	ivec2(int X, int Y) : x(X), y(Y) {}
+	operator Vec2() { return Vec2((float)x, (float)y); }
+};
+
 struct ivec3
 {
 	int x, y, z;

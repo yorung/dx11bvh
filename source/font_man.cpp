@@ -117,8 +117,6 @@ FontMan::FontMan()
 	texture = TexMan::INVALID_TMID;
 	shader = ShaderMan::INVALID_SMID;
 	dirty = false;
-	screenW = 0;
-	screenH = 0;
 }
 
 FontMan::~FontMan()
@@ -132,11 +130,9 @@ void FontMan::ClearCache()
 	curX = curY = curLineMaxH = 0;
 }
 
-bool FontMan::Init(int scrW, int scrH)
+bool FontMan::Init()
 {
 	Destroy();
-	screenW = scrW;
-	screenH = scrH;
 	bool result = false;
 	if (!texSrc.Create(TEX_W, TEX_H)) {
 		goto DONE;
@@ -307,6 +303,8 @@ void FontMan::Render()
 	}
 	FlushToTexture();
 
+	Vec2 scrSize = systemMetrics.GetScreenSize();
+
 	static FontVertex verts[4 * SPRITE_MAX];
 	for (int i = 0; i < numSprites; i++) {
 		CharSprite& cs = charSprites[i];
@@ -317,7 +315,7 @@ void FontMan::Render()
 		}
 		const CharCache& cc = it->second;
 		for (int j = 0; j < (int)dimof(fontVertAlign); j++) {
-			verts[i * 4 + j].pos = (((cs.pos + cc.distDelta + fontVertAlign[j] * cc.srcWidth)) * Vec2(2, -2)) / Vec2((float)screenW, (float)screenH) + Vec2(-1, 1);
+			verts[i * 4 + j].pos = (((cs.pos + cc.distDelta + fontVertAlign[j] * cc.srcWidth)) * Vec2(2, -2)) / scrSize + Vec2(-1, 1);
 			verts[i * 4 + j].coord = (cc.srcPos + fontVertAlign[j] * cc.srcWidth) / Vec2(TEX_W, TEX_H);
 		}
 	}

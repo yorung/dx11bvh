@@ -211,6 +211,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEWHEEL:
 		app.MouseWheel((short)HIWORD(wParam) / (float)WHEEL_DELTA);
 		break;
+	case WM_SIZE:
+		systemMetrics.SetScreenSize(ivec2(LOWORD(lParam), HIWORD(lParam)));
+		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
