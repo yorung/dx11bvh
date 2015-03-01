@@ -148,6 +148,7 @@ bool FontMan::Init(int scrW, int scrH)
 		CInputElement(0, "TEXCOORD", SF_R32G32_FLOAT, 8),
 	};
 	shader = shaderMan.Create("font", elements, dimof(elements));
+	assert(shader);
 
 	ibo = afCreateQuadListIndexBuffer(SPRITE_MAX);
 	vbo = afCreateDynamicVertexBuffer(SPRITE_MAX * sizeof(FontVertex) * 4);
@@ -207,6 +208,7 @@ void FontMan::MakeFontBitmap(const char* fontName, const CharSignature& sig, DIB
 	dib.Clear();
 	wchar_t buf[] = { sig.code, '\0' };
 	HDC hdc = texSrc.getDC();
+	assert(hdc);
 	HFONT oldFont = (HFONT)SelectObject(hdc, font);
 	const MAT2 mat = { {0,1}, {0,0}, {0,0}, {0,1} };
 	GLYPHMETRICS met;
