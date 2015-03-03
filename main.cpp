@@ -199,17 +199,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 	case WM_LBUTTONDOWN:
 		SetCapture(hWnd);
-		app.LButtonDown(LOWORD(lParam) / (float)SCR_W, HIWORD(lParam) / (float)SCR_H);
+		devCamera.LButtonDown(LOWORD(lParam) / (float)SCR_W, HIWORD(lParam) / (float)SCR_H);
 		break;
 	case WM_LBUTTONUP:
 		ReleaseCapture();
-		app.LButtonUp(LOWORD(lParam) / (float)SCR_W, HIWORD(lParam) / (float)SCR_H);
+		devCamera.LButtonUp(LOWORD(lParam) / (float)SCR_W, HIWORD(lParam) / (float)SCR_H);
 		break;
 	case WM_MOUSEMOVE:
-		app.MouseMove(MAKEPOINTS(lParam).x / (float)SCR_W, MAKEPOINTS(lParam).y / (float)SCR_H);
+		devCamera.MouseMove(MAKEPOINTS(lParam).x / (float)SCR_W, MAKEPOINTS(lParam).y / (float)SCR_H);
 		break;
 	case WM_MOUSEWHEEL:
-		app.MouseWheel((short)HIWORD(wParam) / (float)WHEEL_DELTA);
+		devCamera.MouseWheel((short)HIWORD(wParam) / (float)WHEEL_DELTA);
 		break;
 	case WM_SIZE:
 		systemMetrics.SetScreenSize(ivec2(LOWORD(lParam), HIWORD(lParam)));

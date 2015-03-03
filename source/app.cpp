@@ -7,8 +7,6 @@ static int GetKeyState(char) {
 #define VK_RETURN 0x0D
 #endif
 
-static float INVALID_POS = -99999.f;
-
 static float CalcRadius(const Mesh* m)
 {
 	const Block& b = m->GetRawDatas();
@@ -20,7 +18,7 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : scale(1), radius(1), lastX(INVALID_POS), lastY(INVALID_POS), animationNumber(0), trackTime(0), meshTiny(nullptr),
+App::App() : radius(1), animationNumber(0), trackTime(0), meshTiny(nullptr),
 	renderTargetView(nullptr), shaderResourceView(nullptr), unorderedAccessView(nullptr),
 	renderTargetView2(nullptr), shaderResourceView2(nullptr), unorderedAccessView2(nullptr)
 {
@@ -91,51 +89,15 @@ void App::Init(const char* fileName)
 	}
 
 	radius = CalcRadius(mesh[0]);
-	scale = std::max(0.00001f, radius);
-
-	height = radius / 2;
+	float scale = std::max(0.00001f, radius);
+	devCamera.SetScale(scale);
+	devCamera.SetHeight(radius / 2);
 
 	//	skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "sky_cubemap");
 //	skyMan.Create("resource\\Tiny_skin.dds", "sky_spheremap");
 	skyMan.Create("resource\\PANO_20141115_141959.dds", "sky_photosphere");
 
 	lastTime = GetTime();
-}
-
-void App::MouseWheel(float delta)
-{
-	if (delta > 0) {
-		scale /= 1.1f;
-	}
-	if (delta < 0) {
-		scale *= 1.1f;
-	}
-}
-
-void App::LButtonDown(float x, float y)
-{
-	lastX = x;
-	lastY = y;
-
-	waterSurface.CreateRipple();
-}
-
-void App::LButtonUp(float x, float y)
-{
-	MouseMove(x, y);
-	lastX = lastY = INVALID_POS;
-}
-
-void App::MouseMove(float x, float y)
-{
-	if (lastX <= INVALID_POS || lastY <= INVALID_POS) {
-		return;
-	}
-	rotX += (x - lastX) * (float)M_PI * 2.0f;
-	rotY += (y - lastY) * (float)M_PI * 2.0f;
-
-	lastX = x;
-	lastY = y;
 }
 
 inline Vec2 GetScreenPos(const Mat& mLocal)
@@ -247,14 +209,13 @@ void App::Draw()
 	}
 
 	matrixMan.Set(MatrixMan::WORLD, Mat());
-
-	float dist = 3 * scale;
-	Mat cam = translate(0, height, -dist) * q2m(Quat(Vec3(1,0,0), rotY)) * q2m(Quat(Vec3(0,1,0), rotX));
-	matrixMan.Set(MatrixMan::VIEW, fastInv(cam));
+	matrixMan.Set(MatrixMan::VIEW, devCamera.CalcViewMatrix());
 
 	//if (GetKeyState(VK_RETURN) & 0x01) {
 	//	Mat dx = XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, dist / 1000, dist * 1000);
 	//}
+
+	float dist = 3 * devCamera.GetScale();
 
 	float f = dist * 1000;
 	float n = dist / 1000;

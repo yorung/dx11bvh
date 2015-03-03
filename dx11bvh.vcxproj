@@ -93,6 +93,7 @@
     <ClInclude Include="source\compute_shader_skinning.h" />
     <ClInclude Include="source\debug_renderer.h" />
     <ClInclude Include="source\device_man11.h" />
+    <ClInclude Include="source\dev_camera.h" />
     <ClInclude Include="source\dib.h" />
     <ClInclude Include="source\font_man.h" />
     <ClInclude Include="source\fps.h" />
@@ -122,6 +123,7 @@
     <ClCompile Include="source\compute_shader_skinning.cpp" />
     <ClCompile Include="source\debug_renderer.cpp" />
     <ClCompile Include="source\device_man11.cpp" />
+    <ClCompile Include="source\dev_camera.cpp" />
     <ClCompile Include="source\dib.cpp" />
     <ClCompile Include="source\font_man.cpp" />
     <ClCompile Include="source\fps.cpp" />
