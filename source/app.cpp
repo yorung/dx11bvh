@@ -90,7 +90,7 @@ void App::Init(const char* fileName)
 
 	radius = CalcRadius(mesh[0]);
 	float scale = std::max(0.00001f, radius);
-	devCamera.SetScale(scale);
+	devCamera.SetDistance(scale * 3);
 	devCamera.SetHeight(radius / 2);
 
 	//	skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "sky_cubemap");
@@ -215,7 +215,7 @@ void App::Draw()
 	//	Mat dx = XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, dist / 1000, dist * 1000);
 	//}
 
-	float dist = 3 * devCamera.GetScale();
+	float dist = devCamera.GetDistance();
 
 	float f = dist * 1000;
 	float n = dist / 1000;

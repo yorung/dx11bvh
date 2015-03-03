@@ -1,6 +1,6 @@
 class DevCamera
 {
-	float scale;
+	float dist;
 	float lastX;
 	float lastY;
 	float rotX;
@@ -8,12 +8,12 @@ class DevCamera
 	float height;
 public:
 	DevCamera();
-	void SetScale(float scale);
+	void SetDistance(float dist);
 	void MouseWheel(float delta);
 	void LButtonDown(float x, float y);
 	void LButtonUp(float x, float y);
 	void MouseMove(float x, float y);
-	float GetScale();
+	float GetDistance();
 	Mat CalcViewMatrix();
 	void SetHeight(float height);
 };
