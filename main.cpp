@@ -199,6 +199,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 	case WM_LBUTTONDOWN:
 		SetCapture(hWnd);
+		waterSurface.CreateRipple();
 		devCamera.LButtonDown(LOWORD(lParam) / (float)SCR_W, HIWORD(lParam) / (float)SCR_H);
 		break;
 	case WM_LBUTTONUP:

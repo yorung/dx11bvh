@@ -36,8 +36,6 @@ void DevCamera::LButtonDown(float x, float y)
 {
 	lastX = x;
 	lastY = y;
-
-	waterSurface.CreateRipple();
 }
 
 void DevCamera::LButtonUp(float x, float y)
