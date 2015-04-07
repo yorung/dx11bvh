@@ -158,8 +158,8 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 		cBuf.camPos = fastInv(matView).GetRow(3);
 		bufferMan.Write(constantBufferId, &cBuf);
 		const auto buf = bufferMan.Get(constantBufferId);
-		deviceMan11.GetContext()->VSSetConstantBuffers(0, 1, &buf);
-		deviceMan11.GetContext()->PSSetConstantBuffers(0, 1, &buf);
+		deviceMan11.GetContext()->VSSetConstantBuffers(2, 1, &buf);
+		deviceMan11.GetContext()->PSSetConstantBuffers(2, 1, &buf);
 		afDrawIndexedTriangleList(pIndexBuffer, matMap.faces * 3, matMap.faceStartIndex * 3);
 	}
 }

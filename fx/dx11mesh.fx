@@ -1,4 +1,4 @@
-cbuffer perMaterial : register(b0)
+cbuffer perMaterial : register(b2)
 {
 	row_major float4x4 matW;
 	row_major float4x4 matV;
