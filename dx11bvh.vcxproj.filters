@@ -16,6 +16,9 @@
     <Filter Include="source">
       <UniqueIdentifier>{860bd438-489f-4cd4-9b82-c4bbccf7b2a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{70f14503-edc7-47d4-ac3c-5688c5fc6522}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -202,5 +205,37 @@
     <ResourceCompile Include="res.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="fx\dx11mesh.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="fx\font.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="fx\post_effect_cs.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="fx\post_effect_mono.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="fx\skin_cs.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="fx\sky_cubemap.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="fx\sky_photosphere.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="fx\sky_spheremap.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="fx\solid.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="fx\water_surface.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
