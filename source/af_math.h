@@ -468,6 +468,27 @@ inline Mat perspective(affloat fov, affloat aspect, affloat n, affloat f)
 	return proj;
 }
 
+inline Mat ortho(affloat left, affloat right, affloat bottom, affloat top, affloat n, affloat f)
+{
+#ifdef GL_TRUE
+	Mat proj = Mat(2 / (right - left), 0, 0, 0,
+		0, 2 / (top - bottom), 0, 0,
+		0, 0, -2 / (f - n), 0,
+		(left + right) / (left - right), (bottom + top) / (bottom - top), (n + f) / (n - f), 1);
+#else
+	Mat proj = Mat(2 / (right - left), 0, 0, 0,
+		0, 2 / (top - bottom), 0, 0,
+		0, 0, 1 / (f - n), 0,
+		(left + right) / (left - right), (bottom + top) / (bottom - top), n / (n - f), 1);
+#endif
+	return proj;
+}
+
+inline ivec4 uint32ToIvec4(uint32_t col) {
+	return ivec4(col >> 24, (col & 0x00ff0000) >> 16, (col & 0xff00) >> 8, col & 0xff);
+}
+
+
 inline ivec4 UnormToIvec4(uint32_t col) {
 	return ivec4(col >> 24, (col & 0x00ff0000) >> 16, (col & 0xff00) >> 8, col & 0xff);
 }
