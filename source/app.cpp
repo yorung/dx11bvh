@@ -219,11 +219,8 @@ void App::Draw()
 
 	float f = dist * 1000;
 	float n = dist / 1000;
-	Mat mine = Mat((float)1 / tanf(45 * (float)M_PI / 180 * 0.5f) / ((float)SCR_W / SCR_H), 0, 0, 0,
-		0, (float)1 / tanf(45 * (float)M_PI / 180 * 0.5f), 0, 0,
-		0, 0, f / (f - n), 1,
-		0, 0, -(n * f) / (f - n), 0);
-	matrixMan.Set(MatrixMan::PROJ, mine);
+
+	matrixMan.Set(MatrixMan::PROJ, perspective(45, (float)SCR_W / SCR_H, n, f));
 
 	skyMan.Draw();
 //	gridRenderer.Draw();
