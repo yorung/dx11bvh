@@ -111,7 +111,7 @@ ID3D11ShaderResourceView* TexMan11::Get(TMID id)
 	return nullptr;
 }
 
-SIZE TexMan11::GetSize(TMID id)
+ivec2 TexMan11::GetSize(TMID id)
 {
 	ID3D11ShaderResourceView* view = Get(id);
 	assert(view);
@@ -127,9 +127,9 @@ SIZE TexMan11::GetSize(TMID id)
 	tx->GetDesc(&desc);
 	SAFE_RELEASE(tx);
 
-	SIZE sz;
-	sz.cx = (int)desc.Width;
-	sz.cy = (int)desc.Height;
+	ivec2 sz;
+	sz.x = (int)desc.Width;
+	sz.y = (int)desc.Height;
 
 	return sz;
 }
