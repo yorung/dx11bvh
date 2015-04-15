@@ -108,6 +108,9 @@
     <ClInclude Include="source\dev_camera.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="source\helper_dx.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -189,6 +192,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\dev_camera.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\helper_dx.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

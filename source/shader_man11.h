@@ -1,20 +1,3 @@
-#define SF_R32G32_FLOAT DXGI_FORMAT_R32G32_FLOAT
-
-typedef D3D11_INPUT_ELEMENT_DESC InputElement;
-
-class CInputElement : public InputElement {
-public:
-	CInputElement(int inputSlot, const char* name, DXGI_FORMAT format, int offset) {
-		SemanticName = name;
-		SemanticIndex = 0;
-		Format = format;
-		InputSlot = inputSlot;
-		AlignedByteOffset = offset;
-		InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		InstanceDataStepRate = 0;
-	}
-};
-
 class ShaderMan11
 {
 public:

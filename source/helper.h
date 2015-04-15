@@ -25,33 +25,3 @@ template <class T> inline void SAFE_RELEASE(T& p)
 	}
 }
 
-typedef unsigned short AFIndex;
-#ifdef GL_TRUE
-#define AFIndexTypeToDevice GL_UNSIGNED_SHORT
-typedef GLuint AFBufObj;
-#else
-#define AFIndexTypeToDevice DXGI_FORMAT_R16_UINT
-typedef ID3D11Buffer* AFBufObj;
-#endif
-
-#ifdef GL_TRUE
-inline void afSafeDeleteBuffer(GLuint& b)
-{
-	if (b != 0) {
-		glDeleteBuffers(1, &b);
-		b = 0;
-	}
-}
-#else
-inline void afSafeDeleteBuffer(AFBufObj& b)
-{
-	SAFE_RELEASE(b);
-}
-#endif
-
-AFBufObj afCreateIndexBuffer(const AFIndex* indi, int numIndi);
-AFBufObj afCreateQuadListIndexBuffer(int numQuads);
-AFBufObj afCreateVertexBuffer(int size, const void* buf);
-AFBufObj afCreateDynamicVertexBuffer(int size);
-void afWriteBuffer(AFBufObj bo, const void* buf, int size);
-void afDrawIndexedTriangleList(AFBufObj ibo, int count, int start = 0);

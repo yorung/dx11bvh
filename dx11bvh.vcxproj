@@ -99,6 +99,7 @@
     <ClInclude Include="source\fps.h" />
     <ClInclude Include="source\grid_renderer.h" />
     <ClInclude Include="source\helper.h" />
+    <ClInclude Include="source\helper_dx.h" />
     <ClInclude Include="source\helper_text.h" />
     <ClInclude Include="source\joint_db.h" />
     <ClInclude Include="source\matrix_man.h" />
@@ -129,6 +130,7 @@
     <ClCompile Include="source\fps.cpp" />
     <ClCompile Include="source\grid_renderer.cpp" />
     <ClCompile Include="source\helper.cpp" />
+    <ClCompile Include="source\helper_dx.cpp" />
     <ClCompile Include="source\helper_win.cpp" />
     <ClCompile Include="source\joint_db.cpp" />
     <ClCompile Include="source\matrix_man.cpp" />
