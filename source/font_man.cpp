@@ -130,6 +130,11 @@ void FontMan::ClearCache()
 	curX = curY = curLineMaxH = 0;
 }
 
+static InputElement elements[] = {
+	CInputElement(0, "POSITION", SF_R32G32_FLOAT, 0),
+	CInputElement(0, "TEXCOORD", SF_R32G32_FLOAT, 8),
+};
+
 bool FontMan::Init()
 {
 	Destroy();
@@ -139,34 +144,27 @@ bool FontMan::Init()
 	}
 	texture = texMan.CreateDynamicTexture("$FontMan", TEX_W, TEX_H);
 
-	static InputElement elements[] = {
-		CInputElement(0, "POSITION", SF_R32G32_FLOAT, 0),
-		CInputElement(0, "TEXCOORD", SF_R32G32_FLOAT, 8),
-	};
+#ifdef GL_TRUE
+	shader = shaderMan.Create("font");
+#endif
+#ifndef GL_TRUE
 	shader = shaderMan.Create("font", elements, dimof(elements));
+#endif
 	assert(shader);
 
 	ibo = afCreateQuadListIndexBuffer(SPRITE_MAX);
 	vbo = afCreateDynamicVertexBuffer(SPRITE_MAX * sizeof(FontVertex) * 4);
-
+#ifdef GL_TRUE
+	{
+		GLsizei stride = sizeof(FontVertex);
+		vao = afCreateVAO(shader, elements, dimof(elements), 1, &vbo, &stride, ibo);
+	}
+#endif
 #ifndef GL_TRUE
 	{
 		CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
 		descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 		deviceMan11.GetDevice()->CreateSamplerState(&descSamp, &pSamplerState);
-		CD3D11_DEPTH_STENCIL_DESC dsdesc(D3D11_DEFAULT);
-		dsdesc.DepthEnable = FALSE;
-		deviceMan11.GetDevice()->CreateDepthStencilState(&dsdesc, &pDSState);
-		CD3D11_BLEND_DESC bdesc(D3D11_DEFAULT);
-		bdesc.RenderTarget[0].BlendEnable = TRUE;
-		bdesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-		bdesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-		bdesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-		bdesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-		bdesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-		bdesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-		bdesc.RenderTarget[0].RenderTargetWriteMask = D3D10_COLOR_WRITE_ENABLE_ALL;
-		deviceMan11.GetDevice()->CreateBlendState(&bdesc, &blendState);
 	}
 #endif
 	result = true;
@@ -186,10 +184,11 @@ void FontMan::Destroy()
 	texSrc.Destroy();
 	afSafeDeleteBuffer(ibo);
 	afSafeDeleteBuffer(vbo);
+#ifdef GL_TRUE
+	afSafeDeleteVAO(vao);
+#endif
 #ifndef GL_TRUE
 	SAFE_RELEASE(pSamplerState);
-	SAFE_RELEASE(pDSState);
-	SAFE_RELEASE(blendState);
 #endif
 	ClearCache();
 }
@@ -224,7 +223,6 @@ void FontMan::MakeFontBitmap(const char* fontName, const CharSignature& sig, DIB
 	//	SetBkColor(hdc, RGB(0, 0, 0));
 	//	TextOutW(hdc, 0, 0, buf, wcslen(buf));
 		dib3.Blt(dib.getDC(), 0, 0, dib3.getW(), dib3.getH());
-		dib.Save(SPrintf("ScreenShot\\$dib_%d_%d.bmp", sig.code, sig.fontSize));
 		dib.DibToDXFont();
 	}
 	SelectObject(hdc, (HGDIOBJ)oldFont);
@@ -289,8 +287,12 @@ void FontMan::FlushToTexture()
 		return;
 	}
 	dirty = false;
+#ifdef GL_TRUE
+	texMan.Write(texture, texSrc.ReferPixels(), texSrc.getW(), texSrc.getH());
+#endif
+#ifndef GL_TRUE
 	texMan.Write(texture, texSrc.ReferPixels());
-//	texMan.Write(texture, texSrc.ReferPixels(), texSrc.getW(), texSrc.getH());
+#endif
 }
 
 void FontMan::Render()
@@ -322,39 +324,30 @@ void FontMan::Render()
 	afWriteBuffer(vbo, verts, 4 * numSprites * sizeof(FontVertex));
 	shaderMan.Apply(shader);
 
-#ifdef GL_TRUE
-	GLsizei stride = sizeof(FontVertex);
-	shaderMan.SetVertexBuffers(shader, 1, &vbo, &stride);
-#endif
 
 #ifndef GL_TRUE
-	float factor[] = { 0, 0, 0, 0 };
-	deviceMan11.GetContext()->OMSetDepthStencilState(pDSState, 1);
-	deviceMan11.GetContext()->OMSetBlendState(blendState, factor, 0xffffffff);
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
 
 	UINT stride = sizeof(FontVertex);
 	UINT offset = 0;
 	deviceMan11.GetContext()->IASetVertexBuffers(0, 1, &vbo, &stride, &offset);
-	ID3D11ShaderResourceView* tx = texMan.Get(texture);
-	deviceMan11.GetContext()->PSSetShaderResources(0, 1, &tx);
-	afDrawIndexedTriangleList(ibo, numSprites * 6);
 #endif
 
 #ifdef GL_TRUE
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBindVertexArray(vao);
+#endif
+
+	afBindTextureToBindingPoint(texture, 0);
+	afBlendMode(BM_ALPHA);
+	afDepthStencilMode(false);
 	afDrawIndexedTriangleList(ibo, numSprites * 6);
-	glDisable(GL_BLEND);
-#endif
+	afDepthStencilMode(true);
+	afBlendMode(BM_NONE);
 
-#ifndef GL_TRUE
-	tx = nullptr;
-	deviceMan11.GetContext()->PSSetShaderResources(0, 1, &tx);
-	deviceMan11.GetContext()->OMSetBlendState(nullptr, nullptr, 0xffffffff);
-#endif
 
+#ifdef GL_TRUE
+	glBindVertexArray(0);
+#endif
 	numSprites = 0;
 }
 
