@@ -9,6 +9,14 @@ ID3D11Buffer* afCreateIndexBuffer(const AFIndex* indi, int numIndi)
 	return indexBuffer;
 }
 
+ID3D11Buffer* afCreateVertexBuffer(int size, const void* data)
+{
+	ID3D11Buffer* vbo;
+	D3D11_SUBRESOURCE_DATA subresData = { data, 0, 0 };
+	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(size, D3D11_BIND_VERTEX_BUFFER), &subresData, &vbo);
+	return vbo;
+}
+
 ID3D11Buffer* afCreateDynamicVertexBuffer(int size)
 {
 	ID3D11Buffer* vbo;

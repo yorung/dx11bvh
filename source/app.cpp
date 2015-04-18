@@ -223,7 +223,7 @@ void App::Draw()
 	matrixMan.Set(MatrixMan::PROJ, perspective(45, (float)SCR_W / SCR_H, n, f));
 
 	skyMan.Draw();
-//	gridRenderer.Draw();
+	gridRenderer.Draw();
 	waterSurface.Draw();
 
 	for (int i = 0; i < (int)dimof(mesh); i++) {

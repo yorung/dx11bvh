@@ -6,15 +6,15 @@ BufferMan::BMID GridRenderer::constantBufferId = -1;
 
 struct GridVert {
 	Vec3 pos;
-	DWORD color;
+	uint32_t color;
 };
 
 GridRenderer::GridRenderer()
 {
-	pVertexBuffer = nullptr;
-	pIndexBuffer = nullptr;
+	vbo = 0;
+	ibo = 0;
+	vao = 0;
 	pSamplerState = nullptr;
-	pDSState = nullptr;
 }
 
 GridRenderer::~GridRenderer()
@@ -24,10 +24,10 @@ GridRenderer::~GridRenderer()
 
 void GridRenderer::Destroy()
 {
-	SAFE_RELEASE(pIndexBuffer);
-	SAFE_RELEASE(pVertexBuffer);
+	afSafeDeleteBuffer(ibo);
+	afSafeDeleteBuffer(vbo);
+	afSafeDeleteVAO(vao);
 	SAFE_RELEASE(pSamplerState);
-	SAFE_RELEASE(pDSState);
 }
 
 void GridRenderer::Init()
@@ -35,7 +35,7 @@ void GridRenderer::Init()
 	Destroy();
 
 	std::vector<GridVert> vert;
-	std::vector<DWORD> indi;
+	std::vector<AFIndex> indi;
 
 	for (float x = -1000; x <= 1000; x += 100) {
 		GridVert v;
@@ -59,9 +59,6 @@ void GridRenderer::Init()
 	}
 
 	int sizeVertices = vert.size() * sizeof(GridVert);
-	int sizeIndices = indi.size() * sizeof(DWORD);
-	void* vertices = &vert[0];
-	void* indices = &indi[0];
 	lines = indi.size() / 2;
 
 	static D3D11_INPUT_ELEMENT_DESC layout[] = {
@@ -70,10 +67,8 @@ void GridRenderer::Init()
 	};
 	shaderId = shaderMan.Create("solid", layout, dimof(layout));
 
-	D3D11_SUBRESOURCE_DATA subresData = { vertices, 0, 0 };
-	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeVertices, D3D11_BIND_VERTEX_BUFFER), &subresData, &pVertexBuffer);
-	subresData.pSysMem = indices;
-	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(sizeIndices, D3D11_BIND_INDEX_BUFFER), &subresData, &pIndexBuffer);
+	vbo = afCreateVertexBuffer(sizeVertices, &vert[0]);
+	ibo = afCreateIndexBuffer(&indi[0], indi.size());
 	if (constantBufferId < 0) {
 		constantBufferId = bufferMan.Create(sizeof(SolidConstantBuffer));
 	}
@@ -81,12 +76,13 @@ void GridRenderer::Init()
 	CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
 	descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	deviceMan11.GetDevice()->CreateSamplerState(&descSamp, &pSamplerState);
-	deviceMan11.GetDevice()->CreateDepthStencilState(&CD3D11_DEPTH_STENCIL_DESC(D3D11_DEFAULT), &pDSState);
+
+	int strides[] = { sizeof(GridVert) };
+	vao = afCreateVAO(shaderId, layout, dimof(layout), 1, &vbo, strides, ibo);
 }
 
 void GridRenderer::Draw()
 {
-	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 	shaderMan.Apply(shaderId);
 
 	Mat matWorld, matView, matProj;
@@ -96,13 +92,8 @@ void GridRenderer::Draw()
 	Mat matW = matWorld;
 	Mat matVP = matView * matProj;
 
-	deviceMan11.GetContext()->OMSetDepthStencilState(pDSState, 1);
+	afDepthStencilMode(false);
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
-
-	UINT strides[] = { sizeof(GridVert) };
-	UINT offsets[] = { 0 };
-	deviceMan11.GetContext()->IASetIndexBuffer(pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-	deviceMan11.GetContext()->IASetVertexBuffers(0, 1, &pVertexBuffer, strides, offsets);
 
 	SolidConstantBuffer cBuf;
 	cBuf.matW = matW;
@@ -111,6 +102,8 @@ void GridRenderer::Draw()
 	const auto buf = bufferMan.Get(constantBufferId);
 	deviceMan11.GetContext()->VSSetConstantBuffers(0, 1, &buf);
 
+	afBindVAO(vao);
+	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 	deviceMan11.GetContext()->DrawIndexed(lines * 2, 0, 0);
 }
 
