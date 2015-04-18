@@ -21,7 +21,6 @@ MeshRenderer11::MeshRenderer11()
 	skinnedPosBuffer = nullptr;
 	pIndexBuffer = nullptr;
 	pSamplerState = nullptr;
-	pDSState = nullptr;
 }
 
 MeshRenderer11::~MeshRenderer11()
@@ -37,7 +36,6 @@ void MeshRenderer11::Destroy()
 	SAFE_RELEASE(skinBuffer);
 	SAFE_RELEASE(skinnedPosBuffer);
 	SAFE_RELEASE(pSamplerState);
-	SAFE_RELEASE(pDSState);
 }
 
 void MeshRenderer11::Init(const Block& block)
@@ -76,7 +74,6 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 	CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
 	descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	deviceMan11.GetDevice()->CreateSamplerState(&descSamp, &pSamplerState);
-	deviceMan11.GetDevice()->CreateDepthStencilState(&CD3D11_DEPTH_STENCIL_DESC(D3D11_DEFAULT), &pDSState);
 }
 
 void MeshRenderer11::Calc(const Mat BoneMatrices[BONE_MAX], const Block& block) const
@@ -122,7 +119,7 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 	matrixMan.Get(MatrixMan::VIEW, matView);
 	matrixMan.Get(MatrixMan::PROJ, matProj);
 
-	deviceMan11.GetContext()->OMSetDepthStencilState(pDSState, 1);
+	afDepthStencilMode(false);
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
 
 	UINT strides[] = { sizeof(MeshColor) };

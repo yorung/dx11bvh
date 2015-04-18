@@ -12,7 +12,6 @@ class MeshRenderer11
 	ID3D11Buffer* skinnedPosBuffer;
 	ID3D11Buffer* pIndexBuffer;
 	ID3D11SamplerState* pSamplerState;
-	ID3D11DepthStencilState* pDSState;
 	ShaderMan11::SMID shaderId;
 public:
 	MeshRenderer11();
