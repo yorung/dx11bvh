@@ -39,18 +39,16 @@ ShaderMan11::SMID ShaderMan11::Create(const char *name, const D3D11_INPUT_ELEMEN
 	Effect effect;
 	memset(&effect, 0, sizeof(effect));
 
-	ID3DBlob* pBlobVS;
 	ID3DBlob* pBlobPS;
-	Compile(name, false, pBlobVS);
+	Compile(name, false, effect.pBlobVS);
 	Compile(name, true, pBlobPS);
-	HRESULT hr = deviceMan11.GetDevice()->CreateVertexShader(pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), nullptr, &effect.pVertexShader);
+	HRESULT hr = deviceMan11.GetDevice()->CreateVertexShader(effect.pBlobVS->GetBufferPointer(), effect.pBlobVS->GetBufferSize(), nullptr, &effect.pVertexShader);
 	hr = deviceMan11.GetDevice()->CreatePixelShader(pBlobPS->GetBufferPointer(), pBlobPS->GetBufferSize(), nullptr, &effect.pPixelShader);
 
 	if (elements) {
-		hr = deviceMan11.GetDevice()->CreateInputLayout(elements, numElements, pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &effect.pInputLayout);
+		hr = deviceMan11.GetDevice()->CreateInputLayout(elements, numElements, effect.pBlobVS->GetBufferPointer(), effect.pBlobVS->GetBufferSize(), &effect.pInputLayout);
 	//	assert(!hr);
 	}
-	SAFE_RELEASE(pBlobVS);
 	SAFE_RELEASE(pBlobPS);
 
 	effect.elements = elements;
@@ -67,6 +65,7 @@ void ShaderMan11::Destroy()
 		SAFE_RELEASE(it->pInputLayout);
 		SAFE_RELEASE(it->pVertexShader);
 		SAFE_RELEASE(it->pPixelShader);
+		SAFE_RELEASE(it->pBlobVS);
 	}
 	m_effects.clear();
 	m_nameToId.clear();

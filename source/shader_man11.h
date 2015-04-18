@@ -9,6 +9,7 @@ private:
 		ID3D11InputLayout* pInputLayout;
 		ID3D11VertexShader* pVertexShader;
 		ID3D11PixelShader* pPixelShader;
+		ID3DBlob* pBlobVS;
 		const D3D11_INPUT_ELEMENT_DESC *elements;
 		int numElements;
 		Effect() { memset(this, 0, sizeof(*this)); }
