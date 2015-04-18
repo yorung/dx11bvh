@@ -28,6 +28,7 @@ typedef FakeVAO* VAOID;
 #define afSafeDeleteBuffer SAFE_RELEASE
 #define afSafeDeleteSampler SAFE_RELEASE
 #define afSafeDeleteVAO SAFE_DELETE
+#define afSafeDeleteSampler SAFE_RELEASE
 
 void afWriteBuffer(ID3D11Buffer* p, const void* buf, int size);
 

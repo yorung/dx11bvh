@@ -154,7 +154,7 @@ bool FontMan::Init()
 #ifndef GL_TRUE
 	{
 		CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
-		descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+//		descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 		deviceMan11.GetDevice()->CreateSamplerState(&descSamp, &pSamplerState);
 	}
 #endif
