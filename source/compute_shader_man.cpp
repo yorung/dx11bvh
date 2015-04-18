@@ -4,10 +4,10 @@ ComputeShaderMan computeShaderMan;
 
 BufferMan::BMID ComputeShaderMan::constantBufferId = -1;
 
-static void Compile(const char* name, ID3D10Blob*& blob)
+static void Compile(const char* name, ID3DBlob*& blob)
 {
 	blob = nullptr;
-	ID3D10Blob* err = 0;
+	ID3DBlob* err = 0;
 	WCHAR wname[MAX_PATH];
 	MultiByteToWideChar(CP_ACP, 0, name, -1, wname, dimof(wname));
 	HRESULT hr = D3DCompileFromFile(wname, nullptr, nullptr, "mainCS", "cs_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, &blob, &err);
@@ -31,7 +31,7 @@ void ComputeShaderMan::Create(const char *shader)
 {
 	Destroy();
 
-	ID3D10Blob* pBlobCS;
+	ID3DBlob* pBlobCS;
 	Compile(shader, pBlobCS);
 	HRESULT hr = deviceMan11.GetDevice()->CreateComputeShader(pBlobCS->GetBufferPointer(), pBlobCS->GetBufferSize(), nullptr, &computeShader);
 

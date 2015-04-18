@@ -2,13 +2,13 @@
 
 ShaderMan11 shaderMan;
 
-static void Compile(const char* name, bool ps, ID3D10Blob*& blob)
+static void Compile(const char* name, bool ps, ID3DBlob*& blob)
 {
 	char path[MAX_PATH];
 	sprintf_s(path, sizeof(path), "fx/%s.fx", name);
 
 	blob = nullptr;
-	ID3D10Blob* err = 0;
+	ID3DBlob* err = 0;
 	WCHAR wname[MAX_PATH];
 	MultiByteToWideChar(CP_ACP, 0, path, -1, wname, dimof(wname));
 	D3DCompileFromFile(wname, nullptr, nullptr, ps ? "mainPS" : "mainVS", ps ? "ps_5_0" : "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, &blob, &err);
@@ -39,8 +39,8 @@ ShaderMan11::SMID ShaderMan11::Create(const char *name, const D3D11_INPUT_ELEMEN
 	Effect effect;
 	memset(&effect, 0, sizeof(effect));
 
-	ID3D10Blob* pBlobVS;
-	ID3D10Blob* pBlobPS;
+	ID3DBlob* pBlobVS;
+	ID3DBlob* pBlobPS;
 	Compile(name, false, pBlobVS);
 	Compile(name, true, pBlobPS);
 	HRESULT hr = deviceMan11.GetDevice()->CreateVertexShader(pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), nullptr, &effect.pVertexShader);
