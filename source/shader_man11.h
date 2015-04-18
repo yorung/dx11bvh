@@ -19,7 +19,7 @@ private:
 public:
 	ShaderMan11();
 	~ShaderMan11();
-	SMID Create(const char *name, const D3D11_INPUT_ELEMENT_DESC elements[], int numElements);
+	SMID Create(const char *name, const D3D11_INPUT_ELEMENT_DESC elements[] = nullptr, int numElements = 0);
 	void Destroy();
 	void Reload();
 	void Apply(SMID id);

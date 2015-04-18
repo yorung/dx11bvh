@@ -125,7 +125,6 @@ FakeVAO::FakeVAO(ShaderMan11::SMID shaderId, const D3D11_INPUT_ELEMENT_DESC elem
 		ID3DBlob* vsBlob = shaderMan.GetVSBlob(shaderId);
 		deviceMan11.GetDevice()->CreateInputLayout(elements, numElements, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &inputLayout);
 	}
-
 }
 
 FakeVAO::~FakeVAO()

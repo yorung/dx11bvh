@@ -21,7 +21,7 @@ void PostEffectMan::Create(const char *shader)
 {
 	Destroy();
 
-	shaderId = shaderMan.Create(shader, nullptr, 0);
+	shaderId = shaderMan.Create(shader);
 
 	if (constantBufferId < 0)
 	{
