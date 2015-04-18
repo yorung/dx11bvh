@@ -34,7 +34,7 @@ class FakeVAO
 	std::vector<UINT> strides;
 	ID3D11Buffer* ibo;
 public:
-	FakeVAO(ShaderMan11::SMID shaderId, const D3D11_INPUT_ELEMENT_DESC elements[], int numElements, int numBuffers, ID3D11Buffer* buffers[], const UINT strides[], const UINT offsets[], ID3D11Buffer* ibo);
+	FakeVAO(ShaderMan11::SMID shaderId, const D3D11_INPUT_ELEMENT_DESC elements[], int numElements, int numBuffers, ID3D11Buffer* const buffers[], const int strides[], const UINT offsets[], ID3D11Buffer* ibo);
 	~FakeVAO();
 	void Apply();
 };

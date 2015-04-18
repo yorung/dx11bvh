@@ -23,9 +23,11 @@ typedef unsigned short AFIndex;
 typedef ID3D11Buffer* IBOID;
 typedef ID3D11Buffer* VBOID;
 typedef ID3D11Buffer* UBOID;
+typedef FakeVAO* VAOID;
 
 #define afSafeDeleteBuffer SAFE_RELEASE
 #define afSafeDeleteSampler SAFE_RELEASE
+#define afSafeDeleteVAO SAFE_DELETE
 
 void afWriteBuffer(ID3D11Buffer* p, const void* buf, int size);
 
@@ -48,12 +50,5 @@ enum BlendMode {
 void afBlendMode(BlendMode mode);
 void afDepthStencilMode(bool depth);
 
-/*
-struct VAOID {
-	ShaderMan::SMID shaderId;
-	IBOID ibo;
-	std::vector<VBOID> vertexBufferIds;
-	std::vector<size_t> strides;
-};
-GLuint afCreateVAO(GLuint program, const InputElement elements[], int numElements, int numBuffers, VBOID const *vertexBufferIds, const GLsizei* strides, IBOID ibo);
-*/
+VAOID afCreateVAO(ShaderMan::SMID program, const InputElement elements[], int numElements, int numBuffers, VBOID const *vertexBufferIds, const int* strides, IBOID ibo);
+inline void afBindVAO(VAOID vao) { vao->Apply(); }

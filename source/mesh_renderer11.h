@@ -13,6 +13,7 @@ class MeshRenderer11
 	ID3D11Buffer* pIndexBuffer;
 	ID3D11SamplerState* pSamplerState;
 	ShaderMan11::SMID shaderId;
+	VAOID vao;
 public:
 	MeshRenderer11();
 	~MeshRenderer11();

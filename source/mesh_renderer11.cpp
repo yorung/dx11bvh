@@ -21,6 +21,7 @@ MeshRenderer11::MeshRenderer11()
 	skinnedPosBuffer = nullptr;
 	pIndexBuffer = nullptr;
 	pSamplerState = nullptr;
+	vao = 0;
 }
 
 MeshRenderer11::~MeshRenderer11()
@@ -36,6 +37,7 @@ void MeshRenderer11::Destroy()
 	SAFE_RELEASE(skinBuffer);
 	SAFE_RELEASE(skinnedPosBuffer);
 	SAFE_RELEASE(pSamplerState);
+	afSafeDeleteVAO(vao);
 }
 
 void MeshRenderer11::Init(const Block& block)
@@ -70,6 +72,9 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 	if (constantBufferId < 0) {
 		constantBufferId = bufferMan.Create(sizeof(MeshConstantBuffer));
 	}
+
+	int strides[] = { sizeof(MeshColor) };
+	vao = afCreateVAO(shaderId, layout, dimof(layout), 1, &colorBuffer, strides, pIndexBuffer);
 
 	CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
 	descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -121,10 +126,7 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 
 	afDepthStencilMode(false);
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
-
-	UINT strides[] = { sizeof(MeshColor) };
-	UINT offsets[] = { 0 };
-	deviceMan11.GetContext()->IASetVertexBuffers(0, 1, &colorBuffer, strides, offsets);
+	afBindVAO(vao);
 
 	ID3D11ShaderResourceView* srvSkinnedPos;
 	{

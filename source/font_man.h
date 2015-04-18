@@ -30,6 +30,7 @@ class FontMan
 	ShaderMan::SMID shader;
 	IBOID ibo;
 	VBOID vbo;
+	VAOID vao;
 #ifndef GL_TRUE
 	ID3D11SamplerState* pSamplerState;
 #endif

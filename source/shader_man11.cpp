@@ -108,7 +108,7 @@ ID3DBlob* ShaderMan11::GetVSBlob(SMID id)
 	return nullptr;
 }
 
-FakeVAO::FakeVAO(ShaderMan11::SMID shaderId, const D3D11_INPUT_ELEMENT_DESC elements[], int numElements, int numBuffers, ID3D11Buffer* vbos_[], const UINT strides_[], const UINT offsets_[], ID3D11Buffer* ibo_)
+FakeVAO::FakeVAO(ShaderMan11::SMID shaderId, const D3D11_INPUT_ELEMENT_DESC elements[], int numElements, int numBuffers, ID3D11Buffer* const vbos_[], const int strides_[], const UINT offsets_[], ID3D11Buffer* ibo_)
 {
 	inputLayout = nullptr;
 
@@ -118,8 +118,8 @@ FakeVAO::FakeVAO(ShaderMan11::SMID shaderId, const D3D11_INPUT_ELEMENT_DESC elem
 	offsets.resize(numBuffers);
 	for (int i = 0; i < numBuffers; i++) {
 		(vbos[i] = vbos_[i])->AddRef();
-		strides[i] = strides_[i];
-		offsets[i] = offsets_[i];
+		strides[i] = (UINT)strides_[i];
+		offsets[i] = offsets_ ? offsets_[i] : 0;
 	}
 	if (elements) {
 		ID3DBlob* vsBlob = shaderMan.GetVSBlob(shaderId);
@@ -130,6 +130,7 @@ FakeVAO::FakeVAO(ShaderMan11::SMID shaderId, const D3D11_INPUT_ELEMENT_DESC elem
 
 FakeVAO::~FakeVAO()
 {
+	SAFE_RELEASE(inputLayout);
 	SAFE_RELEASE(ibo);
 	for (auto it : vbos) {
 		SAFE_RELEASE(it);

@@ -154,12 +154,8 @@ bool FontMan::Init()
 
 	ibo = afCreateQuadListIndexBuffer(SPRITE_MAX);
 	vbo = afCreateDynamicVertexBuffer(SPRITE_MAX * sizeof(FontVertex) * 4);
-#ifdef GL_TRUE
-	{
-		GLsizei stride = sizeof(FontVertex);
-		vao = afCreateVAO(shader, elements, dimof(elements), 1, &vbo, &stride, ibo);
-	}
-#endif
+	int stride = sizeof(FontVertex);
+	vao = afCreateVAO(shader, elements, dimof(elements), 1, &vbo, &stride, ibo);
 #ifndef GL_TRUE
 	{
 		CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
@@ -184,9 +180,7 @@ void FontMan::Destroy()
 	texSrc.Destroy();
 	afSafeDeleteBuffer(ibo);
 	afSafeDeleteBuffer(vbo);
-#ifdef GL_TRUE
 	afSafeDeleteVAO(vao);
-#endif
 #ifndef GL_TRUE
 	SAFE_RELEASE(pSamplerState);
 #endif
@@ -327,23 +321,15 @@ void FontMan::Render()
 
 #ifndef GL_TRUE
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
-
-	UINT stride = sizeof(FontVertex);
-	UINT offset = 0;
-	deviceMan11.GetContext()->IASetVertexBuffers(0, 1, &vbo, &stride, &offset);
 #endif
 
-#ifdef GL_TRUE
-	glBindVertexArray(vao);
-#endif
-
+	afBindVAO(vao);
 	afBindTextureToBindingPoint(texture, 0);
 	afBlendMode(BM_ALPHA);
 	afDepthStencilMode(false);
 	afDrawIndexedTriangleList(ibo, numSprites * 6);
 	afDepthStencilMode(true);
 	afBlendMode(BM_NONE);
-
 
 #ifdef GL_TRUE
 	glBindVertexArray(0);
