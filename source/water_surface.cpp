@@ -77,10 +77,10 @@ void WaterSurface::UpdateVert(std::vector<WaterVert>& vert)
 WaterSurface::WaterSurface()
 {
 	texId = TexMan::INVALID_TMID;
-	pVertexBuffer = nullptr;
-	pIndexBuffer = nullptr;
+	vbo = 0;
+	ibo = 0;
+	vao = 0;
 	pSamplerState = nullptr;
-	pDSState = nullptr;
 }
 
 WaterSurface::~WaterSurface()
@@ -90,10 +90,10 @@ WaterSurface::~WaterSurface()
 
 void WaterSurface::Destroy()
 {
-	afSafeDeleteBuffer(pIndexBuffer);
-	afSafeDeleteBuffer(pVertexBuffer);
+	afSafeDeleteBuffer(ibo);
+	afSafeDeleteBuffer(vbo);
+	afSafeDeleteVAO(vao);
 	SAFE_RELEASE(pSamplerState);
-	SAFE_RELEASE(pDSState);
 }
 
 void WaterSurface::Init()
@@ -132,8 +132,11 @@ void WaterSurface::Init()
 	texId = texMan.Create("resource\\Tiny_skin.dds");
 	shaderId = shaderMan.Create("water_surface", layout, dimof(layout));
 
-	pVertexBuffer = afCreateDynamicVertexBuffer(sizeVertices);
-	pIndexBuffer = afCreateIndexBuffer(indices, indi.size());
+	vbo = afCreateDynamicVertexBuffer(sizeVertices);
+	ibo = afCreateIndexBuffer(indices, indi.size());
+
+	int strides[] = { sizeof(WaterVert) };
+	vao = afCreateVAO(shaderId, layout, dimof(layout), 1, &vbo, strides, ibo);
 	if (constantBufferId < 0) {
 		constantBufferId = bufferMan.Create(sizeof(WaterConstantBuffer));
 	}
@@ -141,14 +144,13 @@ void WaterSurface::Init()
 	CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
 	descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	deviceMan11.GetDevice()->CreateSamplerState(&descSamp, &pSamplerState);
-	deviceMan11.GetDevice()->CreateDepthStencilState(&CD3D11_DEPTH_STENCIL_DESC(D3D11_DEFAULT), &pDSState);
 }
 
 void WaterSurface::Update()
 {
 	std::vector<WaterVert> vert;
 	UpdateVert(vert);
-	afWriteBuffer(pVertexBuffer, &vert[0], vert.size() * sizeof(WaterVert));
+	afWriteBuffer(vbo, &vert[0], vert.size() * sizeof(WaterVert));
 }
 
 void WaterSurface::Draw()
@@ -157,16 +159,11 @@ void WaterSurface::Draw()
 
 	shaderMan.Apply(shaderId);
 
-	deviceMan11.GetContext()->OMSetDepthStencilState(pDSState, 1);
+	afDepthStencilMode(true);
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
 	ID3D11ShaderResourceView* tx = texMan.Get(texId);
 	deviceMan11.GetContext()->PSSetShaderResources(0, 1, &tx);
 
-	UINT strides[] = { sizeof(WaterVert) };
-	UINT offsets[] = { 0 };
-	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	deviceMan11.GetContext()->IASetIndexBuffer(pIndexBuffer, AFIndexTypeToDevice, 0);
-	deviceMan11.GetContext()->IASetVertexBuffers(0, 1, &pVertexBuffer, strides, offsets);
 
 	WaterConstantBuffer cBuf;
 //	matrixMan.Get(MatrixMan::WORLD, cBuf.matW);
@@ -178,6 +175,8 @@ void WaterSurface::Draw()
 	const auto buf = bufferMan.Get(constantBufferId);
 	deviceMan11.GetContext()->VSSetConstantBuffers(0, 1, &buf);
 
+	afBindVAO(vao);
+	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	deviceMan11.GetContext()->DrawIndexed(lines * 2, 0, 0);
 }
 

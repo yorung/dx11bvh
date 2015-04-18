@@ -14,10 +14,10 @@ class WaterSurface
 {
 	static BufferMan::BMID constantBufferId;
 	TexMan::TMID texId;
-	ID3D11Buffer* pVertexBuffer;
-	ID3D11Buffer* pIndexBuffer;
+	VBOID vbo;
+	IBOID ibo;
+	VAOID vao;
 	ID3D11SamplerState* pSamplerState;
-	ID3D11DepthStencilState* pDSState;
 	ShaderMan11::SMID shaderId;
 	int lines;
 	void UpdateVert(std::vector<WaterVert>& vert);
