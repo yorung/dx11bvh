@@ -31,9 +31,7 @@ class FontMan
 	IBOID ibo;
 	VBOID vbo;
 	VAOID vao;
-#ifndef GL_TRUE
-	ID3D11SamplerState* pSamplerState;
-#endif
+	SAMPLERID sampler;
 	bool dirty;
 	bool Build(const CharSignature& signature);
 	bool Cache(const CharSignature& code);

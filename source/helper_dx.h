@@ -24,6 +24,7 @@ typedef ID3D11Buffer* IBOID;
 typedef ID3D11Buffer* VBOID;
 typedef ID3D11Buffer* UBOID;
 typedef FakeVAO* VAOID;
+typedef ID3D11SamplerState* SAMPLERID;
 
 #define afSafeDeleteBuffer SAFE_RELEASE
 #define afSafeDeleteSampler SAFE_RELEASE
@@ -37,6 +38,7 @@ IBOID afCreateQuadListIndexBuffer(int numQuads);
 VBOID afCreateVertexBuffer(int size, const void* buf);
 VBOID afCreateDynamicVertexBuffer(int size);
 UBOID afCreateUBO(int size);
+SAMPLERID afCreateSampler();
 void afBindBufferToBindingPoint(UBOID ubo, UINT uniformBlockBinding);
 void afBindTextureToBindingPoint(TexMan::TMID tex, UINT textureBindingPoint);
 void afBindSamplerToBindingPoint(ID3D11SamplerState*, UINT textureBindingPoint);
