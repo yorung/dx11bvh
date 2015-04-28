@@ -97,11 +97,10 @@ IBOID afCreateQuadListIndexBuffer(int numQuads)
 	return afCreateIndexBuffer(&indi[0], numIndi);
 }
 
-void afDrawIndexedTriangleList(IBOID ibo, int count, int start)
+void afDrawIndexedTriangleList(int numIndices, int start)
 {
 	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	deviceMan11.GetContext()->IASetIndexBuffer(ibo, AFIndexTypeToDevice, 0);
-	deviceMan11.GetContext()->DrawIndexed(count, start, 0);
+	deviceMan11.GetContext()->DrawIndexed(numIndices, start, 0);
 }
 
 void afEnableBackFaceCulling(bool cullBack)

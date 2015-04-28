@@ -43,7 +43,7 @@ void afBindBufferToBindingPoint(UBOID ubo, UINT uniformBlockBinding);
 void afBindTextureToBindingPoint(TexMan::TMID tex, UINT textureBindingPoint);
 void afBindSamplerToBindingPoint(ID3D11SamplerState*, UINT textureBindingPoint);
 
-void afDrawIndexedTriangleList(IBOID ibo, int count, int start = 0);
+void afDrawIndexedTriangleList(int numIndices, int start = 0);
 void afEnableBackFaceCulling(bool cullBack);
 
 enum BlendMode {

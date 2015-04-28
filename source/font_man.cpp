@@ -117,6 +117,10 @@ FontMan::FontMan()
 	texture = TexMan::INVALID_TMID;
 	shader = ShaderMan::INVALID_SMID;
 	dirty = false;
+	ibo = 0;
+	vbo = 0;
+	vao = 0;
+	sampler = 0;
 }
 
 FontMan::~FontMan()
@@ -138,23 +142,18 @@ static InputElement elements[] = {
 bool FontMan::Init()
 {
 	Destroy();
-	bool result = false;
 	if (!texSrc.Create(TEX_W, TEX_H)) {
-		goto DONE;
+		return false;
 	}
 	texture = texMan.CreateDynamicTexture("$FontMan", TEX_W, TEX_H);
-
 	shader = shaderMan.Create("font");
 	assert(shader);
-
 	ibo = afCreateQuadListIndexBuffer(SPRITE_MAX);
 	vbo = afCreateDynamicVertexBuffer(SPRITE_MAX * sizeof(FontVertex) * 4);
 	int stride = sizeof(FontVertex);
 	vao = afCreateVAO(shader, elements, dimof(elements), 1, &vbo, &stride, ibo);
 	sampler = afCreateSampler();
-	result = true;
-DONE:
-	return result;
+	return true;
 }
 
 void FontMan::Destroy()
@@ -189,6 +188,7 @@ void FontMan::MakeFontBitmap(const char* fontName, const CharSignature& sig, DIB
 	HFONT oldFont = (HFONT)SelectObject(hdc, font);
 	const MAT2 mat = { {0,1}, {0,0}, {0,0}, {0,1} };
 	GLYPHMETRICS met;
+	memset(&met, 0, sizeof(met));
 	DWORD sizeReq = GetGlyphOutlineW(hdc, (UINT)sig.code, GGO_GRAY8_BITMAP, &met, 0, nullptr, &mat);
 	if (sizeReq) {
 		DIB dib3;
@@ -199,11 +199,13 @@ void FontMan::MakeFontBitmap(const char* fontName, const CharSignature& sig, DIB
 			aflog("FontMan::Build() buf size mismatch! code=%d req=%d dib=%d\n", sig.code, sizeReq, sizeBuf);
 			afVerify(false);
 		}
+		memset(&met, 0, sizeof(met));
 		GetGlyphOutlineW(hdc, (UINT)sig.code, GGO_GRAY8_BITMAP, &met, sizeReq, dib3.ReferPixels(), &mat);
 	//	SetTextColor(hdc, RGB(255, 255, 255));
 	//	SetBkColor(hdc, RGB(0, 0, 0));
 	//	TextOutW(hdc, 0, 0, buf, wcslen(buf));
 		dib3.Blt(dib.getDC(), 0, 0, dib3.getW(), dib3.getH());
+	//	dib.Save(SPrintf("../ScreenShot/%04x.bmp", sig.code));
 		dib.DibToDXFont();
 	}
 	SelectObject(hdc, (HGDIOBJ)oldFont);
@@ -243,7 +245,10 @@ bool FontMan::Build(const CharSignature& signature)
 		dib.Blt(texSrc, curX, curY);
 		dirty = true;
 	}
-	aflog("FontMan::Build() curX=%d curY=%d dib.getW()=%d dib.getH()=%d\n", curX, curY, dib.getW(), dib.getH());
+
+	char codestr[128];
+	snprintf(codestr, dimof(codestr), "%04x %c", signature.code, signature.code < 0x80 ? signature.code : 0x20);
+	aflog("FontMan::Build() curX=%d curY=%d dib.getW()=%d dib.getH()=%d code=%s\n", curX, curY, dib.getW(), dib.getH(), codestr);
 
 	curX += (int)ceil(cache.srcWidth.x);
 	caches[signature] = cache;
@@ -267,6 +272,7 @@ void FontMan::FlushToTexture()
 	if (!dirty) {
 		return;
 	}
+	aflog("FontMan::FlushToTexture flushed");
 	dirty = false;
 	texMan.Write(texture, texSrc.ReferPixels());
 }
@@ -305,13 +311,9 @@ void FontMan::Render()
 	afBindTextureToBindingPoint(texture, 0);
 	afBlendMode(BM_ALPHA);
 	afDepthStencilMode(false);
-	afDrawIndexedTriangleList(ibo, numSprites * 6);
+	afDrawIndexedTriangleList(numSprites * 6);
 	afDepthStencilMode(true);
 	afBlendMode(BM_NONE);
-
-#ifdef GL_TRUE
-	glBindVertexArray(0);
-#endif
 	numSprites = 0;
 }
 
