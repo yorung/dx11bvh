@@ -19,7 +19,6 @@ static float CalcRadius(const Mesh* m)
 }
 
 App::App() : radius(1), animationNumber(0), trackTime(0), meshTiny(nullptr),
-	renderTargetView(nullptr), shaderResourceView(nullptr), unorderedAccessView(nullptr),
 	renderTargetView2(nullptr), shaderResourceView2(nullptr), unorderedAccessView2(nullptr)
 {
 	memset(mesh, 0, sizeof(mesh));
@@ -35,21 +34,19 @@ void App::Init(const char* fileName)
 	Destroy();
 
 	CD3D11_TEXTURE2D_DESC tDesc(DXGI_FORMAT_R8G8B8A8_TYPELESS, SCR_W, SCR_H, 1, 1, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS);
-	ID3D11Texture2D* tex;
 	ID3D11Texture2D* tex2;
-	HRESULT hr = deviceMan11.GetDevice()->CreateTexture2D(&tDesc, NULL, &tex);
-	hr = deviceMan11.GetDevice()->CreateTexture2D(&tDesc, NULL, &tex2);
+	HRESULT hr = deviceMan11.GetDevice()->CreateTexture2D(&tDesc, NULL, &tex2);
 	CD3D11_RENDER_TARGET_VIEW_DESC rDesc(D3D11_RTV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
-	hr = deviceMan11.GetDevice()->CreateRenderTargetView(tex, &rDesc, &renderTargetView);
 	hr = deviceMan11.GetDevice()->CreateRenderTargetView(tex2, &rDesc, &renderTargetView2);
 	CD3D11_SHADER_RESOURCE_VIEW_DESC sDesc(D3D11_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
-	hr = deviceMan11.GetDevice()->CreateShaderResourceView(tex, &sDesc, &shaderResourceView);
 	hr = deviceMan11.GetDevice()->CreateShaderResourceView(tex2, &sDesc, &shaderResourceView2);
 	CD3D11_UNORDERED_ACCESS_VIEW_DESC uDesc(D3D11_UAV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
-	hr = deviceMan11.GetDevice()->CreateUnorderedAccessView(tex, &uDesc, &unorderedAccessView);
 	hr = deviceMan11.GetDevice()->CreateUnorderedAccessView(tex2, &uDesc, &unorderedAccessView2);
-	SAFE_RELEASE(tex);
 	SAFE_RELEASE(tex2);
+
+	for (auto& it : rt) {
+		it.Init(ivec2(SCR_W, SCR_H), AFDT_R8G8B8A8_UINT, AFDT_INVALID);
+	}
 
 	fontMan.Init();
 	debugRenderer.Init();
@@ -190,14 +187,7 @@ void App::Draw()
 	fontMan.DrawString(Vec2(10, 170), 40, L"あいうえお한글漢字");
 
 	ID3D11DeviceContext* context = deviceMan11.GetContext();
-	ID3D11RenderTargetView* defaultRenderTarget;
-	ID3D11DepthStencilView* defaultDepthStencil;
-	context->OMGetRenderTargets(1, &defaultRenderTarget, &defaultDepthStencil);
-	context->OMSetRenderTargets(1, &renderTargetView, defaultDepthStencil);
-	context->ClearDepthStencilView(defaultDepthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-	float clearColor2[4] = { 0.0f, 0.2f, 0.0f, 0.0f };
-	context->ClearRenderTargetView(renderTargetView, clearColor2);
+	rt[0].BeginRenderToThis();
 
 	double currentTime = GetTime();
 	double deltaTime = currentTime - lastTime;
@@ -265,15 +255,12 @@ void App::Draw()
 	defaultTarget.InitForDefaultRenderTarget();
 	defaultTarget.BeginRenderToThis();
 
-	computeShaderMan.Draw(shaderResourceView, unorderedAccessView2);
+	computeShaderMan.Draw(rt[0].GetTexture(), unorderedAccessView2);
 	postEffectMan.Draw(shaderResourceView2);
 
 	deviceMan11.Present();
 
 	fps.Update();
-
-	SAFE_RELEASE(defaultRenderTarget);
-	SAFE_RELEASE(defaultDepthStencil);
 }
 
 void App::Destroy()
@@ -282,9 +269,9 @@ void App::Destroy()
 		SAFE_DELETE(it);
 	}
 	SAFE_DELETE(meshTiny);
-	SAFE_RELEASE(renderTargetView);
-	SAFE_RELEASE(shaderResourceView);
-	SAFE_RELEASE(unorderedAccessView);
+	for (auto& it : rt) {
+		it.Destroy();
+	}
 	SAFE_RELEASE(renderTargetView2);
 	SAFE_RELEASE(shaderResourceView2);
 	SAFE_RELEASE(unorderedAccessView2);
