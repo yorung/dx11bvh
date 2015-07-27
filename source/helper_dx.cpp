@@ -179,6 +179,9 @@ void AFRenderTarget::Init(ivec2 size, AFDTFormat colorFormat, AFDTFormat depthSt
 	CD3D11_UNORDERED_ACCESS_VIEW_DESC uDesc(D3D11_UAV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
 	hr = deviceMan11.GetDevice()->CreateUnorderedAccessView(tex, &uDesc, &unorderedAccessView);
 	SAFE_RELEASE(tex);
+
+	depthStencilView = deviceMan11.GetDefaultDepthStencil();
+	depthStencilView->AddRef();
 }
 
 void AFRenderTarget::Destroy()
