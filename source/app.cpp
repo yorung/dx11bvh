@@ -170,12 +170,15 @@ void App::Update()
 
 void App::Draw()
 {
-	fontMan.DrawString(Vec2(0, 110), 16, "TEXT SPRITE TEST!!!!!!!!!!!!!text sprite 1234567890");
-	fontMan.DrawString(Vec2(10, 130), 32, "@#$%^&*()");
-	fontMan.DrawString(Vec2(10, 170), 40, L"あいうえお한글漢字");
+//	fontMan.DrawString(Vec2(0, 110), 16, "TEXT SPRITE TEST!!!!!!!!!!!!!text sprite 1234567890");
+//	fontMan.DrawString(Vec2(10, 130), 32, "@#$%^&*()");
+//	fontMan.DrawString(Vec2(10, 170), 40, L"あいうえお한글漢字");
 
 	ID3D11DeviceContext* context = deviceMan11.GetContext();
-	rt[0].BeginRenderToThis();
+//	rt[0].BeginRenderToThis();
+	AFRenderTarget defaultTarget;
+	defaultTarget.InitForDefaultRenderTarget();
+	defaultTarget.BeginRenderToThis();
 
 	double currentTime = GetTime();
 	double deltaTime = currentTime - lastTime;
@@ -201,8 +204,8 @@ void App::Draw()
 	matrixMan.Set(MatrixMan::PROJ, perspective(45, (float)SCR_W / SCR_H, n, f));
 
 	skyMan.Draw();
-	gridRenderer.Draw();
-	waterSurface.Draw();
+//	gridRenderer.Draw();
+//	waterSurface.Draw();
 
 	for (int i = 0; i < (int)dimof(mesh); i++) {
 		Mesh* it = mesh[i];
@@ -239,12 +242,9 @@ void App::Draw()
 
 	fontMan.Render();
 
-	AFRenderTarget defaultTarget;
-	defaultTarget.InitForDefaultRenderTarget();
-	defaultTarget.BeginRenderToThis();
 
-	computeShaderMan.Draw(rt[0].GetTexture(), rt[1].GetUnorderedAccessView());
-	postEffectMan.Draw(rt[1].GetTexture());
+//	computeShaderMan.Draw(rt[0].GetTexture(), rt[1].GetUnorderedAccessView());
+//	postEffectMan.Draw(rt[1].GetTexture());
 
 	deviceMan11.Present();
 
