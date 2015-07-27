@@ -74,6 +74,7 @@ class AFRenderTarget
 	ID3D11RenderTargetView* renderTargetView = nullptr;
 	ID3D11ShaderResourceView* shaderResourceView = nullptr;
 	ID3D11UnorderedAccessView* unorderedAccessView = nullptr;
+	ID3D11DepthStencilView* depthStencilView = nullptr;
 public:
 	~AFRenderTarget() { Destroy(); }
 	void InitForDefaultRenderTarget();

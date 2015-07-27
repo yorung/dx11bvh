@@ -161,6 +161,8 @@ void AFRenderTarget::InitForDefaultRenderTarget()
 	Destroy();
 	renderTargetView = deviceMan11.GetDefaultRenderTarget();
 	renderTargetView->AddRef();
+	depthStencilView = deviceMan11.GetDefaultDepthStencil();
+	depthStencilView->AddRef();
 }
 
 void AFRenderTarget::Init(ivec2 size, AFDTFormat colorFormat, AFDTFormat depthStencilFormat)
@@ -184,10 +186,13 @@ void AFRenderTarget::Destroy()
 	SAFE_RELEASE(renderTargetView);
 	SAFE_RELEASE(shaderResourceView);
 	SAFE_RELEASE(unorderedAccessView);
+	SAFE_RELEASE(depthStencilView);
 }
 
 void AFRenderTarget::BeginRenderToThis()
 {
-	ID3D11DepthStencilView* defaultDepthStencil = deviceMan11.GetDefaultDepthStencil();
-	deviceMan11.GetContext()->OMSetRenderTargets(1, &renderTargetView, defaultDepthStencil);
+	deviceMan11.GetContext()->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+	float clearColor[4] = { 0.0f, 0.2f, 0.0f, 0.0f };
+	deviceMan11.GetContext()->ClearRenderTargetView(renderTargetView, clearColor);
+	deviceMan11.GetContext()->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
