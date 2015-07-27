@@ -18,11 +18,7 @@
 #include <cmath>
 
 #include <stdlib.h>
-#include <malloc.h>
-#include <memory.h>
 #include <tchar.h>
-#include <stdio.h>
-#include <string.h>
 #include <assert.h>
 
 // C++
@@ -30,6 +26,7 @@
 #include <map>
 #include <vector>
 #include <deque>
+#include <chrono>
 
 // DirectX
 #include <d3d11.h>

@@ -1,7 +1,7 @@
 class FPS
 {
 	const static int SAMPLE_MAX = 60;
-	double samples[SAMPLE_MAX];
+	std::chrono::high_resolution_clock::time_point samples[SAMPLE_MAX];
 	int ptr;
 public:
 	FPS();

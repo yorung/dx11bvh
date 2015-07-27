@@ -4,19 +4,19 @@ FPS fps;
 
 FPS::FPS()
 {
-	std::fill_n(samples, dimof(samples), 0.0);
+	std::fill_n(samples, dimof(samples), std::chrono::high_resolution_clock::now());
 	ptr = 0;
 }
 
 void FPS::Update()
 {
-	samples[ptr] = GetTime();
+	samples[ptr] = std::chrono::high_resolution_clock::now();
 	ptr = (ptr + 1) % dimof(samples);
 }
 
 float FPS::Get()
 {
 	int last = (ptr + dimof(samples) - 1) % dimof(samples);
-	double diff = samples[last] - samples[ptr];
-	return (float)(dimof(samples) / diff);
+	auto diff = std::chrono::duration_cast<std::chrono::duration<float, std::ratio<1, 1>>>(samples[last] - samples[ptr]).count();
+	return (float)dimof(samples) / diff;
 }
