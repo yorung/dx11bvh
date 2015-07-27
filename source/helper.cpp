@@ -1,43 +1,14 @@
 #include "stdafx.h"
 
-#ifndef _MSC_VER
-void *LoadFile(const char *fileName, int* size)
-{
-	jclass myview = jniEnv->FindClass(boundJavaClass);
-	jmethodID method = jniEnv->GetStaticMethodID(myview, "loadIntoBytes", "(Ljava/lang/String;)[B");
-	if (method == 0) {
-		return nullptr;
-	}
-
-	jobject arrayAsJObject = jniEnv->CallStaticObjectMethod(myview, method, jniEnv->NewStringUTF(fileName));
-	jbyteArray array = (jbyteArray)arrayAsJObject;
-
-	jbyte* byteArray = jniEnv->GetByteArrayElements(array, NULL);
-	jsize arrayLen = jniEnv->GetArrayLength(array);
-
-	void* ptr = calloc(arrayLen + 1, 1);
-	memcpy(ptr, byteArray, arrayLen);
-	if (size) {
-		*size = arrayLen;
-	}
-
-	jniEnv->ReleaseByteArrayElements(array, byteArray, 0);
-
-	return ptr;
-}
-#endif
-
-#ifndef _MSC_VER
-double GetTime()
-{
-	timespec t;
-	clock_gettime(CLOCK_MONOTONIC, &t);
-	return (double)t.tv_sec + (double)t.tv_nsec / 1000000000;
-}
-#endif
-
 float Random()
 {
-	return (float)rand() / RAND_MAX;
+	static std::mt19937 seed{ std::random_device()() };
+	return std::uniform_real_distribution<float>(0.0, 1.0)(seed);
 }
 
+double GetTime()
+{
+	static auto start = std::chrono::high_resolution_clock::now();
+	auto now = std::chrono::high_resolution_clock::now();
+	return std::chrono::duration_cast<std::chrono::duration<double, std::ratio<1, 1>>>(now - start).count();
+}

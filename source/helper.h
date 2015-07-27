@@ -2,9 +2,11 @@
 
 void *LoadFile(const char *fileName, int* size = nullptr);
 bool SaveFile(const char *fileName, const uint8_t* buf, int size);
-void GoMyDir();
 double GetTime();
 float Random();
+void GoMyDir();
+void Toast(const char *text);
+void PlayBgm(const char *fileName);
 
 template <class T, size_t N> inline size_t dimof(T(&)[N])
 {
