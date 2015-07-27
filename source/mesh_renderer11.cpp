@@ -124,7 +124,7 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 	matrixMan.Get(MatrixMan::VIEW, matView);
 	matrixMan.Get(MatrixMan::PROJ, matProj);
 
-	afDepthStencilMode(false);
+	afDepthStencilMode(true);
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
 	afBindVAO(vao);
 
