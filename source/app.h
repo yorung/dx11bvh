@@ -3,10 +3,7 @@ class App {
 	MeshXBvhBinding bind[3];
 	Mesh* mesh[3];
 	float radius;
-	ID3D11RenderTargetView* renderTargetView2;
-	ID3D11ShaderResourceView* shaderResourceView2;
-	ID3D11UnorderedAccessView* unorderedAccessView2;
-	AFRenderTarget rt[1];
+	AFRenderTarget rt[2];
 	int animationNumber;
 	double trackTime;
 	double lastTime;

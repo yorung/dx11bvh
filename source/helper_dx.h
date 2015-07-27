@@ -82,4 +82,5 @@ public:
 	void Destroy();
 	void BeginRenderToThis();
 	ID3D11ShaderResourceView* GetTexture() { return shaderResourceView; }
+	ID3D11UnorderedAccessView* GetUnorderedAccessView() { return unorderedAccessView; }
 };

@@ -18,8 +18,7 @@ static float CalcRadius(const Mesh* m)
 	return sqrt(maxSq);
 }
 
-App::App() : radius(1), animationNumber(0), trackTime(0), meshTiny(nullptr),
-	renderTargetView2(nullptr), shaderResourceView2(nullptr), unorderedAccessView2(nullptr)
+App::App() : radius(1), animationNumber(0), trackTime(0), meshTiny(nullptr)
 {
 	memset(mesh, 0, sizeof(mesh));
 	lastTime = GetTime();
@@ -32,17 +31,6 @@ App::~App()
 void App::Init(const char* fileName)
 {
 	Destroy();
-
-	CD3D11_TEXTURE2D_DESC tDesc(DXGI_FORMAT_R8G8B8A8_TYPELESS, SCR_W, SCR_H, 1, 1, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS);
-	ID3D11Texture2D* tex2;
-	HRESULT hr = deviceMan11.GetDevice()->CreateTexture2D(&tDesc, NULL, &tex2);
-	CD3D11_RENDER_TARGET_VIEW_DESC rDesc(D3D11_RTV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
-	hr = deviceMan11.GetDevice()->CreateRenderTargetView(tex2, &rDesc, &renderTargetView2);
-	CD3D11_SHADER_RESOURCE_VIEW_DESC sDesc(D3D11_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
-	hr = deviceMan11.GetDevice()->CreateShaderResourceView(tex2, &sDesc, &shaderResourceView2);
-	CD3D11_UNORDERED_ACCESS_VIEW_DESC uDesc(D3D11_UAV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
-	hr = deviceMan11.GetDevice()->CreateUnorderedAccessView(tex2, &uDesc, &unorderedAccessView2);
-	SAFE_RELEASE(tex2);
 
 	for (auto& it : rt) {
 		it.Init(ivec2(SCR_W, SCR_H), AFDT_R8G8B8A8_UINT, AFDT_INVALID);
@@ -255,8 +243,8 @@ void App::Draw()
 	defaultTarget.InitForDefaultRenderTarget();
 	defaultTarget.BeginRenderToThis();
 
-	computeShaderMan.Draw(rt[0].GetTexture(), unorderedAccessView2);
-	postEffectMan.Draw(shaderResourceView2);
+	computeShaderMan.Draw(rt[0].GetTexture(), rt[1].GetUnorderedAccessView());
+	postEffectMan.Draw(rt[1].GetTexture());
 
 	deviceMan11.Present();
 
@@ -272,9 +260,6 @@ void App::Destroy()
 	for (auto& it : rt) {
 		it.Destroy();
 	}
-	SAFE_RELEASE(renderTargetView2);
-	SAFE_RELEASE(shaderResourceView2);
-	SAFE_RELEASE(unorderedAccessView2);
 
 	fontMan.Destroy();
 	debugRenderer.Destroy();
