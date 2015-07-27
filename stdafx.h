@@ -15,7 +15,8 @@
 
 // C RunTime Header Files
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
+
 #include <stdlib.h>
 #include <malloc.h>
 #include <memory.h>

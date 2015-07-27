@@ -13,15 +13,6 @@ template <class VEC3> inline VEC3 cross(const VEC3& l, const VEC3& r)
 #undef _
 }
 
-inline float afsqrt(float s) { return sqrtf(s); }
-inline double afsqrt(double s) { return sqrt(s); }
-inline float afsin(float s) { return sinf(s); }
-inline double afsin(double s) { return sin(s); }
-inline float afcos(float s) { return cosf(s); }
-inline double afcos(double s) { return cos(s); }
-inline float afacos(float s) { return acosf(s); }
-inline double afacos(double s) { return acos(s); }
-
 struct Vec2
 {
 	affloat x, y;
@@ -81,7 +72,10 @@ struct ivec2
 	int x, y;
 	ivec2() : x(0), y(0) {}
 	ivec2(int X, int Y) : x(X), y(Y) {}
-	operator Vec2() { return Vec2((float)x, (float)y); }
+	ivec2 operator+(const ivec2& r) const { return ivec2(x + r.x, y + r.y); }
+	ivec2 operator-(const ivec2& r) const { return ivec2(x - r.x, y - r.y); }
+	operator Vec2() const { return Vec2((float)x, (float)y); }
+	ivec2 operator =(const Vec2 r) { x = (int)r.x; y = (int)r.y; return *this; }
 };
 
 struct ivec3
@@ -147,6 +141,14 @@ inline Vec2 min(const Vec2& a, const Vec2& b) {
 	return Vec2(std::min(a.x, b.x), std::min(a.y, b.y));
 }
 
+inline ivec2 max(const ivec2& a, const ivec2& b) {
+	return ivec2(std::max(a.x, b.x), std::max(a.y, b.y));
+}
+
+inline ivec2 min(const ivec2& a, const ivec2& b) {
+	return ivec2(std::min(a.x, b.x), std::min(a.y, b.y));
+}
+
 template <class V> inline affloat lengthSq(const V& v)
 {
 	return dot(v, v);
@@ -154,7 +156,7 @@ template <class V> inline affloat lengthSq(const V& v)
 
 template <class V3> inline affloat length(const V3& v)
 {
-	return afsqrt(lengthSq(v));
+	return std::sqrt(lengthSq(v));
 }
 
 template <class V> inline V normalize(const V& v)
@@ -173,7 +175,7 @@ struct Quat
 	affloat w;
 	Quat() { *this = Quat(1, Vec3()); }
 	Quat(affloat W, const Vec3& V) : w(W), v(V) {}
-	Quat(const Vec3& axis, affloat angle) { w = afcos(angle / 2); v = normalize(axis) * afsin(angle / 2); }
+	Quat(const Vec3& axis, affloat angle) { w = std::cos(angle / 2); v = normalize(axis) * std::sin(angle / 2); }
 #ifdef USE_SIMPLE_MATH
 	Quat(const Quaternion& q) : Quat(q.w, Vec3(q.x, q.y, q.z)) {}
 	operator Quaternion() const { return Quaternion(v.x, v.y, v.z, w); }
@@ -202,22 +204,22 @@ inline Quat slerp(const Quat& l, Quat r, affloat ratio)
 		r.w = -r.w;
 	}
 
-	affloat angle = afacos(clamp(dotlr, -1, 1));
+	affloat angle = std::acos(clamp(dotlr, -1, 1));
 	if (angle == 0) {
 		return l;
 	}
-	affloat sinangle = afsin(angle);
+	affloat sinangle = std::sin(angle);
 	if (sinangle == 0) {
 		return l;
 	}
 	affloat reciprocal = 1 / sinangle;
-	Quat afr = l * afsin((1 - ratio) * angle) * reciprocal + r * afsin(ratio * angle) * reciprocal;
+	Quat afr = l * std::sin((1 - ratio) * angle) * reciprocal + r * std::sin(ratio * angle) * reciprocal;
 #ifdef USE_SIMPLE_MATH
 	Quat dx = Quaternion::Slerp(l, r, ratio);
-	assert(abs(afr.w - dx.w) < 0.01f);
-	assert(abs(afr.v.x - dx.v.x) < 0.01f);
-	assert(abs(afr.v.y - dx.v.y) < 0.01f);
-	assert(abs(afr.v.z - dx.v.z) < 0.01f);
+	assert(std::abs(afr.w - dx.w) < 0.01f);
+	assert(std::abs(afr.v.x - dx.v.x) < 0.01f);
+	assert(std::abs(afr.v.y - dx.v.y) < 0.01f);
+	assert(std::abs(afr.v.z - dx.v.z) < 0.01f);
 #endif
 	return afr;
 #endif
@@ -313,7 +315,7 @@ inline Mat inv(const Mat& mtx)
 		affloat maxf = 0;
 		int maxi = -1;
 		for (int i = d; i < 4; i++) {
-			affloat v = abs(l.m[i][j]);
+			affloat v = std::abs(l.m[i][j]);
 			if (v > maxf) {
 				maxf = v;
 				maxi = i;
@@ -385,23 +387,23 @@ inline Quat m2q(const Mat& m_)
 	return Quaternion::CreateFromRotationMatrix(m);
 #else
 
-	affloat x, y, z, w = afsqrt(m._11 + m._22 + m._33 + 1) / 2;
+	affloat x, y, z, w = std::sqrt(m._11 + m._22 + m._33 + 1) / 2;
 	if (w > 0.5f) {							 // w is the largest
 		z = (m._12 - m._21) / (w * 4);
 		y = (m._31 - m._13) / (w * 4);
 		x = (m._23 - m._32) / (w * 4);
 	} else if (m._11 > m._22 && m._11 > m._33) { // x is the largest
-		x = afsqrt((-m._11 + m._22 + m._33 - 1) / -4);
+		x = std::sqrt((-m._11 + m._22 + m._33 - 1) / -4);
 		y = (m._12 + m._21) / (x * 4);
 		z = (m._31 + m._13) / (x * 4);
 		w = (m._23 - m._32) / (x * 4);
 	} else if (m._22 > m._33) {					// y is the largest
-		y = afsqrt((m._11 - m._22 + m._33 - 1) / -4);
+		y = std::sqrt((m._11 - m._22 + m._33 - 1) / -4);
 		x = (m._12 + m._21) / (y * 4);
 		w = (m._31 - m._13) / (y * 4);
 		z = (m._23 + m._32) / (y * 4);
 	} else {									// z is the largest
-		z = afsqrt((m._11 + m._22 - m._33 - 1) / -4);
+		z = std::sqrt((m._11 + m._22 - m._33 - 1) / -4);
 		w = (m._12 - m._21) / (z * 4);
 		x = (m._31 + m._13) / (z * 4);
 		y = (m._23 + m._32) / (z * 4);
@@ -455,13 +457,13 @@ inline Mat fastInv(const Mat& mtx)
 inline Mat perspective(affloat fov, affloat aspect, affloat n, affloat f)
 {
 #ifdef GL_TRUE
-	Mat proj = Mat((float)1 / tanf(fov * (float)M_PI / 180 * 0.5f) / aspect, 0, 0, 0,
-		0, (float)1 / tanf(fov * (float)M_PI / 180 * 0.5f), 0, 0,
+	Mat proj = Mat((float)1 / std::tan(fov * (float)M_PI / 180 * 0.5f) / aspect, 0, 0, 0,
+		0, (float)1 / std::tan(fov * (float)M_PI / 180 * 0.5f), 0, 0,
 		0, 0, -(f + n) / (f - n), 1,
 		0, 0, (n * f) * 2 / (f - n), 0);
 #else
-	Mat proj = Mat((float)1 / tanf(fov * (float)M_PI / 180 * 0.5f) / aspect, 0, 0, 0,
-		0, (float)1 / tanf(fov * (float)M_PI / 180 * 0.5f), 0, 0,
+	Mat proj = Mat((float)1 / std::tan(fov * (float)M_PI / 180 * 0.5f) / aspect, 0, 0, 0,
+		0, (float)1 / std::tan(fov * (float)M_PI / 180 * 0.5f), 0, 0,
 		0, 0, f / (f - n), 1,
 		0, 0, -(n * f) / (f - n), 0);
 #endif
