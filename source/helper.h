@@ -27,3 +27,5 @@ template <class T> inline void SAFE_RELEASE(T& p)
 	}
 }
 
+IBOID afCreateTiledPlaneIBO(int numTiles, int* numIndies = nullptr);
+VBOID afCreateTiledPlaneVBO(int numTiles);
