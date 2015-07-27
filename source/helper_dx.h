@@ -53,5 +53,32 @@ enum BlendMode {
 void afBlendMode(BlendMode mode);
 void afDepthStencilMode(bool depth);
 
+enum AFDTFormat
+{
+	AFDT_INVALID,
+	AFDT_R8G8B8A8_UINT,
+	AFDT_R5G6B5_UINT,
+	AFDT_R32G32B32A32_FLOAT,
+	AFDT_R16G16B16A16_FLOAT,
+	AFDT_DEPTH,
+	AFDT_DEPTH_STENCIL,
+};
+//GLuint afCreateDynamicTexture(int w, int h, AFDTFormat format);
+
 VAOID afCreateVAO(ShaderMan::SMID program, const InputElement elements[], int numElements, int numBuffers, VBOID const *vertexBufferIds, const int* strides, IBOID ibo);
 inline void afBindVAO(VAOID vao) { vao->Apply(); }
+
+class AFRenderTarget
+{
+	ivec2 texSize;
+	ID3D11RenderTargetView* renderTargetView = nullptr;
+	ID3D11ShaderResourceView* shaderResourceView = nullptr;
+	ID3D11UnorderedAccessView* unorderedAccessView = nullptr;
+public:
+	~AFRenderTarget() { Destroy(); }
+	void InitForDefaultRenderTarget();
+	void Init(ivec2 size, AFDTFormat colorFormat, AFDTFormat depthStencilFormat);
+	void Destroy();
+	void BeginRenderToThis();
+	ID3D11ShaderResourceView* GetTexture() { return shaderResourceView; }
+};

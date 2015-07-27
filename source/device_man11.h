@@ -16,6 +16,8 @@ public:
 
 	ID3D11Device* GetDevice() { return pDevice; }
 	ID3D11DeviceContext* GetContext() { return pImmediateContext; }
+	ID3D11RenderTargetView*	GetDefaultRenderTarget() { return pRenderTargetView; }
+	ID3D11DepthStencilView* GetDefaultDepthStencil() { return pDepthStencilView; }
 };
 
 extern DeviceMan11 deviceMan11;

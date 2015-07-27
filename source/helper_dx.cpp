@@ -154,3 +154,40 @@ VAOID afCreateVAO(ShaderMan::SMID program, const InputElement elements[], int nu
 }
 
 #endif
+
+
+void AFRenderTarget::InitForDefaultRenderTarget()
+{
+	Destroy();
+	renderTargetView = deviceMan11.GetDefaultRenderTarget();
+	renderTargetView->AddRef();
+}
+
+void AFRenderTarget::Init(ivec2 size, AFDTFormat colorFormat, AFDTFormat depthStencilFormat)
+{
+	Destroy();
+	texSize = size;
+	CD3D11_TEXTURE2D_DESC tDesc(DXGI_FORMAT_R8G8B8A8_TYPELESS, size.x, size.y, 1, 1, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS);
+	ID3D11Texture2D* tex;
+	HRESULT hr = deviceMan11.GetDevice()->CreateTexture2D(&tDesc, NULL, &tex);
+	CD3D11_RENDER_TARGET_VIEW_DESC rDesc(D3D11_RTV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
+	hr = deviceMan11.GetDevice()->CreateRenderTargetView(tex, &rDesc, &renderTargetView);
+	CD3D11_SHADER_RESOURCE_VIEW_DESC sDesc(D3D11_SRV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
+	hr = deviceMan11.GetDevice()->CreateShaderResourceView(tex, &sDesc, &shaderResourceView);
+	CD3D11_UNORDERED_ACCESS_VIEW_DESC uDesc(D3D11_UAV_DIMENSION_TEXTURE2D, DXGI_FORMAT_R8G8B8A8_UNORM);
+	hr = deviceMan11.GetDevice()->CreateUnorderedAccessView(tex, &uDesc, &unorderedAccessView);
+	SAFE_RELEASE(tex);
+}
+
+void AFRenderTarget::Destroy()
+{
+	SAFE_RELEASE(renderTargetView);
+	SAFE_RELEASE(shaderResourceView);
+	SAFE_RELEASE(unorderedAccessView);
+}
+
+void AFRenderTarget::BeginRenderToThis()
+{
+	ID3D11DepthStencilView* defaultDepthStencil = deviceMan11.GetDefaultDepthStencil();
+	deviceMan11.GetContext()->OMSetRenderTargets(1, &renderTargetView, defaultDepthStencil);
+}
