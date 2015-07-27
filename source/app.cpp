@@ -261,10 +261,10 @@ void App::Draw()
 
 	fontMan.Render();
 
-	context->OMSetRenderTargets(1, &defaultRenderTarget, defaultDepthStencil);
-	float clearColor[4] = { 0.2f, 0.0f, 0.2f, 0.0f };
-	context->ClearRenderTargetView(defaultRenderTarget, clearColor);
-	context->ClearDepthStencilView(defaultDepthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	AFRenderTarget defaultTarget;
+	defaultTarget.InitForDefaultRenderTarget();
+	defaultTarget.BeginRenderToThis();
+
 	computeShaderMan.Draw(shaderResourceView, unorderedAccessView2);
 	postEffectMan.Draw(shaderResourceView2);
 
