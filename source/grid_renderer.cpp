@@ -42,20 +42,20 @@ void GridRenderer::Init()
 		v.color = 0xff777777;
 		v.pos = Vec3(x, 0, -1000);
 		vert.push_back(v);
-		indi.push_back(indi.size());
+		indi.push_back((AFIndex)indi.size());
 		v.pos = Vec3(x, 0, 1000);
 		vert.push_back(v);
-		indi.push_back(indi.size());
+		indi.push_back((AFIndex)indi.size());
 	}
 	for (float z = -1000; z <= 1000; z += 100) {
 		GridVert v;
 		v.color = 0xff777777;
 		v.pos = Vec3(-1000, 0, z);
 		vert.push_back(v);
-		indi.push_back(indi.size());
+		indi.push_back((AFIndex)indi.size());
 		v.pos = Vec3(1000, 0, z);
 		vert.push_back(v);
-		indi.push_back(indi.size());
+		indi.push_back((AFIndex)indi.size());
 	}
 
 	int sizeVertices = vert.size() * sizeof(GridVert);

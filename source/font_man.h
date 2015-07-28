@@ -1,7 +1,7 @@
 class FontMan
 {
 	struct CharSignature {
-		int code;
+		wchar_t code;
 		int fontSize;
 		inline int GetOrder() const { return (code << 8) | fontSize;}
 		bool operator < (const CharSignature& r) const { return GetOrder() < r.GetOrder(); }

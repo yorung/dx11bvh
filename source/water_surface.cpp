@@ -48,7 +48,7 @@ void WaterSurface::UpdateVert(std::vector<WaterVert>& vert)
 		for (int x = 0; x <= tileMax; x++) {
 			std::for_each(ripples.begin(), ripples.end(),
 				[&](const WaterRipple& r) {
-					Vec2 pos = Vec2((float)x, (float)z) / tileMax * 2 - Vec2(1, 1);
+					Vec2 pos = Vec2((float)x, (float)z) / (float)tileMax * 2.0f - Vec2(1, 1);
 					float lifeTime = (float)(tm - r.generatedTime);
 					float timeAfterArrived = lifeTime - length(r.centerPos - pos);
 					float h = timeAfterArrived > 0 ? (float)sin(timeAfterArrived * (M_PI * 2) * repeat) * heightUnit : 0;

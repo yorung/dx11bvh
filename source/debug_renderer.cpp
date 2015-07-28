@@ -53,7 +53,7 @@ void CreateCone(Block& b, const Vec3& v1, const Vec3& v2, BONE_ID boneId, uint32
 			b.vertices.push_back(vert[i]);
 			b.skin.push_back(skin);
 			b.color.push_back(col);
-			b.indices.push_back(b.indices.size());
+			b.indices.push_back((AFIndex)b.indices.size());
 		}
 		vRotLast = vRot;
 	}
