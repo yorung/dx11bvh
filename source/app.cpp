@@ -78,9 +78,10 @@ void App::Init(const char* fileName)
 	devCamera.SetDistance(scale * 3);
 	devCamera.SetHeight(radius / 2);
 
-	//	skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "sky_cubemap");
+	skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "sky_cubemap_high");
+//	skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "sky_cubemap");
 //	skyMan.Create("resource\\Tiny_skin.dds", "sky_spheremap");
-	skyMan.Create("resource\\PANO_20141115_141959.dds", "sky_photosphere");
+//	skyMan.Create("resource\\PANO_20141115_141959.dds", "sky_photosphere");
 
 	lastTime = GetTime();
 }
