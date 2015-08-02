@@ -240,7 +240,7 @@ void App::Draw()
 	float f = dist * 1000;
 	float n = dist / 1000;
 
-	matrixMan.Set(MatrixMan::PROJ, perspective(45, (float)SCR_W / SCR_H, n, f));
+	matrixMan.Set(MatrixMan::PROJ, perspective(60, (float)SCR_W / SCR_H, n, f));
 
 	skyMan.Draw();
 //	gridRenderer.Draw();
