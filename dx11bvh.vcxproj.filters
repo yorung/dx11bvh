@@ -246,5 +246,8 @@
     <FxCompile Include="fx\sky_cubemap_high.fx">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="fx\projection_equirectangular.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
