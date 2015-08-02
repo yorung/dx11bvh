@@ -8,9 +8,11 @@ class App {
 	double trackTime;
 	double lastTime;
 	GridRenderer gridRenderer;
+	int skyNum = 0;
 public:
 	App();
 	~App();
+	void ApplySky();
 	void Init(const char* fileName);
 	void Update();
 	void Draw();

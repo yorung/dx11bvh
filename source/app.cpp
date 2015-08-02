@@ -28,6 +28,27 @@ App::~App()
 {
 }
 
+void App::ApplySky()
+{
+	switch(skyNum) {
+	case 0:
+		skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "sky_cubemap_high");
+		break;
+	case 1:
+		skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "sky_cubemap");
+		break;
+	case 2:
+		skyMan.Create("resource\\Tiny_skin.dds", "sky_spheremap");
+		break;
+	case 3:
+		skyMan.Create("resource\\PANO_20141115_141959.dds", "sky_photosphere");
+		break;
+	case 4:
+		skyMan.Create("resource\\Equirectangular-projection.jpg", "sky_photosphere");
+		break;
+	}
+}
+
 void App::Init(const char* fileName)
 {
 	Destroy();
@@ -78,12 +99,8 @@ void App::Init(const char* fileName)
 	devCamera.SetDistance(scale * 3);
 	devCamera.SetHeight(radius / 2);
 
-//	skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "sky_cubemap_high");
-//	skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "sky_cubemap");
-//	skyMan.Create("resource\\Tiny_skin.dds", "sky_spheremap");
-	skyMan.Create("resource\\PANO_20141115_141959.dds", "sky_photosphere");
-
 	lastTime = GetTime();
+	ApplySky();
 }
 
 inline Vec2 GetScreenPos(const Mat& mLocal)
@@ -152,6 +169,27 @@ void App::DrawCameraParams()
 
 void App::Update()
 {
+	if (GetKeyState(VK_F1) & 0x80) {
+		skyNum = 0;
+		ApplySky();
+	}
+	if (GetKeyState(VK_F2) & 0x80) {
+		skyNum = 1;
+		ApplySky();
+	}
+	if (GetKeyState(VK_F3) & 0x80) {
+		skyNum = 2;
+		ApplySky();
+	}
+	if (GetKeyState(VK_F4) & 0x80) {
+		skyNum = 3;
+		ApplySky();
+	}
+	if (GetKeyState(VK_F5) & 0x80) {
+		skyNum = 4;
+		ApplySky();
+	}
+
 	if (GetKeyState('P') & 0x80) {
 		g_type = "pivot";
 	}
