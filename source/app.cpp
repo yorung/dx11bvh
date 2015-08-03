@@ -39,15 +39,18 @@ void App::ApplySky()
 		skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "projection_equirectangular");
 		break;
 	case 2:
-		skyMan.Create("resource\\Tiny_skin.dds", "sky_spheremap");
+		skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "projection_little_planet");
 		break;
 	case 3:
-		skyMan.Create("resource\\PANO_20141115_141959.dds", "sky_photosphere");
+		skyMan.Create("resource\\Tiny_skin.dds", "sky_spheremap");
 		break;
 	case 4:
-		skyMan.Create("resource\\Equirectangular-projection.jpg", "sky_photosphere");
+		skyMan.Create("resource\\PANO_20141115_141959.dds", "sky_photosphere");
 		break;
 	case 5:
+		skyMan.Create("resource\\Equirectangular-projection.jpg", "sky_photosphere");
+		break;
+	case 6:
 		skyMan.Create("resource\\warcraft.dds", "sky_photosphere");
 		break;
 	}
@@ -195,6 +198,10 @@ void App::Update()
 	}
 	if (GetKeyState(VK_F6) & 0x80) {
 		skyNum = 5;
+		ApplySky();
+	}
+	if (GetKeyState(VK_F7) & 0x80) {
+		skyNum = 6;
 		ApplySky();
 	}
 

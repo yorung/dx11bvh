@@ -249,5 +249,8 @@
     <FxCompile Include="fx\projection_equirectangular.fx">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="fx\projection_little_planet.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
