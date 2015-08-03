@@ -14,7 +14,8 @@ public:
 	void LButtonUp(float x, float y);
 	void MouseMove(float x, float y);
 	float GetDistance();
-	Mat CalcViewMatrix();
+	Mat GetViewMatrix();
+	Mat GetProjMatrix();
 	void SetHeight(float height);
 };
 extern DevCamera devCamera;

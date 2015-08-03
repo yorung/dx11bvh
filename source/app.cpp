@@ -244,18 +244,8 @@ void App::Draw()
 	}
 
 	matrixMan.Set(MatrixMan::WORLD, Mat());
-	matrixMan.Set(MatrixMan::VIEW, devCamera.CalcViewMatrix());
-
-	//if (GetKeyState(VK_RETURN) & 0x01) {
-	//	Mat dx = XMMatrixPerspectiveFovLH(45 * XM_PI / 180, (float)SCR_W / SCR_H, dist / 1000, dist * 1000);
-	//}
-
-	float dist = devCamera.GetDistance();
-
-	float f = dist * 1000;
-	float n = dist / 1000;
-
-	matrixMan.Set(MatrixMan::PROJ, perspective(60, (float)SCR_W / SCR_H, n, f));
+	matrixMan.Set(MatrixMan::VIEW, devCamera.GetViewMatrix());
+	matrixMan.Set(MatrixMan::PROJ, devCamera.GetProjMatrix());
 
 	skyMan.Draw();
 //	gridRenderer.Draw();

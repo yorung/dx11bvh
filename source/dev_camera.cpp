@@ -56,10 +56,18 @@ void DevCamera::MouseMove(float x, float y)
 	lastY = y;
 }
 
-Mat DevCamera::CalcViewMatrix()
+Mat DevCamera::GetViewMatrix()
 {
 	Mat cam = translate(0, height, -dist) * q2m(Quat(Vec3(1, 0, 0), rotY)) * q2m(Quat(Vec3(0, 1, 0), rotX));
 	return fastInv(cam);
+}
+
+Mat DevCamera::GetProjMatrix()
+{
+	float dist = GetDistance();
+	float f = dist * 1000;
+	float n = dist / 1000;
+	return perspective(60, (float)SCR_W / SCR_H, n, f);
 }
 
 void DevCamera::SetHeight(float height)
