@@ -6,10 +6,6 @@ static float INVALID_POS = -99999.f;
 
 DevCamera::DevCamera()
 {
-	dist = 1;
-	lastX = lastY = INVALID_POS;
-	rotX = rotY = 0;
-	height = 0;
 }
 
 void DevCamera::SetDistance(float dist_)
@@ -34,6 +30,7 @@ void DevCamera::MouseWheel(float delta)
 
 void DevCamera::LButtonDown(float x, float y)
 {
+	lButton = true;
 	lastX = x;
 	lastY = y;
 }
@@ -41,16 +38,31 @@ void DevCamera::LButtonDown(float x, float y)
 void DevCamera::LButtonUp(float x, float y)
 {
 	MouseMove(x, y);
-	lastX = lastY = INVALID_POS;
+	lButton = false;
+}
+
+void DevCamera::RButtonDown(float x, float y)
+{
+	rButton = true;
+	lastX = x;
+	lastY = y;
+}
+
+void DevCamera::RButtonUp(float x, float y)
+{
+	MouseMove(x, y);
+	rButton = false;
 }
 
 void DevCamera::MouseMove(float x, float y)
 {
-	if (lastX <= INVALID_POS || lastY <= INVALID_POS) {
-		return;
+	if (lButton) {
+		rotX += (x - lastX) * (float)M_PI * 2.0f;
+		rotY += (y - lastY) * (float)M_PI * 2.0f;
 	}
-	rotX += (x - lastX) * (float)M_PI * 2.0f;
-	rotY += (y - lastY) * (float)M_PI * 2.0f;
+	if (rButton) {
+		fov += (y - lastY) * 10.0f;
+	}
 
 	lastX = x;
 	lastY = y;
@@ -67,7 +79,7 @@ Mat DevCamera::GetProjMatrix()
 	float dist = GetDistance();
 	float f = dist * 1000;
 	float n = dist / 1000;
-	return perspective(60, (float)SCR_W / SCR_H, n, f);
+	return perspective(fov, (float)SCR_W / SCR_H, n, f);
 }
 
 void DevCamera::SetHeight(float height)
