@@ -79,7 +79,7 @@ void App::Init(const char* fileName)
 	if (ext && !_stricmp(ext, ".x")) {
 		meshFileName = fileName;
 	}
-
+#if 0
 	meshTiny = new MeshX(meshFileName);
 
 	if (ext && !_stricmp(ext, ".bvh")) {
@@ -101,7 +101,10 @@ void App::Init(const char* fileName)
 		}
 	}
 
-	radius = CalcRadius(mesh[0]);
+	if (mesh[0]) {
+		radius = CalcRadius(mesh[0]);
+	}
+#endif
 	float scale = std::max(0.00001f, radius);
 	devCamera.SetDistance(scale * 3);
 	devCamera.SetHeight(radius / 2);
