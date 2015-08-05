@@ -23,7 +23,7 @@ VsToPs mainVS(uint id : SV_VertexID)
 float4 mainPS(VsToPs inp) : SV_Target
 {
 	float3 dir = normalize(mul(inp.pos2, invVP).xyz);
-	float coordX = atan2(dir.x, dir.z) / 3.14159265f;
-	float coordY = asin(dir.y) / (3.14159265f / 2);
-	return gTexture.Sample(samplerState, float2(coordX, coordY) * float2(0.5, -0.5) + 0.5);
+	float longitude = atan2(dir.x, dir.z) * (180 / 3.14159265f);
+	float latitude = asin(dir.y) * (180 / 3.14159265f);
+	return gTexture.Sample(samplerState, float2(longitude, latitude) / float2(360, -180) + 0.5);
 }

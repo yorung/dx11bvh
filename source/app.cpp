@@ -163,18 +163,29 @@ void App::DrawCameraParams()
 	Mat mInv = inv(v);
 
 	char buf[128];
-	Vec2 pos = { 5, 55 };
-	snprintf(buf, sizeof(buf), "cam pos(via inv view):%f, %f, %f dir:%f, %f, %f", mInv._41, mInv._42, mInv._43, mInv._31, mInv._32, mInv._33);
-	fontMan.DrawString(pos, 16, buf);
+	Vec2 pos = { 5, 105 };
+	auto draw = [&]() {
+		fontMan.DrawString(pos, 20, buf);
+		pos.y += 22;
+	};
 
-	mInv = fastInv(v);
-	snprintf(buf, sizeof(buf), "cam pos(by fastInv):%f, %f, %f dir:%f, %f, %f", mInv._41, mInv._42, mInv._43, mInv._31, mInv._32, mInv._33);
-	pos.y = 75;
-	fontMan.DrawString(pos, 16, buf);
+//	snprintf(buf, sizeof(buf), "cam pos(via inv view):%f, %f, %f dir:%f, %f, %f", mInv._41, mInv._42, mInv._43, mInv._31, mInv._32, mInv._33);
+//	draw();
 
-	snprintf(buf, sizeof(buf), "cam dir(view mtx direct): %f, %f, %f", v._13, v._23, v._33);
-	pos.y = 95;
-	fontMan.DrawString(pos, 16, buf);
+//	mInv = fastInv(v);
+//	snprintf(buf, sizeof(buf), "cam pos(by fastInv):%f, %f, %f dir:%f, %f, %f", mInv._41, mInv._42, mInv._43, mInv._31, mInv._32, mInv._33);
+//	draw();
+
+//	snprintf(buf, sizeof(buf), "cam dir(view mtx direct): %f, %f, %f", v._13, v._23, v._33);
+//	draw();
+
+	snprintf(buf, sizeof(buf), "cam dir: %f, %f, %f", v._13, v._23, v._33);
+	draw();
+
+	float longitude = atan2(v._13, v._33) * (180.0f / 3.14159265f);
+	float latitude = asin(v._23) * (180.0f / 3.14159265f);
+	snprintf(buf, sizeof(buf), "longitude: %f, latitude: %f", longitude, latitude);
+	draw();
 }
 
 void App::Update()
