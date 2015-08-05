@@ -57,8 +57,8 @@ void DevCamera::RButtonUp(float x, float y)
 void DevCamera::MouseMove(float x, float y)
 {
 	if (lButton) {
-		rotX += (x - lastX) * (float)M_PI * 2.0f;
-		rotY += (y - lastY) * (float)M_PI * 2.0f;
+		rotX -= (x - lastX) * (float)M_PI * 1.8f;
+		rotY -= (y - lastY) * (float)M_PI * 1.0f;
 	}
 	if (rButton) {
 		fov += (y - lastY) * 10.0f;
