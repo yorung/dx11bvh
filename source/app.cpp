@@ -291,13 +291,13 @@ void App::Draw()
 		}
 	}
 
-	DrawCameraParams();
-
-	char buf[20];
-	sprintf(buf, "FPS: %f", fps.Get());
-	Vec2 pos = { 5, 15 };
-	fontMan.DrawString(pos, 16, buf);
-
+	if (GetKeyState('T') & 0x01) {
+		DrawCameraParams();
+		char buf[20];
+		sprintf(buf, "FPS: %f", fps.Get());
+		Vec2 pos = { 5, 15 };
+		fontMan.DrawString(pos, 16, buf);
+	}
 	fontMan.Render();
 
 
