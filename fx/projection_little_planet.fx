@@ -22,15 +22,8 @@ VsToPs mainVS(uint id : SV_VertexID)
 
 float4 mainPS(VsToPs inp) : SV_Target
 {
-	float dist = sqrt(dot(inp.screenPos.xy, inp.screenPos.xy));
-//	float axisX = sin((dist - 1) * 3.14159265f);
-	float axisX = -cos(dist * 3.14159265f);
-//	float axisX = sin(dist * 3.14159265f);
-	float axisY = atan2(inp.screenPos.x, inp.screenPos.y);
-	float3 dir;
-	dir.x = sin(axisY) * cos(axisX);
-	dir.z = cos(axisY) * cos(axisX);
-	dir.y = sin(axisX);
-	return texCube.Sample(samplerState, dir);
-//	return dist;
+	float scale = 2;
+	float2 plane = inp.screenPos.xy * scale;
+	float3 dir = float3(plane.x * 2, plane.y * 2, -1 + dot(plane, plane)) / (1 + dot(plane, plane));
+	return texCube.Sample(samplerState, dir.xzy);
 }
