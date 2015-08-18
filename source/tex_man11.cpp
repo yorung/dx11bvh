@@ -55,7 +55,8 @@ struct DDSHeader {
 	uint32_t h2[2];
 	uint32_t mipCnt;
 	uint32_t h13[13];
-	uint32_t fourcc, bitsPerPixel, rMask, gMask, bMask, aMask;
+	uint32_t fourcc, bitsPerPixel, rMask, gMask, bMask, aMask, caps1, caps2;
+	bool IsCubeMap() const { return caps2 == 0xFE00; }
 };
 
 static void bitScanForward(uint32_t* result, uint32_t mask)
@@ -85,25 +86,32 @@ static ID3D11ShaderResourceView* CreateTextureFromRowDDS(const void* img, int si
 	bitScanForward(&gShift, hdr->gMask);
 	bitScanForward(&bShift, hdr->bMask);
 	bitScanForward(&aShift, hdr->aMask);
-	for (int y = 0; y < h; y++) {
-		for (int x = 0; x < w; x++) {
-			uint32_t c = *im++;
-			col.push_back(
-				((hdr->aMask & c) >> aShift << 24) +
-				((hdr->bMask & c) >> bShift << 16) +
-				((hdr->gMask & c) >> gShift << 8) +
-				((hdr->rMask & c) >> rShift));
+	int arraySize = hdr->IsCubeMap() ? 6 : 1;
+	for (int i = 0; i < arraySize; i++) {
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				uint32_t c = *im++;
+				col.push_back(
+					((hdr->aMask & c) >> aShift << 24) +
+					((hdr->bMask & c) >> bShift << 16) +
+					((hdr->gMask & c) >> gShift << 8) +
+					((hdr->rMask & c) >> rShift));
+			}
 		}
 	}
 	texSize.x = hdr->w;
 	texSize.y = hdr->h;
 
-	CD3D11_TEXTURE2D_DESC desc(DXGI_FORMAT_R8G8B8A8_UNORM, w, h, 1, 1, D3D11_BIND_SHADER_RESOURCE);
-	D3D11_SUBRESOURCE_DATA r = { &col[0], (uint32_t)w * 4, 0 };
+	CD3D11_TEXTURE2D_DESC desc(DXGI_FORMAT_R8G8B8A8_UNORM, w, h, arraySize, 1, D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DEFAULT, 0, 1, 0, hdr->IsCubeMap() ? D3D11_RESOURCE_MISC_TEXTURECUBE : 0);
+	CD3D11_SHADER_RESOURCE_VIEW_DESC srvDesc(hdr->IsCubeMap() ? D3D_SRV_DIMENSION_TEXTURECUBE : D3D_SRV_DIMENSION_TEXTURE2D, desc.Format, 0, 1);
+	std::vector<D3D11_SUBRESOURCE_DATA> r;
+	for (int i = 0; i < arraySize; i++) {
+		r.push_back({ &col[w * h * i], (uint32_t)w * 4, 0 });
+	}
 	ID3D11Texture2D* tex = nullptr;
 	ID3D11ShaderResourceView* srv = nullptr;
-	deviceMan11.GetDevice()->CreateTexture2D(&desc, &r, &tex);
-	deviceMan11.GetDevice()->CreateShaderResourceView(tex, nullptr, &srv);
+	deviceMan11.GetDevice()->CreateTexture2D(&desc, &r[0], &tex);
+	deviceMan11.GetDevice()->CreateShaderResourceView(tex, &srvDesc, &srv);
 	SAFE_RELEASE(tex);
 	return srv;
 }
