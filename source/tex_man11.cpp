@@ -75,13 +75,12 @@ static void bitScanForward(uint32_t* result, uint32_t mask)
 	*result = 0;
 }
 
-static ID3D11ShaderResourceView* CreateTextureFromRowDDS(void* img, int size, ivec2& texSize)
+static void ArrangeRawDDS(void* img, int size)
 {
 	const DDSHeader* hdr = (DDSHeader*)img;
 	int w = (int)hdr->w;
 	int h = (int)hdr->h;
 	uint32_t* im = (uint32_t*)img + 128 / 4;
-	std::vector<uint32_t> col;
 	uint32_t rShift, gShift, bShift, aShift;
 	bitScanForward(&rShift, hdr->rMask);
 	bitScanForward(&gShift, hdr->gMask);
@@ -99,23 +98,6 @@ static ID3D11ShaderResourceView* CreateTextureFromRowDDS(void* img, int size, iv
 			}
 		}
 	}
-	texSize.x = hdr->w;
-	texSize.y = hdr->h;
-
-	CD3D11_TEXTURE2D_DESC desc(DXGI_FORMAT_R8G8B8A8_UNORM, w, h, arraySize, 1, D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DEFAULT, 0, 1, 0, hdr->IsCubeMap() ? D3D11_RESOURCE_MISC_TEXTURECUBE : 0);
-	CD3D11_SHADER_RESOURCE_VIEW_DESC srvDesc(hdr->IsCubeMap() ? D3D_SRV_DIMENSION_TEXTURECUBE : D3D_SRV_DIMENSION_TEXTURE2D, desc.Format, 0, 1);
-	std::vector<D3D11_SUBRESOURCE_DATA> r;
-	int pitch = w * 4;
-	int slice = pitch * h;
-	for (int i = 0; i < arraySize; i++) {
-		r.push_back({ (char*)img + 128 + slice * i, (uint32_t)pitch, 0 });
-	}
-	ID3D11Texture2D* tex = nullptr;
-	ID3D11ShaderResourceView* srv = nullptr;
-	deviceMan11.GetDevice()->CreateTexture2D(&desc, &r[0], &tex);
-	deviceMan11.GetDevice()->CreateShaderResourceView(tex, &srvDesc, &srv);
-	SAFE_RELEASE(tex);
-	return srv;
 }
 
 static ID3D11ShaderResourceView* LoadDDSTexture(const char* name, ivec2& texSize)
@@ -130,11 +112,14 @@ static ID3D11ShaderResourceView* LoadDDSTexture(const char* name, ivec2& texSize
 	const DDSHeader* hdr = (DDSHeader*)img;
 
 	int blockSize = 16;
+	int pitch = 0, slice = 0;
 	DXGI_FORMAT format;
 	switch (hdr->fourcc) {
 	case 0x31545844: //'1TXD':
 		format = DXGI_FORMAT_BC1_UNORM;
 		blockSize = 8;
+		pitch = blockSize * ((hdr->w + 3) / 4);
+		slice = pitch * ((hdr->h + 3) / 4);
 		break;
 		//	case 0x33545844; //'3TXD':
 		//		format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
@@ -143,8 +128,11 @@ static ID3D11ShaderResourceView* LoadDDSTexture(const char* name, ivec2& texSize
 		//		format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 		//		break;
 	default:
-		srv = CreateTextureFromRowDDS(img, size, texSize);
-		goto END;
+		ArrangeRawDDS(img, size);
+		format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		pitch = hdr->w * 4;
+		slice = pitch * hdr->h;
+		break;
 	}
 	texSize.x = hdr->w;
 	texSize.y = hdr->h;
@@ -154,8 +142,6 @@ static ID3D11ShaderResourceView* LoadDDSTexture(const char* name, ivec2& texSize
 		CD3D11_TEXTURE2D_DESC desc(format, hdr->w, hdr->h, arraySize, 1, D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DEFAULT, 0, 1, 0, hdr->IsCubeMap() ? D3D11_RESOURCE_MISC_TEXTURECUBE : 0);
 		CD3D11_SHADER_RESOURCE_VIEW_DESC srvDesc(hdr->IsCubeMap() ? D3D_SRV_DIMENSION_TEXTURECUBE : D3D_SRV_DIMENSION_TEXTURE2D, desc.Format, 0, -1);
 		std::vector<D3D11_SUBRESOURCE_DATA> r;
-		int pitch = blockSize * ((hdr->w + 3) / 4);
-		int slice = pitch * ((hdr->h + 3) / 4);
 		for (int i = 0; i < arraySize; i++) {
 			r.push_back({ (char*)img + 128 + slice * i, (uint32_t)pitch, 0 });
 		}
@@ -164,7 +150,6 @@ static ID3D11ShaderResourceView* LoadDDSTexture(const char* name, ivec2& texSize
 		deviceMan11.GetDevice()->CreateShaderResourceView(tex, &srvDesc, &srv);
 		SAFE_RELEASE(tex);
 	}
-END:
 	free(img);
 	return srv;
 }
