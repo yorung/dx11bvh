@@ -53,11 +53,12 @@ struct DDSHeader {
 	uint32_t h3[3];
 	uint32_t h, w;
 	uint32_t h2[2];
-	uint32_t mipCnt;
+	int mipCnt;
 	uint32_t h13[13];
 	uint32_t fourcc, bitsPerPixel, rMask, gMask, bMask, aMask, caps1, caps2;
 	bool IsCubeMap() const { return caps2 == 0xFE00; }
 	int GetArraySize() const { return IsCubeMap() ? 6 : 1; }
+	int GetMipCnt() const { return std::max(mipCnt, 1); }
 };
 
 static void bitScanForward(uint32_t* result, uint32_t mask)
@@ -137,19 +138,23 @@ static ID3D11ShaderResourceView* LoadDDSTexture(const char* name, ivec2& texSize
 	texSize.x = hdr->w;
 	texSize.y = hdr->h;
 
-	{
-		int arraySize = hdr->GetArraySize();
-		CD3D11_TEXTURE2D_DESC desc(format, hdr->w, hdr->h, arraySize, 1, D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DEFAULT, 0, 1, 0, hdr->IsCubeMap() ? D3D11_RESOURCE_MISC_TEXTURECUBE : 0);
-		CD3D11_SHADER_RESOURCE_VIEW_DESC srvDesc(hdr->IsCubeMap() ? D3D_SRV_DIMENSION_TEXTURECUBE : D3D_SRV_DIMENSION_TEXTURE2D, desc.Format, 0, -1);
-		std::vector<D3D11_SUBRESOURCE_DATA> r;
-		for (int i = 0; i < arraySize; i++) {
-			r.push_back({ (char*)img + 128 + slice * i, (uint32_t)pitch, 0 });
+	int arraySize = hdr->GetArraySize();
+	int mipCnt = hdr->GetMipCnt();
+	CD3D11_TEXTURE2D_DESC desc(format, hdr->w, hdr->h, arraySize, hdr->GetMipCnt(), D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DEFAULT, 0, 1, 0, hdr->IsCubeMap() ? D3D11_RESOURCE_MISC_TEXTURECUBE : 0);
+	CD3D11_SHADER_RESOURCE_VIEW_DESC srvDesc(hdr->IsCubeMap() ? D3D_SRV_DIMENSION_TEXTURECUBE : D3D_SRV_DIMENSION_TEXTURE2D, desc.Format, 0, -1);
+	std::vector<D3D11_SUBRESOURCE_DATA> r;
+	int offset = 128;
+	for (int a = 0; a < arraySize; a++) {
+		for (int m = 0; m < mipCnt; m++) {
+			r.push_back({ (char*)img + offset, (uint32_t)pitch, 0 });
 		}
-		ID3D11Texture2D* tex = nullptr;
-		deviceMan11.GetDevice()->CreateTexture2D(&desc, &r[0], &tex);
-		deviceMan11.GetDevice()->CreateShaderResourceView(tex, &srvDesc, &srv);
-		SAFE_RELEASE(tex);
+		offset += slice;
 	}
+	ID3D11Texture2D* tex = nullptr;
+	deviceMan11.GetDevice()->CreateTexture2D(&desc, &r[0], &tex);
+	deviceMan11.GetDevice()->CreateShaderResourceView(tex, &srvDesc, &srv);
+	SAFE_RELEASE(tex);
+
 	free(img);
 	return srv;
 }
