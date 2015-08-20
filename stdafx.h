@@ -28,6 +28,7 @@
 #include <deque>
 #include <chrono>
 #include <random>
+#include <functional>
 
 // DirectX
 #include <d3d11.h>

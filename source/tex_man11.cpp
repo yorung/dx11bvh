@@ -51,7 +51,7 @@ static ID3D11ShaderResourceView* LoadTextureViaOS(const char* name)
 
 struct DDSHeader {
 	uint32_t h3[3];
-	uint32_t h, w;
+	int h, w;
 	uint32_t h2[2];
 	int mipCnt;
 	uint32_t h13[13];
@@ -112,15 +112,12 @@ static ID3D11ShaderResourceView* LoadDDSTexture(const char* name, ivec2& texSize
 	}
 	const DDSHeader* hdr = (DDSHeader*)img;
 
-	int blockSize = 16;
-	int pitch = 0, slice = 0;
 	DXGI_FORMAT format;
+	std::function<int(int, int)> pitchCalcurator;
 	switch (hdr->fourcc) {
 	case 0x31545844: //'1TXD':
 		format = DXGI_FORMAT_BC1_UNORM;
-		blockSize = 8;
-		pitch = blockSize * ((hdr->w + 3) / 4);
-		slice = pitch * ((hdr->h + 3) / 4);
+		pitchCalcurator = [=](int w, int h) { return ((w + 3) / 4) * ((h + 3) / 4) * 8; };
 		break;
 		//	case 0x33545844; //'3TXD':
 		//		format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
@@ -131,8 +128,7 @@ static ID3D11ShaderResourceView* LoadDDSTexture(const char* name, ivec2& texSize
 	default:
 		ArrangeRawDDS(img, size);
 		format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		pitch = hdr->w * 4;
-		slice = pitch * hdr->h;
+		pitchCalcurator = [=](int w, int h) { return w * h * 4; };
 		break;
 	}
 	texSize.x = hdr->w;
@@ -146,9 +142,11 @@ static ID3D11ShaderResourceView* LoadDDSTexture(const char* name, ivec2& texSize
 	int offset = 128;
 	for (int a = 0; a < arraySize; a++) {
 		for (int m = 0; m < mipCnt; m++) {
-			r.push_back({ (char*)img + offset, (uint32_t)pitch, 0 });
+			int w = std::max(1, hdr->w >> m);
+			int h = std::max(1, hdr->h >> m);
+			r.push_back({ (char*)img + offset, (uint32_t)pitchCalcurator(w, 1), 0 });
+			offset += pitchCalcurator(w, h);
 		}
-		offset += slice;
 	}
 	ID3D11Texture2D* tex = nullptr;
 	deviceMan11.GetDevice()->CreateTexture2D(&desc, &r[0], &tex);
