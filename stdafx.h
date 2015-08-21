@@ -34,11 +34,11 @@
 #include <d3d11.h>
 #include <D3Dcompiler.h>
 //#include <SimpleMath.h>
-#include <DDSTextureLoader.h>
-#include <WICTextureLoader.h>
+//#include <DDSTextureLoader.h>
+//#include <WICTextureLoader.h>
 //#include <SpriteFont.h>
 
-using namespace DirectX;
+//using namespace DirectX;
 //using namespace SimpleMath;
 
 static const int BONE_MAX = 70;
