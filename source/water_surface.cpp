@@ -161,7 +161,7 @@ void WaterSurface::Draw()
 
 	afDepthStencilMode(true);
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
-	ID3D11ShaderResourceView* tx = texMan.Get(texId);
+	ComPtr<ID3D11ShaderResourceView> tx = texMan.Get(texId);
 	deviceMan11.GetContext()->PSSetShaderResources(0, 1, &tx);
 
 

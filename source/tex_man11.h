@@ -9,12 +9,12 @@ public:
 	TMID CreateWhiteTexture();
 	TMID CreateDynamicTexture(const char* name, int w, int h);
 	void Destroy();
-	ID3D11ShaderResourceView* Get(TMID id);
+	ComPtr<ID3D11ShaderResourceView> Get(TMID id);
 	ivec2 GetSize(TMID id);
 	void Write(TMID id, const void* buf);
 private:
 	std::map<std::string, TMID> nameToId;
-	std::vector<ID3D11ShaderResourceView*> texs;
+	std::vector<ComPtr<ID3D11ShaderResourceView>> texs;
 };
 
 extern TexMan11 texMan;

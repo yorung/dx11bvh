@@ -55,7 +55,7 @@ void afBindBufferToBindingPoint(UBOID ubo, UINT uniformBlockBinding)
 
 void afBindTextureToBindingPoint(TexMan::TMID tex, UINT textureBindingPoint)
 {
-	ID3D11ShaderResourceView* tx = texMan.Get(tex);
+	ComPtr<ID3D11ShaderResourceView> tx = texMan.Get(tex);
 	deviceMan11.GetContext()->VSSetShaderResources(textureBindingPoint, 1, &tx);
 	deviceMan11.GetContext()->PSSetShaderResources(textureBindingPoint, 1, &tx);
 }

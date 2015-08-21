@@ -145,7 +145,7 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 		const MaterialMap& matMap = block.materialMaps[j];
 		const Material* mat = matMan.Get(matMap.materialId);
 		assert(mat);
-		ID3D11ShaderResourceView* tx = texMan.Get(mat->tmid);
+		ComPtr<ID3D11ShaderResourceView> tx = texMan.Get(mat->tmid);
 		deviceMan11.GetContext()->PSSetShaderResources(0, 1, &tx);
 
 		MeshConstantBuffer cBuf;
