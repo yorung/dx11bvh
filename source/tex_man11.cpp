@@ -112,24 +112,24 @@ static ComPtr<ID3D11ShaderResourceView> LoadDDSTexture(const char* name, ivec2& 
 	const DDSHeader* hdr = (DDSHeader*)img;
 
 	DXGI_FORMAT format;
-	std::function<int(int, int)> pitchCalcurator;
+	int (*pitchCalcurator)(int, int) = nullptr;
 	switch (hdr->fourcc) {
 	case 0x31545844: //'1TXD':
 		format = DXGI_FORMAT_BC1_UNORM;
-		pitchCalcurator = [=](int w, int h) { return ((w + 3) / 4) * ((h + 3) / 4) * 8; };
+		pitchCalcurator = [](int w, int h) { return ((w + 3) / 4) * ((h + 3) / 4) * 8; };
 		break;
 	case 0x33545844: //'3TXD':
 		format = DXGI_FORMAT_BC2_UNORM;
-		pitchCalcurator = [=](int w, int h) { return ((w + 3) / 4) * ((h + 3) / 4) * 16; };
+		pitchCalcurator = [](int w, int h) { return ((w + 3) / 4) * ((h + 3) / 4) * 16; };
 		break;
 	case 0x35545844: //'5TXD':
 		format = DXGI_FORMAT_BC3_UNORM;
-		pitchCalcurator = [=](int w, int h) { return ((w + 3) / 4) * ((h + 3) / 4) * 16; };
+		pitchCalcurator = [](int w, int h) { return ((w + 3) / 4) * ((h + 3) / 4) * 16; };
 		break;
 	default:
 		ArrangeRawDDS(img, size);
 		format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		pitchCalcurator = [=](int w, int h) { return w * h * 4; };
+		pitchCalcurator = [](int w, int h) { return w * h * 4; };
 		break;
 	}
 	texSize.x = hdr->w;
