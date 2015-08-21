@@ -33,6 +33,7 @@
 // DirectX
 #include <d3d11.h>
 #include <D3Dcompiler.h>
+#include <wrl.h>	// ComPtr
 //#include <SimpleMath.h>
 //#include <DDSTextureLoader.h>
 //#include <WICTextureLoader.h>
@@ -40,6 +41,7 @@
 
 //using namespace DirectX;
 //using namespace SimpleMath;
+using Microsoft::WRL::ComPtr;
 
 static const int BONE_MAX = 70;
 
