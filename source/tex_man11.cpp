@@ -9,7 +9,7 @@ namespace Gdiplus {
 #include <gdiplus.h>
 #pragma comment(lib, "gdiplus.lib")
 
-static ID3D11ShaderResourceView* LoadTextureViaOS(const char* name)
+static ComPtr<ID3D11ShaderResourceView> LoadTextureViaOS(const char* name)
 {
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR gdiplusToken;
@@ -41,11 +41,10 @@ static ID3D11ShaderResourceView* LoadTextureViaOS(const char* name)
 
 	CD3D11_TEXTURE2D_DESC desc(DXGI_FORMAT_R8G8B8A8_UNORM, w, h, 1, 1, D3D11_BIND_SHADER_RESOURCE);
 	D3D11_SUBRESOURCE_DATA r = { &col[0], (uint32_t)w * 4, 0 };
-	ID3D11Texture2D* tex = nullptr;
-	ID3D11ShaderResourceView* srv = nullptr;
+	ComPtr<ID3D11Texture2D> tex;
+	ComPtr<ID3D11ShaderResourceView> srv;
 	deviceMan11.GetDevice()->CreateTexture2D(&desc, &r, &tex);
-	deviceMan11.GetDevice()->CreateShaderResourceView(tex, nullptr, &srv);
-	SAFE_RELEASE(tex);
+	deviceMan11.GetDevice()->CreateShaderResourceView(tex.Get(), nullptr, &srv);
 	return srv;
 }
 
