@@ -119,12 +119,14 @@ static ID3D11ShaderResourceView* LoadDDSTexture(const char* name, ivec2& texSize
 		format = DXGI_FORMAT_BC1_UNORM;
 		pitchCalcurator = [=](int w, int h) { return ((w + 3) / 4) * ((h + 3) / 4) * 8; };
 		break;
-		//	case 0x33545844; //'3TXD':
-		//		format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
-		//		break;
-		//	case 0x35545844; //'5TXD':
-		//		format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-		//		break;
+	case 0x33545844: //'3TXD':
+		format = DXGI_FORMAT_BC2_UNORM;
+		pitchCalcurator = [=](int w, int h) { return ((w + 3) / 4) * ((h + 3) / 4) * 16; };
+		break;
+	case 0x35545844: //'5TXD':
+		format = DXGI_FORMAT_BC3_UNORM;
+		pitchCalcurator = [=](int w, int h) { return ((w + 3) / 4) * ((h + 3) / 4) * 16; };
+		break;
 	default:
 		ArrangeRawDDS(img, size);
 		format = DXGI_FORMAT_R8G8B8A8_UNORM;
