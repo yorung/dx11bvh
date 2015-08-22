@@ -78,26 +78,14 @@ static void bitScanForward(uint32_t* result, uint32_t mask)
 static void ArrangeRawDDS(void* img, int size)
 {
 	const DDSHeader* hdr = (DDSHeader*)img;
-	int w = (int)hdr->w;
-	int h = (int)hdr->h;
-	uint32_t* im = (uint32_t*)img + 128 / 4;
-	uint32_t rShift, gShift, bShift, aShift;
-	bitScanForward(&rShift, hdr->rMask);
-	bitScanForward(&gShift, hdr->gMask);
-	bitScanForward(&bShift, hdr->bMask);
-	bitScanForward(&aShift, hdr->aMask);
-	int arraySize = hdr->GetArraySize();
-	for (int i = 0; i < arraySize; i++) {
-		for (int y = 0; y < h; y++) {
-			for (int x = 0; x < w; x++) {
-				uint32_t c = *im;
-				*im++ = ((hdr->aMask & c) >> aShift << 24) +
-					((hdr->bMask & c) >> bShift << 16) +
-					((hdr->gMask & c) >> gShift << 8) +
-					((hdr->rMask & c) >> rShift);
-			}
-		}
-	}
+	DWORD rShift, gShift, bShift, aShift;
+	_BitScanForward(&rShift, hdr->rMask);
+	_BitScanForward(&gShift, hdr->gMask);
+	_BitScanForward(&bShift, hdr->bMask);
+	_BitScanForward(&aShift, hdr->aMask);
+	std::for_each((uint32_t*)img + 128 / 4, (uint32_t*)img + size / 4, [&](uint32_t& im) {
+		im = ((hdr->aMask & im) >> aShift << 24) + ((hdr->bMask & im) >> bShift << 16) + ((hdr->gMask & im) >> gShift << 8) + ((hdr->rMask & im) >> rShift);
+	} );
 }
 
 static ComPtr<ID3D11ShaderResourceView> LoadDDSTexture(const char* name, ivec2& texSize)
