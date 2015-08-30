@@ -56,7 +56,7 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 		{ "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 4, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
-	shaderId = shaderMan.Create("dx11mesh");
+	shaderId = shaderMan.Create("dx11mesh", layout, dimof(layout), BM_NONE, true);
 
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshVertex), D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, sizeof(MeshVertex)), nullptr, &skinnedPosBuffer);
 	D3D11_SUBRESOURCE_DATA subresData = { vertices, 0, 0 };
@@ -124,7 +124,6 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 	matrixMan.Get(MatrixMan::VIEW, matView);
 	matrixMan.Get(MatrixMan::PROJ, matProj);
 
-	afDepthStencilMode(true);
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
 	afBindVAO(vao);
 

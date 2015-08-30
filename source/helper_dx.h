@@ -16,14 +16,12 @@ public:
 	}
 };
 
-
 typedef unsigned short AFIndex;
 
 #define AFIndexTypeToDevice DXGI_FORMAT_R16_UINT
 typedef ID3D11Buffer* IBOID;
 typedef ID3D11Buffer* VBOID;
 typedef ID3D11Buffer* UBOID;
-typedef FakeVAO* VAOID;
 typedef ID3D11SamplerState* SAMPLERID;
 
 #define afSafeDeleteBuffer SAFE_RELEASE
@@ -64,9 +62,6 @@ enum AFDTFormat
 	AFDT_DEPTH_STENCIL,
 };
 //GLuint afCreateDynamicTexture(int w, int h, AFDTFormat format);
-
-VAOID afCreateVAO(ShaderMan::SMID program, const InputElement elements[], int numElements, int numBuffers, VBOID const *vertexBufferIds, const int* strides, IBOID ibo);
-inline void afBindVAO(VAOID vao) { vao->Apply(); }
 
 class AFRenderTarget
 {

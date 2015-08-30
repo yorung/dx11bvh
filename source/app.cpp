@@ -85,7 +85,7 @@ void App::Init(const char* fileName)
 	if (ext && !_stricmp(ext, ".x")) {
 		meshFileName = fileName;
 	}
-#if 0
+#if 1
 	meshTiny = new MeshX(meshFileName);
 
 	if (ext && !_stricmp(ext, ".bvh")) {

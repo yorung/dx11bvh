@@ -12,6 +12,8 @@ private:
 		ID3DBlob* pBlobVS;
 		const D3D11_INPUT_ELEMENT_DESC *elements;
 		int numElements;
+		BlendMode blendMode;
+		bool useDepthBuffer;
 		Effect() { memset(this, 0, sizeof(*this)); }
 	};
 	std::map<std::string, SMID> m_nameToId;
@@ -19,7 +21,7 @@ private:
 public:
 	ShaderMan11();
 	~ShaderMan11();
-	SMID Create(const char *name, const D3D11_INPUT_ELEMENT_DESC elements[] = nullptr, int numElements = 0);
+	SMID Create(const char *name, const D3D11_INPUT_ELEMENT_DESC elements[], int numElements, BlendMode blendMode, bool useDepthBuffer);
 	void Destroy();
 	void Reload();
 	void Apply(SMID id);
@@ -38,7 +40,10 @@ public:
 	~FakeVAO();
 	void Apply();
 };
+typedef FakeVAO* VAOID;
 
 extern ShaderMan11 shaderMan;
 typedef ShaderMan11 ShaderMan;
 
+VAOID afCreateVAO(ShaderMan::SMID program, const InputElement elements[], int numElements, int numBuffers, VBOID const *vertexBufferIds, const int* strides, IBOID ibo);
+inline void afBindVAO(VAOID vao) { vao->Apply(); }

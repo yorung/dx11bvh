@@ -23,7 +23,7 @@ void SkyMan::Create(const char *strCubeMapFile, const char *shader)
 	Destroy();
 
 	texId = texMan.Create(strCubeMapFile);
-	shaderId = shaderMan.Create(shader, nullptr, 0);
+	shaderId = shaderMan.Create(shader, nullptr, 0, BM_NONE, false);
 
 	if (constantBufferId < 0)
 	{

@@ -146,7 +146,7 @@ bool FontMan::Init()
 		return false;
 	}
 	texture = texMan.CreateDynamicTexture("$FontMan", TEX_W, TEX_H);
-	shader = shaderMan.Create("font");
+	shader = shaderMan.Create("font", elements, dimof(elements), BM_ALPHA, false);
 	assert(shader);
 	ibo = afCreateQuadListIndexBuffer(SPRITE_MAX);
 	vbo = afCreateDynamicVertexBuffer(SPRITE_MAX * sizeof(FontVertex) * 4);
@@ -309,11 +309,7 @@ void FontMan::Render()
 	afBindVAO(vao);
 	afBindSamplerToBindingPoint(sampler, 0);
 	afBindTextureToBindingPoint(texture, 0);
-	afBlendMode(BM_ALPHA);
-	afDepthStencilMode(false);
 	afDrawIndexedTriangleList(numSprites * 6);
-	afDepthStencilMode(true);
-	afBlendMode(BM_NONE);
 	numSprites = 0;
 }
 

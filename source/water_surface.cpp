@@ -130,7 +130,7 @@ void WaterSurface::Init()
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	texId = texMan.Create("resource\\Tiny_skin.dds");
-	shaderId = shaderMan.Create("water_surface");
+	shaderId = shaderMan.Create("water_surface", layout, dimof(layout), BM_NONE, true);
 
 	vbo = afCreateDynamicVertexBuffer(sizeVertices);
 	ibo = afCreateIndexBuffer(indices, indi.size());
