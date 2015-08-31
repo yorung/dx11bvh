@@ -99,7 +99,7 @@ IBOID afCreateQuadListIndexBuffer(int numQuads)
 
 void afDrawIndexedTriangleList(int numIndices, int start)
 {
-	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	deviceMan11.GetContext()->DrawIndexed(numIndices, start, 0);
 }
 
