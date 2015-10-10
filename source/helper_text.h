@@ -1,7 +1,5 @@
 ﻿#ifdef _MSC_VER
 #define aflog printf
-#define snprintf sprintf_s
-#define vsnprintf vsprintf_s
 #define stricmp _stricmp
 #else
 #define strcpy_s(dst,size,src) strlcpy(dst,src,size)
