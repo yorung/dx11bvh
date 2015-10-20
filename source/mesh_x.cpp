@@ -831,7 +831,7 @@ void MeshX::DeleteDummyFrames()
 		}
 	} while (deleted);
 
-	while (!m_frames.empty() && m_frames.rbegin()->parentId < 0 && m_frames.rbegin()->childId < 0) {
+	while (m_frames.size() >= 2 && m_frames.rbegin()->parentId < 0 && m_frames.rbegin()->childId < 0) {
 		m_frames.erase(m_frames.end() - 1);
 	}
 }
