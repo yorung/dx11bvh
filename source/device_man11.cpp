@@ -2,18 +2,8 @@
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3dcompiler.lib")
-#pragma comment(lib, "DirectXTK.lib")
 
 DeviceMan11 deviceMan11;
-
-DeviceMan11::DeviceMan11()
-{
-	pDevice = nullptr;
-	pSwapChain = nullptr;
-	pImmediateContext = nullptr;
-	pRenderTargetView = nullptr;
-	pDepthStencilView = nullptr;
-}
 
 DeviceMan11::~DeviceMan11()
 {

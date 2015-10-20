@@ -1,12 +1,11 @@
 class DeviceMan11
 {
-	ID3D11Device* pDevice;
-	IDXGISwapChain* pSwapChain;
-	ID3D11DeviceContext* pImmediateContext;
-	ID3D11RenderTargetView*	pRenderTargetView;
-	ID3D11DepthStencilView* pDepthStencilView;
+	ID3D11Device* pDevice = nullptr;
+	IDXGISwapChain* pSwapChain = nullptr;
+	ID3D11DeviceContext* pImmediateContext = nullptr;
+	ID3D11RenderTargetView*	pRenderTargetView = nullptr;
+	ID3D11DepthStencilView* pDepthStencilView = nullptr;
 public:
-	DeviceMan11();
 	~DeviceMan11();
 
 	void Create(HWND hWnd);
