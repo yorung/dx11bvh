@@ -5,14 +5,7 @@ Very simple Biovision BVH viewer.
 
 ![Perfume](resource/perfume.png)
 
-Visual Studio 2013 community required.
-Before open the solution file, type below from Git Bash to get DirectXTK.
-
-$ git submodule init
-
-$ git submodule update
-
-Then, open dx11bvh.sln and build it:)
+Visual Studio 2015 required.
 
 ## How to use
 
