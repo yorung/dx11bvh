@@ -45,7 +45,7 @@ void App::ApplySky()
 	case 3:
 		skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\Media\\trees\\tree35S.dds", "sky_spheremap");
 		//skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\Media\\SubD10\\msd_MicrosoftCharacterMaya100_heroChr_mechanicalCM_tga_001.dds", "sky_spheremap");
-		//skyMan.Create("resource\\Tiny_skin.dds", "sky_spheremap");
+		//skyMan.Create("resource\\sphere_map.dds", "sky_spheremap");
 		break;
 	case 4:
 		skyMan.Create("resource\\PANO_20141115_141959.dds", "sky_photosphere");

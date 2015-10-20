@@ -614,7 +614,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
 
       TextureFilename {
-         "Tiny_skin.dds";
+         "Equirectangular-projection.jpg";
       }
    }
  }
