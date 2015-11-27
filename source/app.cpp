@@ -66,8 +66,9 @@ void App::Init(const char* fileName)
 {
 	Destroy();
 
-	for (auto& it : rt) {
-		it.Init(ivec2(SCR_W, SCR_H), AFDT_R8G8B8A8_UINT, AFDT_INVALID);
+	for (int i = 0; i < (int)dimof(rt); i++) {
+//		rt[i].Init(ivec2(SCR_W, SCR_H), i == 2 ? DXGI_FORMAT_R32_UINT : DXGI_FORMAT_R8G8B8A8_UNORM);
+		rt[i].Init(ivec2(SCR_W, SCR_H), DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	fontMan.Init();
@@ -76,6 +77,7 @@ void App::Init(const char* fileName)
 	waterSurface.Init();
 	postEffectCopy.Create("post_effect_copy");
 	postEffectMono.Create("post_effect_mono");
+	postEffectUAVTest.Create("post_effect_uav_test");
 	computeShaderMan.Create("fx\\post_effect_cs.fx");
 	computeShaderSkinning.Create("fx\\skin_cs.fx");
 
@@ -252,8 +254,11 @@ void App::Draw()
 //	fontMan.DrawString(Vec2(0, 110), 16, "TEXT SPRITE TEST!!!!!!!!!!!!!text sprite 1234567890");
 //	fontMan.DrawString(Vec2(10, 130), 32, "@#$%^&*()");
 //	fontMan.DrawString(Vec2(10, 170), 40, L"あいうえお한글漢字");
-	ID3D11DeviceContext* context = deviceMan11.GetContext();
+
+	// render to rt[0]
 	rt[0].BeginRenderToThis();
+
+	ID3D11DeviceContext* context = deviceMan11.GetContext();
 
 	double currentTime = GetTime();
 	double deltaTime = currentTime - lastTime;
@@ -307,16 +312,32 @@ void App::Draw()
 	}
 	fontMan.Render();
 
+	// 0 => 1
 	deviceMan11.GetContext()->OMSetRenderTargets(0, nullptr, nullptr);	// unbind RT to prevent warnings in debug layer
 	computeShaderMan.Draw(rt[0].GetTexture(), rt[1].GetUnorderedAccessView());
 
-	rt[0].BeginRenderToThis();
-	postEffectMono.Draw(rt[1].GetTexture());
-
 	AFRenderTarget defaultTarget;
 	defaultTarget.InitForDefaultRenderTarget();
-	defaultTarget.BeginRenderToThis();
-	postEffectCopy.Draw(rt[0].GetTexture());
+
+	if (GetKeyState('U') & 0x01) {
+		// 1 => 2
+		ID3D11UnorderedAccessView* view = rt[2].GetUnorderedAccessView();
+		deviceMan11.GetContext()->OMSetRenderTargetsAndUnorderedAccessViews(0, nullptr, nullptr, 1, 1, &view, nullptr);
+		postEffectUAVTest.Draw(rt[1].GetTexture());
+
+		// 2 => front
+		defaultTarget.BeginRenderToThis();
+		postEffectMono.Draw(rt[2].GetTexture());
+	} else {
+		// 1 => 0
+		rt[0].BeginRenderToThis();
+		postEffectCopy.Draw(rt[1].GetTexture());
+
+		// 0 => front
+		defaultTarget.BeginRenderToThis();
+		postEffectMono.Draw(rt[0].GetTexture());
+	}
+
 
 	ID3D11ShaderResourceView* dummy = nullptr;
 	deviceMan11.GetContext()->PSSetShaderResources(0, 1, &dummy);
@@ -341,6 +362,7 @@ void App::Destroy()
 	waterSurface.Destroy();
 	postEffectMono.Destroy();
 	postEffectCopy.Destroy();
+	postEffectUAVTest.Destroy();
 	computeShaderMan.Destroy();
 	computeShaderSkinning.Destroy();
 }

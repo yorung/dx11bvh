@@ -258,5 +258,8 @@
     <FxCompile Include="fx\post_effect_copy.fx">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="fx\post_effect_uav_test.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

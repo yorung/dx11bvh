@@ -3,13 +3,13 @@ class App {
 	MeshXBvhBinding bind[3];
 	Mesh* mesh[3];
 	float radius;
-	AFRenderTarget rt[2];
+	AFRenderTarget rt[3];
 	int animationNumber;
 	double trackTime;
 	double lastTime;
 	GridRenderer gridRenderer;
 	int skyNum = 0;
-	PostEffectMan postEffectCopy, postEffectMono;
+	PostEffectMan postEffectCopy, postEffectMono, postEffectUAVTest;
 public:
 	App();
 	~App();

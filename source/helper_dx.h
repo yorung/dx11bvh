@@ -73,7 +73,7 @@ class AFRenderTarget
 public:
 	~AFRenderTarget() { Destroy(); }
 	void InitForDefaultRenderTarget();
-	void Init(ivec2 size, AFDTFormat colorFormat, AFDTFormat depthStencilFormat);
+	void Init(ivec2 size, DXGI_FORMAT colorFormat);
 	void Destroy();
 	void BeginRenderToThis();
 	ID3D11ShaderResourceView* GetTexture() { return shaderResourceView; }
