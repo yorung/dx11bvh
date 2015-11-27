@@ -253,10 +253,7 @@ void App::Draw()
 //	fontMan.DrawString(Vec2(10, 170), 40, L"あいうえお한글漢字");
 
 	ID3D11DeviceContext* context = deviceMan11.GetContext();
-//	rt[0].BeginRenderToThis();
-	AFRenderTarget defaultTarget;
-	defaultTarget.InitForDefaultRenderTarget();
-	defaultTarget.BeginRenderToThis();
+	rt[0].BeginRenderToThis();
 
 	double currentTime = GetTime();
 	double deltaTime = currentTime - lastTime;
@@ -310,9 +307,14 @@ void App::Draw()
 	}
 	fontMan.Render();
 
+	deviceMan11.GetContext()->OMSetRenderTargets(0, nullptr, nullptr);	// unbind RT to prevent warnings in debug layer
+	computeShaderMan.Draw(rt[0].GetTexture(), rt[1].GetUnorderedAccessView());
 
-//	computeShaderMan.Draw(rt[0].GetTexture(), rt[1].GetUnorderedAccessView());
-//	postEffectMan.Draw(rt[1].GetTexture());
+	AFRenderTarget defaultTarget;
+	defaultTarget.InitForDefaultRenderTarget();
+	defaultTarget.BeginRenderToThis();
+
+	postEffectMan.Draw(rt[1].GetTexture());
 
 	deviceMan11.Present();
 
