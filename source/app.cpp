@@ -74,7 +74,8 @@ void App::Init(const char* fileName)
 	debugRenderer.Init();
 	gridRenderer.Init();
 	waterSurface.Init();
-	postEffectMan.Create("post_effect_mono");
+	postEffectMan.Create("post_effect_copy");
+//	postEffectMan.Create("post_effect_mono");
 	computeShaderMan.Create("fx\\post_effect_cs.fx");
 	computeShaderSkinning.Create("fx\\skin_cs.fx");
 

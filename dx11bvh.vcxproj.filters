@@ -255,5 +255,8 @@
     <FxCompile Include="fx\projection_equirectangular_to_stereographic.fx">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="fx\post_effect_copy.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
