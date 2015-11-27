@@ -127,18 +127,12 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
 	afBindVAO(vao);
 
-	ID3D11ShaderResourceView* srvSkinnedPos;
 	{
-		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-		memset(&desc, 0, sizeof(desc));
-		desc.ViewDimension = D3D11_SRV_DIMENSION_BUFFEREX;
-		desc.Format = DXGI_FORMAT_UNKNOWN;
-		desc.BufferEx.FirstElement = 0;
-		desc.BufferEx.NumElements = block.vertices.size();
+		ComPtr<ID3D11ShaderResourceView> srvSkinnedPos;
+		CD3D11_SHADER_RESOURCE_VIEW_DESC desc(D3D_SRV_DIMENSION_BUFFEREX, DXGI_FORMAT_UNKNOWN, 0, block.vertices.size());
 		HRESULT hr = deviceMan11.GetDevice()->CreateShaderResourceView(skinnedPosBuffer, &desc, &srvSkinnedPos);
+		deviceMan11.GetContext()->VSSetShaderResources(0, 1, srvSkinnedPos.GetAddressOf());
 	}
-	deviceMan11.GetContext()->VSSetShaderResources(0, 1, &srvSkinnedPos);
-	SAFE_RELEASE(srvSkinnedPos);
 
 	for (int j = 0; (unsigned)j < block.materialMaps.size(); j++) {
 		const MaterialMap& matMap = block.materialMaps[j];
