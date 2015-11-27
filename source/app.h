@@ -9,6 +9,7 @@ class App {
 	double lastTime;
 	GridRenderer gridRenderer;
 	int skyNum = 0;
+	PostEffectMan postEffectCopy, postEffectMono;
 public:
 	App();
 	~App();

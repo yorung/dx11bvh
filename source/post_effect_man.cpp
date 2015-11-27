@@ -1,7 +1,5 @@
 #include <stdafx.h>
 
-PostEffectMan postEffectMan;
-
 BufferMan::BMID PostEffectMan::constantBufferId = -1;
 
 PostEffectMan::PostEffectMan()
@@ -65,6 +63,8 @@ void PostEffectMan::Draw(ID3D11ShaderResourceView* shaderResourceView)
 	buf = nullptr;
 	deviceMan11.GetContext()->VSSetConstantBuffers(0, 1, &buf);
 	deviceMan11.GetContext()->PSSetConstantBuffers(0, 1, &buf);
+	ID3D11ShaderResourceView* dummy = nullptr;
+	deviceMan11.GetContext()->PSSetShaderResources(0, 1, &dummy);
 }
 
 void PostEffectMan::Destroy()

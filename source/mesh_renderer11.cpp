@@ -155,5 +155,8 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 		deviceMan11.GetContext()->IASetIndexBuffer(pIndexBuffer, AFIndexTypeToDevice, 0);
 		afDrawIndexedTriangleList(matMap.faces * 3, matMap.faceStartIndex * 3);
 	}
+
+	ID3D11ShaderResourceView* dummy = nullptr;
+	deviceMan11.GetContext()->PSSetShaderResources(0, 1, &dummy);
 }
 

@@ -74,8 +74,8 @@ void App::Init(const char* fileName)
 	debugRenderer.Init();
 	gridRenderer.Init();
 	waterSurface.Init();
-	postEffectMan.Create("post_effect_copy");
-//	postEffectMan.Create("post_effect_mono");
+	postEffectCopy.Create("post_effect_copy");
+	postEffectMono.Create("post_effect_mono");
 	computeShaderMan.Create("fx\\post_effect_cs.fx");
 	computeShaderSkinning.Create("fx\\skin_cs.fx");
 
@@ -252,7 +252,6 @@ void App::Draw()
 //	fontMan.DrawString(Vec2(0, 110), 16, "TEXT SPRITE TEST!!!!!!!!!!!!!text sprite 1234567890");
 //	fontMan.DrawString(Vec2(10, 130), 32, "@#$%^&*()");
 //	fontMan.DrawString(Vec2(10, 170), 40, L"あいうえお한글漢字");
-
 	ID3D11DeviceContext* context = deviceMan11.GetContext();
 	rt[0].BeginRenderToThis();
 
@@ -311,14 +310,18 @@ void App::Draw()
 	deviceMan11.GetContext()->OMSetRenderTargets(0, nullptr, nullptr);	// unbind RT to prevent warnings in debug layer
 	computeShaderMan.Draw(rt[0].GetTexture(), rt[1].GetUnorderedAccessView());
 
+	rt[0].BeginRenderToThis();
+	postEffectMono.Draw(rt[1].GetTexture());
+
 	AFRenderTarget defaultTarget;
 	defaultTarget.InitForDefaultRenderTarget();
 	defaultTarget.BeginRenderToThis();
+	postEffectCopy.Draw(rt[0].GetTexture());
 
-	postEffectMan.Draw(rt[1].GetTexture());
+	ID3D11ShaderResourceView* dummy = nullptr;
+	deviceMan11.GetContext()->PSSetShaderResources(0, 1, &dummy);
 
 	deviceMan11.Present();
-
 	fps.Update();
 }
 
@@ -336,7 +339,8 @@ void App::Destroy()
 	debugRenderer.Destroy();
 	gridRenderer.Destroy();
 	waterSurface.Destroy();
-	postEffectMan.Destroy();
+	postEffectMono.Destroy();
+	postEffectCopy.Destroy();
 	computeShaderMan.Destroy();
 	computeShaderSkinning.Destroy();
 }

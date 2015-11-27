@@ -11,5 +11,3 @@ public:
 	void Draw(ID3D11ShaderResourceView* shaderResourceView);
 	void Destroy();
 };
-
-extern PostEffectMan postEffectMan;
