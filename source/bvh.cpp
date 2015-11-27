@@ -277,6 +277,9 @@ int Bvh::GetDepth(BONE_ID id)
 
 void Bvh::CreateBoneTypeToIdTbl()
 {
+	for (int i = 0; i < BT_MAX; i++) {
+		boneTypeToIdTbl[i] = -1;
+	}
 	for (auto& it : bvhPresets) {
 		int cnt = 0;
 		for (int i = 0; i < BT_MAX; i++) {

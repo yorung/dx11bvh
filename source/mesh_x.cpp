@@ -288,7 +288,7 @@ class FrameIterator
 	const std::vector<Frame>& frames;
 	BONE_ID cur;
 public:
-	FrameIterator(const std::vector<Frame>& f) : cur(0), frames(f) {}
+	FrameIterator(const std::vector<Frame>& f) : cur(f.empty() ? -1 : 0), frames(f) {}
 	BONE_ID GetCurrent() { return cur; }
 	void operator++() {
 		if (frames[cur].childId >= 0) {
