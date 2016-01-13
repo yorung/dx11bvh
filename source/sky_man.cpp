@@ -60,10 +60,8 @@ void SkyMan::Draw()
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &sampler);
 	ComPtr<ID3D11ShaderResourceView> tx = texMan.Get(texId);
 	deviceMan11.GetContext()->PSSetShaderResources(0, 1, tx.GetAddressOf());
-
 	deviceMan11.GetContext()->OMSetDepthStencilState(depthStencilState, 0);
-	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	deviceMan11.GetContext()->Draw(4, 0);
+	afDrawTriangleStrip(4);
 
 	tx = nullptr;
 	deviceMan11.GetContext()->PSSetShaderResources(0, 1, &tx);

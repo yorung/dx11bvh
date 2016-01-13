@@ -108,7 +108,7 @@
     <ClInclude Include="source\mesh_x.h" />
     <ClInclude Include="source\post_effect_man.h" />
     <ClInclude Include="source\shader_man11.h" />
-    <ClInclude Include="source\sky_man11.h" />
+    <ClInclude Include="source\sky_man.h" />
     <ClInclude Include="source\system_metrics.h" />
     <ClInclude Include="source\tex_man11.h" />
     <ClInclude Include="source\water_surface.h" />
@@ -139,7 +139,7 @@
     <ClCompile Include="source\mesh_x.cpp" />
     <ClCompile Include="source\post_effect_man.cpp" />
     <ClCompile Include="source\shader_man11.cpp" />
-    <ClCompile Include="source\sky_man11.cpp" />
+    <ClCompile Include="source\sky_man.cpp" />
     <ClCompile Include="source\system_metrics.cpp" />
     <ClCompile Include="source\tex_man11.cpp" />
     <ClCompile Include="source\water_surface.cpp" />

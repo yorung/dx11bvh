@@ -103,6 +103,12 @@ void afDrawIndexedTriangleList(int numIndices, int start)
 	deviceMan11.GetContext()->DrawIndexed(numIndices, start, 0);
 }
 
+void afDrawTriangleStrip(int numVertices, int start)
+{
+	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	deviceMan11.GetContext()->Draw(numVertices, start);
+}
+
 void afEnableBackFaceCulling(bool cullBack)
 {
 	ID3D11RasterizerState* rs;

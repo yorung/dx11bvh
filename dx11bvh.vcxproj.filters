@@ -75,9 +75,6 @@
     <ClInclude Include="source\buffer_man11.h">
       <Filter>source</Filter>
     </ClInclude>
-    <ClInclude Include="source\sky_man11.h">
-      <Filter>source</Filter>
-    </ClInclude>
     <ClInclude Include="source\water_surface.h">
       <Filter>source</Filter>
     </ClInclude>
@@ -109,6 +106,9 @@
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="source\helper_dx.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="source\sky_man.h">
       <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
@@ -155,9 +155,6 @@
     <ClCompile Include="source\buffer_man11.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="source\sky_man11.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="source\water_surface.cpp">
       <Filter>source</Filter>
     </ClCompile>
@@ -195,6 +192,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\helper_dx.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\sky_man.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
