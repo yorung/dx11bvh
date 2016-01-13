@@ -79,7 +79,7 @@ Mat DevCamera::GetProjMatrix()
 	float dist = GetDistance();
 	float f = dist * 1000;
 	float n = dist / 1000;
-	return perspective(fov, (float)SCR_W / SCR_H, n, f);
+	return perspectiveLH(fov * (float)M_PI / 180.f, (float)SCR_W / SCR_H, n, f);
 }
 
 void DevCamera::SetHeight(float height)
