@@ -5,6 +5,7 @@ ScreenShot/
 *.suo
 *.user
 *.sdf
+*.opendb
 *.opensdf
 *.ipch
 *.bak
