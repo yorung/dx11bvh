@@ -2,8 +2,9 @@ class SkyMan
 {
 	TexMan::TMID texId;
 	ShaderMan::SMID shaderId;
-	ID3D11SamplerState* sampler;
-	ID3D11DepthStencilState* depthStencilState;
+	ID3D11SamplerState* sampler = nullptr;
+	ID3D11DepthStencilState* depthStencilState = nullptr;
+	ID3D11BlendState* blendState = nullptr;
 	static BufferMan::BMID constantBufferId;
 public:
 	SkyMan();

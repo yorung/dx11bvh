@@ -8,14 +8,13 @@ SkyMan::SkyMan()
 {
 	texId = TexMan::INVALID_TMID;
 	shaderId = ShaderMan::INVALID_SMID;
-	sampler = nullptr;
-	depthStencilState = nullptr;
 }
 
 SkyMan::~SkyMan()
 {
 	assert(!sampler);
 	assert(!depthStencilState);
+	assert(!blendState);
 }
 
 void SkyMan::Create(const char *strCubeMapFile, const char *shader)
@@ -36,7 +35,8 @@ void SkyMan::Create(const char *strCubeMapFile, const char *shader)
 	desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 	desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 	deviceMan11.GetDevice()->CreateDepthStencilState(&desc, &depthStencilState);
-
+	CD3D11_BLEND_DESC bdesc(D3D11_DEFAULT);
+	deviceMan11.GetDevice()->CreateBlendState(&bdesc, &blendState);
 }
 
 void SkyMan::Draw()
@@ -61,6 +61,7 @@ void SkyMan::Draw()
 	ComPtr<ID3D11ShaderResourceView> tx = texMan.Get(texId);
 	deviceMan11.GetContext()->PSSetShaderResources(0, 1, tx.GetAddressOf());
 	deviceMan11.GetContext()->OMSetDepthStencilState(depthStencilState, 0);
+	deviceMan11.GetContext()->OMSetBlendState(blendState, nullptr, 0xffffffff);
 	afDrawTriangleStrip(4);
 
 	tx = nullptr;
@@ -71,4 +72,5 @@ void SkyMan::Destroy()
 {
 	SAFE_RELEASE(sampler);
 	SAFE_RELEASE(depthStencilState);
+	SAFE_RELEASE(blendState);
 }

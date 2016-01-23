@@ -273,7 +273,6 @@ void App::Draw()
 	matrixMan.Set(MatrixMan::VIEW, devCamera.GetViewMatrix());
 	matrixMan.Set(MatrixMan::PROJ, devCamera.GetProjMatrix());
 
-	skyMan.Draw();
 //	gridRenderer.Draw();
 //	waterSurface.Draw();
 
@@ -310,6 +309,9 @@ void App::Draw()
 		Vec2 pos = { 5, 15 };
 		fontMan.DrawString(pos, 16, buf);
 	}
+
+	skyMan.Draw();
+
 	fontMan.Render();
 
 	// 0 => 1
