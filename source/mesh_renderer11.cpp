@@ -148,7 +148,6 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 		cBuf.camPos = fastInv(matView).GetRow(3);
 		afWriteBuffer(uboId, &cBuf, sizeof(cBuf));
 		afBindBufferToBindingPoint(uboId, 2);
-		deviceMan11.GetContext()->IASetIndexBuffer(pIndexBuffer, AFIndexTypeToDevice, 0);
 		afDrawIndexedTriangleList(matMap.faces * 3, matMap.faceStartIndex * 3);
 	}
 
