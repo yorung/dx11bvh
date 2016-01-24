@@ -2,14 +2,6 @@
 
 SkyMan skyMan;
 
-BufferMan::BMID SkyMan::constantBufferId = -1;
-
-SkyMan::SkyMan()
-{
-	texId = TexMan::INVALID_TMID;
-	shaderId = ShaderMan::INVALID_SMID;
-}
-
 SkyMan::~SkyMan()
 {
 	assert(!sampler);
@@ -17,20 +9,15 @@ SkyMan::~SkyMan()
 	assert(!blendState);
 }
 
-void SkyMan::Create(const char *strCubeMapFile, const char *shader)
+void SkyMan::Create(const char *texFileName, const char *shader)
 {
 	Destroy();
 
-	texId = texMan.Create(strCubeMapFile);
+	texId = texMan.Create(texFileName);
 	shaderId = shaderMan.Create(shader, nullptr, 0, BM_NONE, false);
-
-	if (constantBufferId < 0)
-	{
-		constantBufferId = bufferMan.Create(sizeof(Mat));
-	}
+	uboId = afCreateUBO(sizeof(Mat));
 
 	deviceMan11.GetDevice()->CreateSamplerState(&CD3D11_SAMPLER_DESC(D3D11_DEFAULT), &sampler);
-
 	CD3D11_DEPTH_STENCIL_DESC desc(D3D11_DEFAULT);
 	desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 	desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
@@ -52,10 +39,8 @@ void SkyMan::Draw()
 	matrixMan.Get(MatrixMan::PROJ, matP);
 	Mat invVP = inv(matV * matP);
 
-	bufferMan.Write(constantBufferId, &invVP);
-	auto buf = bufferMan.Get(constantBufferId);
-	deviceMan11.GetContext()->VSSetConstantBuffers(0, 1, &buf);
-	deviceMan11.GetContext()->PSSetConstantBuffers(0, 1, &buf);
+	afWriteBuffer(uboId, &invVP, sizeof(invVP));
+	afBindBufferToBindingPoint(uboId, 0);
 	afBindTextureToBindingPoint(texId, 0);
 
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &sampler);
@@ -70,4 +55,5 @@ void SkyMan::Destroy()
 	SAFE_RELEASE(sampler);
 	SAFE_RELEASE(depthStencilState);
 	SAFE_RELEASE(blendState);
+	SAFE_RELEASE(uboId);
 }
