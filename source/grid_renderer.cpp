@@ -77,8 +77,9 @@ void GridRenderer::Init()
 	descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	deviceMan11.GetDevice()->CreateSamplerState(&descSamp, &pSamplerState);
 
-	int strides[] = { sizeof(GridVert) };
-	vao = afCreateVAO(shaderId, layout, dimof(layout), 1, &vbo, strides, ibo);
+	int strides[] = {sizeof(GridVert)};
+	VBOID vbos[] = {vbo};
+	vao = afCreateVAO(shaderId, layout, dimof(layout), 1, vbos, strides, ibo);
 }
 
 void GridRenderer::Draw()

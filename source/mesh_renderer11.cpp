@@ -73,8 +73,9 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 		constantBufferId = bufferMan.Create(sizeof(MeshConstantBuffer));
 	}
 
-	int strides[] = { sizeof(MeshColor) };
-	vao = afCreateVAO(shaderId, layout, dimof(layout), 1, &colorBuffer, strides, pIndexBuffer);
+	int strides[] = {sizeof(MeshColor)};
+	VBOID vbos[] = {colorBuffer};
+	vao = afCreateVAO(shaderId, layout, dimof(layout), 1, vbos, strides, pIndexBuffer);
 
 	CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
 	descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
