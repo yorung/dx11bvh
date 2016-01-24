@@ -1,32 +1,32 @@
 #include "stdafx.h"
 
 #ifdef __d3d11_h__
-ID3D11Buffer* afCreateIndexBuffer(const AFIndex* indi, int numIndi)
+IBOID afCreateIndexBuffer(const AFIndex* indi, int numIndi)
 {
-	ID3D11Buffer* indexBuffer;
+	IBOID indexBuffer;
 	D3D11_SUBRESOURCE_DATA subresData = { indi, 0, 0 };
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numIndi * sizeof(AFIndex), D3D11_BIND_INDEX_BUFFER), &subresData, &indexBuffer);
 	return indexBuffer;
 }
 
-ID3D11Buffer* afCreateVertexBuffer(int size, const void* data)
+VBOID afCreateVertexBuffer(int size, const void* data)
 {
-	ID3D11Buffer* vbo;
+	VBOID vbo;
 	D3D11_SUBRESOURCE_DATA subresData = { data, 0, 0 };
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(size, D3D11_BIND_VERTEX_BUFFER), &subresData, &vbo);
 	return vbo;
 }
 
-ID3D11Buffer* afCreateDynamicVertexBuffer(int size)
+VBOID afCreateDynamicVertexBuffer(int size)
 {
-	ID3D11Buffer* vbo;
+	VBOID vbo;
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(size, D3D11_BIND_VERTEX_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE), nullptr, &vbo);
 	return vbo;
 }
 
 UBOID afCreateUBO(int size)
 {
-	ID3D11Buffer* ubo;
+	UBOID ubo;
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(size, D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE), nullptr, &ubo);
 	return ubo;
 }
@@ -66,7 +66,7 @@ void afBindSamplerToBindingPoint(ID3D11SamplerState* sampler, UINT textureBindin
 	deviceMan11.GetContext()->PSSetSamplers(textureBindingPoint, 1, &sampler);
 }
 
-void afWriteBuffer(ID3D11Buffer* p, const void* buf, int size)
+void afWriteBuffer(const IBOID p, const void* buf, int size)
 {
 #ifdef _DEBUG
 	D3D11_BUFFER_DESC desc;

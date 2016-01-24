@@ -29,7 +29,7 @@ typedef ID3D11SamplerState* SAMPLERID;
 #define afSafeDeleteVAO SAFE_DELETE
 #define afSafeDeleteSampler SAFE_RELEASE
 
-void afWriteBuffer(ID3D11Buffer* p, const void* buf, int size);
+void afWriteBuffer(const IBOID p, const void* buf, int size);
 
 IBOID afCreateIndexBuffer(const AFIndex* indi, int numIndi);
 IBOID afCreateQuadListIndexBuffer(int numQuads);
