@@ -5,7 +5,7 @@ struct MeshSkin;
 
 class MeshRenderer11
 {
-	static BufferMan::BMID constantBufferId;
+	UBOID uboId;
 	ID3D11Buffer* posBuffer;
 	ID3D11Buffer* colorBuffer;
 	ID3D11Buffer* skinBuffer;

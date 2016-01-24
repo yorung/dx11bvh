@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-BufferMan::BMID MeshRenderer11::constantBufferId = -1;
-
 struct MeshConstantBuffer
 {
 	Mat matW;
@@ -38,6 +36,7 @@ void MeshRenderer11::Destroy()
 	SAFE_RELEASE(skinnedPosBuffer);
 	SAFE_RELEASE(pSamplerState);
 	afSafeDeleteVAO(vao);
+	afSafeDeleteBuffer(uboId);
 }
 
 void MeshRenderer11::Init(const Block& block)
@@ -69,9 +68,7 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshColor), D3D11_BIND_VERTEX_BUFFER), &subresData, &colorBuffer);
 	subresData.pSysMem = indices;
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numIndices * sizeof(AFIndex), D3D11_BIND_INDEX_BUFFER), &subresData, &pIndexBuffer);
-	if (constantBufferId < 0) {
-		constantBufferId = bufferMan.Create(sizeof(MeshConstantBuffer));
-	}
+	uboId = afCreateUBO(sizeof(MeshConstantBuffer));
 
 	int strides[] = {sizeof(MeshColor)};
 	VBOID vbos[] = {colorBuffer};
@@ -149,10 +146,8 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 		cBuf.faceColor = mat->faceColor;
 		cBuf.emissive = mat->emissive;
 		cBuf.camPos = fastInv(matView).GetRow(3);
-		bufferMan.Write(constantBufferId, &cBuf);
-		const auto buf = bufferMan.Get(constantBufferId);
-		deviceMan11.GetContext()->VSSetConstantBuffers(2, 1, &buf);
-		deviceMan11.GetContext()->PSSetConstantBuffers(2, 1, &buf);
+		afWriteBuffer(uboId, &cBuf, sizeof(cBuf));
+		afBindBufferToBindingPoint(uboId, 2);
 		deviceMan11.GetContext()->IASetIndexBuffer(pIndexBuffer, AFIndexTypeToDevice, 0);
 		afDrawIndexedTriangleList(matMap.faces * 3, matMap.faceStartIndex * 3);
 	}
@@ -160,4 +155,3 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 	ID3D11ShaderResourceView* dummy = nullptr;
 	deviceMan11.GetContext()->PSSetShaderResources(0, 1, &dummy);
 }
-
