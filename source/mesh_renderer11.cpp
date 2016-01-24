@@ -60,9 +60,7 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshVertex), D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, sizeof(MeshVertex)), nullptr, &skinnedPosBuffer);
 	D3D11_SUBRESOURCE_DATA subresData = { vertices, 0, 0 };
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshVertex), D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, sizeof(MeshVertex)), &subresData, &posBuffer);
-//	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshVertex), D3D11_BIND_VERTEX_BUFFER | D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, sizeof(MeshVertex)), &subresData, &posBuffer);
 	subresData.pSysMem = skin;
-//	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshSkin), D3D11_BIND_VERTEX_BUFFER), &subresData, &skinBuffer);
 	HRESULT hr = deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshSkin), D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, sizeof(MeshSkin)), &subresData, &skinBuffer);
 	colorBuffer = afCreateVertexBuffer(numVertices * sizeof(MeshColor), color);
 	iboId = afCreateIndexBuffer(indices, numIndices);
@@ -130,25 +128,21 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 		deviceMan11.GetContext()->VSSetShaderResources(0, 1, srvSkinnedPos.GetAddressOf());
 	}
 
+	MeshConstantBuffer cBuf;
+	cBuf.matW = matWorld;
+	cBuf.matV = matView;
+	cBuf.matP = matProj;
+	cBuf.camPos = fastInv(matView).GetRow(3);
 	for (int j = 0; (unsigned)j < block.materialMaps.size(); j++) {
 		const MaterialMap& matMap = block.materialMaps[j];
 		const Material* mat = matMan.Get(matMap.materialId);
 		assert(mat);
-		ComPtr<ID3D11ShaderResourceView> tx = texMan.Get(mat->tmid);
-		deviceMan11.GetContext()->PSSetShaderResources(0, 1, tx.GetAddressOf());
-
-		MeshConstantBuffer cBuf;
-		cBuf.matW = matWorld;
-		cBuf.matV = matView;
-		cBuf.matP = matProj;
 		cBuf.faceColor = mat->faceColor;
 		cBuf.emissive = mat->emissive;
-		cBuf.camPos = fastInv(matView).GetRow(3);
 		afWriteBuffer(uboId, &cBuf, sizeof(cBuf));
 		afBindBufferToBindingPoint(uboId, 2);
+		afBindTextureToBindingPoint(mat->tmid, 0);
 		afDrawIndexedTriangleList(matMap.faces * 3, matMap.faceStartIndex * 3);
 	}
-
-	ID3D11ShaderResourceView* dummy = nullptr;
-	deviceMan11.GetContext()->PSSetShaderResources(0, 1, &dummy);
+	afBindTextureToBindingPoint(0, 0);
 }
