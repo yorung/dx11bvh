@@ -11,8 +11,6 @@ struct GridVert {
 
 GridRenderer::GridRenderer()
 {
-	vbo = 0;
-	ibo = 0;
 	vao = 0;
 	pSamplerState = nullptr;
 }

@@ -49,8 +49,8 @@ SAMPLERID afCreateSampler()
 
 void afBindBufferToBindingPoint(UBOID ubo, UINT uniformBlockBinding)
 {
-	deviceMan11.GetContext()->VSSetConstantBuffers(uniformBlockBinding, 1, &ubo);
-	deviceMan11.GetContext()->PSSetConstantBuffers(uniformBlockBinding, 1, &ubo);
+	deviceMan11.GetContext()->VSSetConstantBuffers(uniformBlockBinding, 1, ubo.GetAddressOf());
+	deviceMan11.GetContext()->PSSetConstantBuffers(uniformBlockBinding, 1, ubo.GetAddressOf());
 }
 
 void afBindTextureToBindingPoint(TexMan::TMID tex, UINT textureBindingPoint)
@@ -75,9 +75,9 @@ void afWriteBuffer(const IBOID p, const void* buf, int size)
 	}
 #endif
 	D3D11_MAPPED_SUBRESOURCE m;
-	HRESULT hr = deviceMan11.GetContext()->Map(p, 0, D3D11_MAP_WRITE_DISCARD, 0, &m);
+	HRESULT hr = deviceMan11.GetContext()->Map(p.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &m);
 	memcpy(m.pData, buf, size);
-	deviceMan11.GetContext()->Unmap(p, 0);
+	deviceMan11.GetContext()->Unmap(p.Get(), 0);
 }
 
 

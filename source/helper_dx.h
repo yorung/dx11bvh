@@ -19,15 +19,14 @@ public:
 typedef unsigned short AFIndex;
 
 #define AFIndexTypeToDevice DXGI_FORMAT_R16_UINT
-typedef ID3D11Buffer* IBOID;
-typedef ID3D11Buffer* VBOID;
-typedef ID3D11Buffer* UBOID;
+typedef ComPtr<ID3D11Buffer> IBOID;
+typedef ComPtr<ID3D11Buffer> VBOID;
+typedef ComPtr<ID3D11Buffer> UBOID;
 typedef ID3D11SamplerState* SAMPLERID;
 
-#define afSafeDeleteBuffer SAFE_RELEASE
+inline void afSafeDeleteBuffer(ComPtr<ID3D11Buffer>& p) { p.Reset(); }
 #define afSafeDeleteSampler SAFE_RELEASE
 #define afSafeDeleteVAO SAFE_DELETE
-#define afSafeDeleteSampler SAFE_RELEASE
 
 void afWriteBuffer(const IBOID p, const void* buf, int size);
 

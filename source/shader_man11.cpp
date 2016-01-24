@@ -124,7 +124,7 @@ FakeVAO::FakeVAO(ShaderMan11::SMID shaderId, const D3D11_INPUT_ELEMENT_DESC elem
 	offsets.resize(numBuffers);
 	for (int i = 0; i < numBuffers; i++) {
 		vbos[i] = vbos_[i];
-		d3dBuffers[i] = vbos[i];
+		d3dBuffers[i] = vbos[i].Get();
 		strides[i] = (UINT)strides_[i];
 		offsets[i] = offsets_ ? offsets_[i] : 0;
 	}

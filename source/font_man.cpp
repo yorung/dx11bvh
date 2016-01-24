@@ -117,8 +117,6 @@ FontMan::FontMan()
 	texture = TexMan::INVALID_TMID;
 	shader = ShaderMan::INVALID_SMID;
 	dirty = false;
-	ibo = 0;
-	vbo = 0;
 	vao = 0;
 	sampler = 0;
 }
