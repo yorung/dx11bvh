@@ -55,5 +55,5 @@ void SkyMan::Destroy()
 	SAFE_RELEASE(sampler);
 	SAFE_RELEASE(depthStencilState);
 	SAFE_RELEASE(blendState);
-	SAFE_RELEASE(uboId);
+	afSafeDeleteBuffer(uboId);
 }

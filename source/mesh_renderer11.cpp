@@ -17,7 +17,7 @@ MeshRenderer11::MeshRenderer11()
 	colorBuffer = nullptr;
 	skinBuffer = nullptr;
 	skinnedPosBuffer = nullptr;
-	pIndexBuffer = nullptr;
+	iboId = nullptr;
 	pSamplerState = nullptr;
 	vao = 0;
 }
@@ -29,7 +29,6 @@ MeshRenderer11::~MeshRenderer11()
 
 void MeshRenderer11::Destroy()
 {
-	SAFE_RELEASE(pIndexBuffer);
 	SAFE_RELEASE(posBuffer);
 	SAFE_RELEASE(colorBuffer);
 	SAFE_RELEASE(skinBuffer);
@@ -37,6 +36,7 @@ void MeshRenderer11::Destroy()
 	SAFE_RELEASE(pSamplerState);
 	afSafeDeleteVAO(vao);
 	afSafeDeleteBuffer(uboId);
+	afSafeDeleteBuffer(iboId);
 }
 
 void MeshRenderer11::Init(const Block& block)
@@ -66,13 +66,12 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 	HRESULT hr = deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshSkin), D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, sizeof(MeshSkin)), &subresData, &skinBuffer);
 	subresData.pSysMem = color;
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshColor), D3D11_BIND_VERTEX_BUFFER), &subresData, &colorBuffer);
-	subresData.pSysMem = indices;
-	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numIndices * sizeof(AFIndex), D3D11_BIND_INDEX_BUFFER), &subresData, &pIndexBuffer);
+	iboId = afCreateIndexBuffer(indices, numIndices);
 	uboId = afCreateUBO(sizeof(MeshConstantBuffer));
 
 	int strides[] = {sizeof(MeshColor)};
 	VBOID vbos[] = {colorBuffer};
-	vao = afCreateVAO(shaderId, layout, dimof(layout), 1, vbos, strides, pIndexBuffer);
+	vao = afCreateVAO(shaderId, layout, dimof(layout), 1, vbos, strides, iboId);
 
 	CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
 	descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
