@@ -7,7 +7,7 @@ class MeshRenderer11
 {
 	UBOID uboId;
 	ID3D11Buffer* posBuffer;
-	ID3D11Buffer* colorBuffer;
+	VBOID colorBuffer;
 	ID3D11Buffer* skinBuffer;
 	ID3D11Buffer* skinnedPosBuffer;
 	IBOID iboId;
