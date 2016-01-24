@@ -113,16 +113,18 @@ ID3DBlob* ShaderMan11::GetVSBlob(SMID id)
 	return nullptr;
 }
 
-FakeVAO::FakeVAO(ShaderMan11::SMID shaderId, const D3D11_INPUT_ELEMENT_DESC elements[], int numElements, int numBuffers, ID3D11Buffer* const vbos_[], const int strides_[], const UINT offsets_[], ID3D11Buffer* ibo_)
+FakeVAO::FakeVAO(ShaderMan11::SMID shaderId, const D3D11_INPUT_ELEMENT_DESC elements[], int numElements, int numBuffers, VBOID* const vbos_, const int strides_[], const UINT offsets_[], IBOID ibo_)
 {
 	inputLayout = nullptr;
 
-	(ibo = ibo_)->AddRef();
+	ibo = ibo_;
 	vbos.resize(numBuffers);
+	d3dBuffers.resize(numBuffers);
 	strides.resize(numBuffers);
 	offsets.resize(numBuffers);
 	for (int i = 0; i < numBuffers; i++) {
-		(vbos[i] = vbos_[i])->AddRef();
+		vbos[i] = vbos_[i];
+		d3dBuffers[i] = vbos[i];
 		strides[i] = (UINT)strides_[i];
 		offsets[i] = offsets_ ? offsets_[i] : 0;
 	}
@@ -132,18 +134,9 @@ FakeVAO::FakeVAO(ShaderMan11::SMID shaderId, const D3D11_INPUT_ELEMENT_DESC elem
 	}
 }
 
-FakeVAO::~FakeVAO()
-{
-	SAFE_RELEASE(inputLayout);
-	SAFE_RELEASE(ibo);
-	for (auto it : vbos) {
-		SAFE_RELEASE(it);
-	}
-}
-
 void FakeVAO::Apply()
 {
-	deviceMan11.GetContext()->IASetInputLayout(inputLayout);
-	deviceMan11.GetContext()->IASetVertexBuffers(0, vbos.size(), &vbos[0], &strides[0], &offsets[0]);
-	deviceMan11.GetContext()->IASetIndexBuffer(ibo, AFIndexTypeToDevice, 0);
+	deviceMan11.GetContext()->IASetInputLayout(inputLayout.Get());
+	deviceMan11.GetContext()->IASetVertexBuffers(0, vbos.size(), &d3dBuffers[0], &strides[0], &offsets[0]);
+	deviceMan11.GetContext()->IASetIndexBuffer(ibo.Get(), AFIndexTypeToDevice, 0);
 }

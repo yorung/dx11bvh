@@ -153,7 +153,7 @@ void afDepthStencilMode(bool depth)
 	SAFE_RELEASE(ds);
 }
 
-VAOID afCreateVAO(ShaderMan::SMID program, const InputElement elements[], int numElements, int numBuffers, VBOID const* vertexBufferIds, const int* strides, IBOID ibo)
+VAOID afCreateVAO(ShaderMan::SMID program, const InputElement elements[], int numElements, int numBuffers, VBOID* const vertexBufferIds, const int* strides, IBOID ibo)
 {
 	return new FakeVAO(program, elements, numElements, numBuffers, vertexBufferIds, strides, nullptr, ibo);
 }
