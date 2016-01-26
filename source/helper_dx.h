@@ -35,7 +35,18 @@ IBOID afCreateQuadListIndexBuffer(int numQuads);
 VBOID afCreateVertexBuffer(int size, const void* buf);
 VBOID afCreateDynamicVertexBuffer(int size);
 UBOID afCreateUBO(int size);
-SAMPLERID afCreateSampler();
+
+#define SamplerWrap D3D11_TEXTURE_ADDRESS_MODE
+#define SW_REPEAT D3D11_TEXTURE_ADDRESS_WRAP
+#define SW_CLAMP D3D11_TEXTURE_ADDRESS_CLAMP
+
+#define SamplerFilter D3D11_FILTER
+#define SF_POINT D3D11_FILTER_MIN_MAG_MIP_POINT
+#define SF_LINEAR D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT
+#define SF_MIPMAP D3D11_FILTER_MIN_MAG_MIP_LINEAR
+
+SAMPLERID afCreateSampler(SamplerFilter samplerFilter, SamplerWrap wrap);
+
 void afBindBufferToBindingPoint(UBOID ubo, UINT uniformBlockBinding);
 void afBindTextureToBindingPoint(TexMan::TMID tex, UINT textureBindingPoint);
 void afBindSamplerToBindingPoint(ID3D11SamplerState*, UINT textureBindingPoint);
