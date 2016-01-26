@@ -78,7 +78,7 @@ void FontMan::MakeFontBitmap(const char* fontName, const CharSignature& sig, DIB
 
 	jfloatArray floatArray = jniEnv->NewFloatArray(5);
 	jobject arrayAsJObject = jniEnv->CallStaticObjectMethod(myview, method, jniEnv->NewStringUTF(fontName), jniEnv->NewString(codeInUnicode, 1), (jint)sig.fontSize, floatArray);
-	aflog("Java method called and returned");
+//	aflog("Java method called and returned");
 
 	{
 		jfloat* pFloatArray = jniEnv->GetFloatArrayElements(floatArray, NULL);
@@ -88,19 +88,18 @@ void FontMan::MakeFontBitmap(const char* fontName, const CharSignature& sig, DIB
 		jniEnv->ReleaseFloatArrayElements(floatArray, pFloatArray, 0);
 	}
 	if (!arrayAsJObject) {
-		aflog("Java method returned null; it's white space");
+//		aflog("Java method returned null; it's white space");
 		return;
 	}
 
 	jbyteArray array = (jbyteArray)arrayAsJObject;
 	jbyte* byteArray = jniEnv->GetByteArrayElements(array, NULL);
 	jsize arrayLen = jniEnv->GetArrayLength(array);
-	aflog("arrayLen=%d", arrayLen);
+//	aflog("arrayLen=%d", arrayLen);
 
 	int expectedLen = cache.srcWidth.x * cache.srcWidth.y * 4;
-	bool result = false;
 	if (arrayLen != expectedLen) {
-		aflog("wrong size! returned=%d expected=%d", arrayLen, expectedLen);
+//		aflog("wrong size! returned=%d expected=%d", arrayLen, expectedLen);
 		afVerify(false);
 	} else {
 		dib.Create(cache.srcWidth.x, cache.srcWidth.y, 32);
@@ -229,11 +228,11 @@ bool FontMan::Build(const CharSignature& signature)
 		curX = 0;
 		curY += curLineMaxH;
 		curLineMaxH = 0;
-		aflog("FontMan::Build() new line\n");
+	//	aflog("FontMan::Build() new line\n");
 	}
 	int remainY = texSrc.getH() - curY;
 	if (remainY < dib.getH()) {
-		aflog("FontMan::Build() font texture is full!\n");
+	//	aflog("FontMan::Build() font texture is full!\n");
 		return false;
 	}
 	curLineMaxH = std::max(curLineMaxH, dib.getH());
@@ -244,9 +243,9 @@ bool FontMan::Build(const CharSignature& signature)
 		dirty = true;
 	}
 
-	char codestr[128];
-	snprintf(codestr, dimof(codestr), "%04x %c", signature.code, signature.code < 0x80 ? signature.code : 0x20);
-	aflog("FontMan::Build() curX=%d curY=%d dib.getW()=%d dib.getH()=%d code=%s\n", curX, curY, dib.getW(), dib.getH(), codestr);
+	//char codestr[128];
+	//snprintf(codestr, dimof(codestr), "%04x %c", signature.code, signature.code < 0x80 ? signature.code : 0x20);
+	//aflog("FontMan::Build() curX=%d curY=%d dib.getW()=%d dib.getH()=%d code=%s\n", curX, curY, dib.getW(), dib.getH(), codestr);
 
 	curX += (int)std::ceil(cache.srcWidth.x);
 	caches[signature] = cache;
@@ -269,7 +268,7 @@ void FontMan::FlushToTexture()
 	if (!dirty) {
 		return;
 	}
-	aflog("FontMan::FlushToTexture flushed");
+//	aflog("FontMan::FlushToTexture flushed\n");
 	dirty = false;
 	texMan.Write(texture, texSrc.ReferPixels());
 }
