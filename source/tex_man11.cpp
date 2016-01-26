@@ -2,45 +2,16 @@
 
 TexMan11 texMan;
 
-namespace Gdiplus {
-	using std::min;
-	using std::max;
-}
-#include <gdiplus.h>
-#pragma comment(lib, "gdiplus.lib")
-
 static ComPtr<ID3D11ShaderResourceView> LoadTextureViaOS(const char* name)
 {
-	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-	ULONG_PTR gdiplusToken;
-	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
-	WCHAR wc[MAX_PATH];
-	MultiByteToWideChar(CP_ACP, 0, name, -1, wc, dimof(wc));
-	Gdiplus::Bitmap* image = new Gdiplus::Bitmap(wc);
-
-	int w = (int)image->GetWidth();
-	int h = (int)image->GetHeight();
-	Gdiplus::Rect rc(0, 0, w, h);
-
-	Gdiplus::BitmapData* bitmapData = new Gdiplus::BitmapData;
-	image->LockBits(&rc, Gdiplus::ImageLockModeRead, PixelFormat32bppARGB, bitmapData);
-
 	std::vector<uint32_t> col;
-	col.resize(w * h);
-	for (int y = 0; y < h; y++) {
-		memcpy(&col[y * w], (char*)bitmapData->Scan0 + bitmapData->Stride * y, w * 4);
-		for (int x = 0; x < w; x++) {
-			uint32_t& c = col[y * w + x];
-			c = (c & 0xff00ff00) | ((c & 0xff) << 16) | ((c & 0xff0000) >> 16);
-		}
+	ivec2 size;
+	if (!LoadImageViaGdiPlus(name, size, col)) {
+		return nullptr;
 	}
-	image->UnlockBits(bitmapData);
-	delete bitmapData;
-	delete image;
-	Gdiplus::GdiplusShutdown(gdiplusToken);
 
-	CD3D11_TEXTURE2D_DESC desc(DXGI_FORMAT_R8G8B8A8_UNORM, w, h, 1, 1, D3D11_BIND_SHADER_RESOURCE);
-	D3D11_SUBRESOURCE_DATA r = { &col[0], (uint32_t)w * 4, 0 };
+	CD3D11_TEXTURE2D_DESC desc(DXGI_FORMAT_R8G8B8A8_UNORM, size.x, size.y, 1, 1, D3D11_BIND_SHADER_RESOURCE);
+	D3D11_SUBRESOURCE_DATA r = { &col[0], (uint32_t)size.x * 4, 0 };
 	ComPtr<ID3D11Texture2D> tex;
 	ComPtr<ID3D11ShaderResourceView> srv;
 	deviceMan11.GetDevice()->CreateTexture2D(&desc, &r, &tex);
