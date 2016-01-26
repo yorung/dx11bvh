@@ -42,7 +42,7 @@ SAMPLERID afCreateSampler(SamplerFilter filter, SamplerWrap wrap)
 	desc.Filter = filter;
 	desc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 	desc.MaxLOD = D3D11_FLOAT32_MAX;
-	ID3D11SamplerState* sampler;
+	ComPtr<ID3D11SamplerState> sampler;
 	deviceMan11.GetDevice()->CreateSamplerState(&desc, &sampler);
 	return sampler;
 }
@@ -59,10 +59,10 @@ void afBindTextureToBindingPoint(TexMan::TMID tex, UINT textureBindingPoint)
 	deviceMan11.GetContext()->PSSetShaderResources(textureBindingPoint, 1, tx.GetAddressOf());
 }
 
-void afBindSamplerToBindingPoint(ID3D11SamplerState* sampler, UINT textureBindingPoint)
+void afBindSamplerToBindingPoint(SAMPLERID sampler, UINT textureBindingPoint)
 {
-	deviceMan11.GetContext()->VSSetSamplers(textureBindingPoint, 1, &sampler);
-	deviceMan11.GetContext()->PSSetSamplers(textureBindingPoint, 1, &sampler);
+	deviceMan11.GetContext()->VSSetSamplers(textureBindingPoint, 1, sampler.GetAddressOf());
+	deviceMan11.GetContext()->PSSetSamplers(textureBindingPoint, 1, sampler.GetAddressOf());
 }
 
 void afWriteBuffer(const IBOID p, const void* buf, int size)

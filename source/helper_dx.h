@@ -22,10 +22,10 @@ typedef unsigned short AFIndex;
 typedef ComPtr<ID3D11Buffer> IBOID;
 typedef ComPtr<ID3D11Buffer> VBOID;
 typedef ComPtr<ID3D11Buffer> UBOID;
-typedef ID3D11SamplerState* SAMPLERID;
+typedef ComPtr<ID3D11SamplerState> SAMPLERID;
 
 inline void afSafeDeleteBuffer(ComPtr<ID3D11Buffer>& p) { p.Reset(); }
-#define afSafeDeleteSampler SAFE_RELEASE
+inline void afSafeDeleteSampler(SAMPLERID& p) { p.Reset(); }
 #define afSafeDeleteVAO SAFE_DELETE
 
 void afWriteBuffer(const IBOID p, const void* buf, int size);
@@ -49,7 +49,7 @@ SAMPLERID afCreateSampler(SamplerFilter samplerFilter, SamplerWrap wrap);
 
 void afBindBufferToBindingPoint(UBOID ubo, UINT uniformBlockBinding);
 void afBindTextureToBindingPoint(TexMan::TMID tex, UINT textureBindingPoint);
-void afBindSamplerToBindingPoint(ID3D11SamplerState*, UINT textureBindingPoint);
+void afBindSamplerToBindingPoint(SAMPLERID sampler, UINT textureBindingPoint);
 
 void afDrawIndexedTriangleList(int numIndices, int start = 0);
 void afDrawTriangleStrip(int numVertices, int start = 0);

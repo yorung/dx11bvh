@@ -117,7 +117,6 @@ FontMan::FontMan()
 	shader = ShaderMan::INVALID_SMID;
 	dirty = false;
 	vao = 0;
-	sampler = 0;
 }
 
 FontMan::~FontMan()
