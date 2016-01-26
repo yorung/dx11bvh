@@ -56,7 +56,10 @@ static void ArrangeRawDDS(void* img, int size)
 	_BitScanForward(&aShift, hdr->aMask);
 	std::for_each((uint32_t*)img + 128 / 4, (uint32_t*)img + size / 4, [&](uint32_t& im) {
 		im = ((hdr->aMask & im) >> aShift << 24) + ((hdr->bMask & im) >> bShift << 16) + ((hdr->gMask & im) >> gShift << 8) + ((hdr->rMask & im) >> rShift);
-	} );
+		if (hdr->aMask == 0) {
+			im |= 0xff000000;
+		}
+	});
 }
 
 static ComPtr<ID3D11ShaderResourceView> LoadDDSTexture(const char* name, ivec2& texSize)
