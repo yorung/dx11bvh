@@ -21,12 +21,12 @@ static Vec2 fontVertAlign[] =
 	Vec2(1, 1),
 };
 
+#ifdef _MSC_VER
 static bool isKorean(int code)
 {
 	return IS_HANGUL2(code) || code < 0x80;
 }
 
-#ifdef _MSC_VER
 static HFONT CreateAsianFont(int code, int height)
 {
 	BOOL isK = isKorean(code);
@@ -221,7 +221,6 @@ void FontMan::MakeFontBitmap(const char* fontName, const CharSignature& sig, DIB
 
 bool FontMan::Build(const CharSignature& signature)
 {
-	bool result = false;
 	DIB	dib;
 	CharCache cache;
 	MakeFontBitmap("Gulim", signature, dib, cache);
@@ -249,15 +248,14 @@ bool FontMan::Build(const CharSignature& signature)
 	snprintf(codestr, dimof(codestr), "%04x %c", signature.code, signature.code < 0x80 ? signature.code : 0x20);
 	aflog("FontMan::Build() curX=%d curY=%d dib.getW()=%d dib.getH()=%d code=%s\n", curX, curY, dib.getW(), dib.getH(), codestr);
 
-	curX += (int)ceil(cache.srcWidth.x);
+	curX += (int)std::ceil(cache.srcWidth.x);
 	caches[signature] = cache;
 	return true;
 }
 
 bool FontMan::Cache(const CharSignature& sig)
 {
-	int code = sig.code;
-	assert(code >= 0 && code <= 0xffff);
+	assert(sig.code >= 0 && sig.code <= 0xffff);
 	Caches::iterator it = caches.find(sig);
 	if (it != caches.end())
 	{

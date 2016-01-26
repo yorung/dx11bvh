@@ -52,6 +52,7 @@ bool DIB::Create(int w, int h, int bits, int)
 	m_h = h;
 	m_pitch = (w * (bits / 8) + 3) & ~3;
 	m_p = malloc(m_pitch * h);
+	return true;
 }
 #endif
 
