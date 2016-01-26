@@ -149,7 +149,8 @@ bool FontMan::Init()
 	ibo = afCreateQuadListIndexBuffer(SPRITE_MAX);
 	vbo = afCreateDynamicVertexBuffer(SPRITE_MAX * sizeof(FontVertex) * 4);
 	int stride = sizeof(FontVertex);
-	vao = afCreateVAO(shader, elements, dimof(elements), 1, &vbo, &stride, ibo);
+	VBOID vboIds[] = {vbo};
+	vao = afCreateVAO(shader, elements, dimof(elements), 1, vboIds, &stride, ibo);
 	sampler = afCreateSampler();
 	return true;
 }
