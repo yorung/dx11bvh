@@ -9,7 +9,7 @@ static SRVID LoadTextureViaOS(const char* name)
 	if (!LoadImageViaGdiPlus(name, size, col)) {
 		return nullptr;
 	}
-	return afCreateTexture2D(TF_R8G8B8A8_UNORM, size, &col[0]);
+	return afCreateTexture2D(AFDT_R8G8B8A8_UNORM, size, &col[0]);
 }
 
 struct DDSHeader {
@@ -156,7 +156,7 @@ TexMan11::TMID TexMan11::CreateDynamicTexture(const char* name, const ivec2& siz
 	{
 		return it->second;
 	}
-	SRVID tex = afCreateDynamicTexture(TF_R8G8B8A8_UNORM, size);
+	SRVID tex = afCreateDynamicTexture(AFDT_R8G8B8A8_UNORM, size);
 	if (!tex) {
 		return INVALID_TMID;
 	}
@@ -174,7 +174,7 @@ TexMan11::TMID TexMan11::CreateWhiteTexture()
 		return it->second;
 	}
 	uint32_t white = 0xffffffff;
-	SRVID tex = afCreateTexture2D(TF_R8G8B8A8_UNORM, ivec2(1, 1), &white);
+	SRVID tex = afCreateTexture2D(AFDT_R8G8B8A8_UNORM, ivec2(1, 1), &white);
 	if (!tex) {
 		return INVALID_TMID;
 	}
