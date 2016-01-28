@@ -179,9 +179,6 @@ VAOID afCreateVAO(ShaderMan::SMID program, const InputElement elements[], int nu
 	return new FakeVAO(program, elements, numElements, numBuffers, vertexBufferIds, strides, nullptr, ibo);
 }
 
-#endif
-
-
 void AFRenderTarget::InitForDefaultRenderTarget()
 {
 	Destroy();
@@ -225,3 +222,4 @@ void AFRenderTarget::BeginRenderToThis()
 	deviceMan11.GetContext()->ClearRenderTargetView(renderTargetView, clearColor);
 	deviceMan11.GetContext()->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
+#endif
