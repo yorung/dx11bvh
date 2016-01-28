@@ -2,21 +2,14 @@
 
 TexMan11 texMan;
 
-static ComPtr<ID3D11ShaderResourceView> LoadTextureViaOS(const char* name)
+static SRVID LoadTextureViaOS(const char* name)
 {
 	std::vector<uint32_t> col;
 	ivec2 size;
 	if (!LoadImageViaGdiPlus(name, size, col)) {
 		return nullptr;
 	}
-
-	CD3D11_TEXTURE2D_DESC desc(DXGI_FORMAT_R8G8B8A8_UNORM, size.x, size.y, 1, 1, D3D11_BIND_SHADER_RESOURCE);
-	D3D11_SUBRESOURCE_DATA r = { &col[0], (uint32_t)size.x * 4, 0 };
-	ComPtr<ID3D11Texture2D> tex;
-	ComPtr<ID3D11ShaderResourceView> srv;
-	deviceMan11.GetDevice()->CreateTexture2D(&desc, &r, &tex);
-	deviceMan11.GetDevice()->CreateShaderResourceView(tex.Get(), nullptr, &srv);
-	return srv;
+	return afCreateTexture2D(TF_R8G8B8A8_UNORM, size, &col[0]);
 }
 
 struct DDSHeader {
@@ -156,36 +149,14 @@ TexMan11::TMID TexMan11::Create(const char *name)
 	return nameToId[name] = texs.size() - 1;
 }
 
-static ComPtr<ID3D11ShaderResourceView> CreateWhiteTexture()
-{
-	CD3D11_TEXTURE2D_DESC desc(DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, 1, 1, D3D11_BIND_SHADER_RESOURCE);
-	uint32_t white = 0xffffffff;
-	D3D11_SUBRESOURCE_DATA r = { &white, 4, 4 };
-	ComPtr<ID3D11Texture2D> tex;
-	ComPtr<ID3D11ShaderResourceView> srv;
-	deviceMan11.GetDevice()->CreateTexture2D(&desc, &r, &tex);
-	deviceMan11.GetDevice()->CreateShaderResourceView(tex.Get(), nullptr, &srv);
-	return srv;
-}
-
-static ComPtr<ID3D11ShaderResourceView> CreateDynamicTexture(int w, int h)
-{
-	CD3D11_TEXTURE2D_DESC desc(DXGI_FORMAT_R8G8B8A8_UNORM, w, h, 1, 1, D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
-	ComPtr<ID3D11Texture2D> tex;
-	ComPtr<ID3D11ShaderResourceView> srv;
-	deviceMan11.GetDevice()->CreateTexture2D(&desc, nullptr, &tex);
-	deviceMan11.GetDevice()->CreateShaderResourceView(tex.Get(), nullptr, &srv);
-	return srv;
-}
-
-TexMan11::TMID TexMan11::CreateDynamicTexture(const char* name, int w, int h)
+TexMan11::TMID TexMan11::CreateDynamicTexture(const char* name, const ivec2& size)
 {
 	auto it = nameToId.find(name);
 	if (it != nameToId.end())
 	{
 		return it->second;
 	}
-	ComPtr<ID3D11ShaderResourceView> tex = ::CreateDynamicTexture(w, h);
+	SRVID tex = afCreateDynamicTexture(TF_R8G8B8A8_UNORM, size);
 	if (!tex) {
 		return INVALID_TMID;
 	}
@@ -202,7 +173,8 @@ TexMan11::TMID TexMan11::CreateWhiteTexture()
 	{
 		return it->second;
 	}
-	ComPtr<ID3D11ShaderResourceView> tex = ::CreateWhiteTexture();
+	uint32_t white = 0xffffffff;
+	SRVID tex = afCreateTexture2D(TF_R8G8B8A8_UNORM, ivec2(1, 1), &white);
 	if (!tex) {
 		return INVALID_TMID;
 	}

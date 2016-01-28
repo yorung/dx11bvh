@@ -7,7 +7,7 @@ public:
 	~TexMan11();
 	TMID Create(const char *name);
 	TMID CreateWhiteTexture();
-	TMID CreateDynamicTexture(const char* name, int w, int h);
+	TMID CreateDynamicTexture(const char* name, const ivec2& size);
 	void Destroy();
 	ComPtr<ID3D11ShaderResourceView> Get(TMID id);
 	ivec2 GetSize(TMID id);

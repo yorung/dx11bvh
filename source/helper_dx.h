@@ -23,7 +23,7 @@ typedef ComPtr<ID3D11Buffer> IBOID;
 typedef ComPtr<ID3D11Buffer> VBOID;
 typedef ComPtr<ID3D11Buffer> UBOID;
 typedef ComPtr<ID3D11SamplerState> SAMPLERID;
-
+typedef ComPtr<ID3D11ShaderResourceView> SRVID;
 inline void afSafeDeleteBuffer(ComPtr<ID3D11Buffer>& p) { p.Reset(); }
 inline void afSafeDeleteSampler(SAMPLERID& p) { p.Reset(); }
 #define afSafeDeleteVAO SAFE_DELETE
@@ -35,6 +35,11 @@ IBOID afCreateQuadListIndexBuffer(int numQuads);
 VBOID afCreateVertexBuffer(int size, const void* buf);
 VBOID afCreateDynamicVertexBuffer(int size);
 UBOID afCreateUBO(int size);
+
+typedef DXGI_FORMAT AFTexFormat;
+#define TF_R8G8B8A8_UNORM DXGI_FORMAT_R8G8B8A8_UNORM
+SRVID afCreateTexture2D(AFTexFormat format, const ivec2& size, void *image);
+SRVID afCreateDynamicTexture(AFTexFormat format, const ivec2& size);
 
 #define SamplerWrap D3D11_TEXTURE_ADDRESS_MODE
 #define SW_REPEAT D3D11_TEXTURE_ADDRESS_WRAP

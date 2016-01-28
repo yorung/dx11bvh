@@ -31,6 +31,27 @@ UBOID afCreateUBO(int size)
 	return ubo;
 }
 
+SRVID afCreateTexture2D(AFTexFormat format, const ivec2& size, void *image)
+{
+	CD3D11_TEXTURE2D_DESC desc(format, size.x, size.y, 1, 1, D3D11_BIND_SHADER_RESOURCE);
+	D3D11_SUBRESOURCE_DATA r = { image, (uint32_t)size.x * 4, 0 };
+	ComPtr<ID3D11Texture2D> tex;
+	ComPtr<ID3D11ShaderResourceView> srv;
+	deviceMan11.GetDevice()->CreateTexture2D(&desc, &r, &tex);
+	deviceMan11.GetDevice()->CreateShaderResourceView(tex.Get(), nullptr, &srv);
+	return srv;
+}
+
+SRVID afCreateDynamicTexture(AFTexFormat format, const ivec2& size)
+{
+	CD3D11_TEXTURE2D_DESC desc(format, size.x, size.y, 1, 1, D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
+	ComPtr<ID3D11Texture2D> tex;
+	ComPtr<ID3D11ShaderResourceView> srv;
+	deviceMan11.GetDevice()->CreateTexture2D(&desc, nullptr, &tex);
+	deviceMan11.GetDevice()->CreateShaderResourceView(tex.Get(), nullptr, &srv);
+	return srv;
+}
+
 SAMPLERID afCreateSampler(SamplerFilter filter, SamplerWrap wrap)
 {
 	D3D11_SAMPLER_DESC  desc;
