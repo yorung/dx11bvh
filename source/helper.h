@@ -31,3 +31,10 @@ template <class T> inline void SAFE_RELEASE(T& p)
 
 IBOID afCreateTiledPlaneIBO(int numTiles, int* numIndies = nullptr);
 VBOID afCreateTiledPlaneVBO(int numTiles);
+
+struct TexDesc {
+	ivec2 size;
+	int arraySize = 1;
+};
+
+SRVID afLoadTexture(const char* name, TexDesc& desc);
