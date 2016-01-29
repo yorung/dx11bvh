@@ -2,16 +2,6 @@
 
 TexMan11 texMan;
 
-static SRVID LoadTextureViaOS(const char* name)
-{
-	std::vector<uint32_t> col;
-	ivec2 size;
-	if (!LoadImageViaGdiPlus(name, size, col)) {
-		return nullptr;
-	}
-	return afCreateTexture2D(AFDT_R8G8B8A8_UNORM, size, &col[0]);
-}
-
 struct DDSHeader {
 	uint32_t h3[3];
 	int h, w;
@@ -130,16 +120,16 @@ TexMan11::TMID TexMan11::Create(const char *name)
 		return it->second;
 	}
 
-	ComPtr<ID3D11ShaderResourceView> tex;
+	SRVID tex;
 
 	WCHAR wname[MAX_PATH];
 	MultiByteToWideChar(CP_ACP, 0, name, -1, wname, dimof(wname));
+	ivec2 texSize;
 	if (!_stricmp(".dds", name + strlen(name) - 4)) {
-		ivec2 texSize;
 		tex = LoadDDSTexture(name, texSize);
 	//	CreateDDSTextureFromFileEx(deviceMan11.GetDevice(), wname, 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false, nullptr, &tex);
 	} else {
-		tex = LoadTextureViaOS(name);
+		tex = LoadTextureViaOS(name, texSize);
 	//	CreateWICTextureFromFileEx(deviceMan11.GetDevice(), deviceMan11.GetContext(), wname, 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false, nullptr, &tex);
 	}
 	if (!tex) {

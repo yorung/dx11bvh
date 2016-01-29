@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#ifdef _MSC_VER
+
 bool SaveFile(const char *fileName, const uint8_t* buf, int size)
 {
 	bool result = false;
@@ -154,3 +156,14 @@ bool LoadImageViaGdiPlus(const char* name, ivec2& size, std::vector<uint32_t>& c
 	Gdiplus::GdiplusShutdown(gdiplusToken);
 	return w && h;
 }
+
+SRVID LoadTextureViaOS(const char* name, ivec2& size)
+{
+	std::vector<uint32_t> col;
+	if (!LoadImageViaGdiPlus(name, size, col)) {
+		return nullptr;
+	}
+	return afCreateTexture2D(AFDT_R8G8B8A8_UNORM, size, &col[0]);
+}
+
+#endif
