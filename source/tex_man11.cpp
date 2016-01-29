@@ -45,10 +45,9 @@ static void ArrangeRawDDS(void* img, int size)
 	});
 }
 
-static ComPtr<ID3D11ShaderResourceView> LoadDDSTexture(const char* name, ivec2& texSize)
+static SRVID LoadDDSTexture(const char* name, ivec2& texSize)
 {
 	int size;
-	ComPtr<ID3D11ShaderResourceView> srv;
 	void* img = LoadFile(name, &size);
 	if (!img) {
 		aflog("LoadDDSTexture failed! %s", name);
@@ -56,24 +55,24 @@ static ComPtr<ID3D11ShaderResourceView> LoadDDSTexture(const char* name, ivec2& 
 	}
 	const DDSHeader* hdr = (DDSHeader*)img;
 
-	DXGI_FORMAT format;
+	AFDTFormat format = AFDT_INVALID;
 	int (*pitchCalcurator)(int, int) = nullptr;
 	switch (hdr->fourcc) {
 	case 0x31545844: //'1TXD':
-		format = DXGI_FORMAT_BC1_UNORM;
+		format = AFDT_BC1_UNORM;
 		pitchCalcurator = [](int w, int h) { return ((w + 3) / 4) * ((h + 3) / 4) * 8; };
 		break;
 	case 0x33545844: //'3TXD':
-		format = DXGI_FORMAT_BC2_UNORM;
+		format = AFDT_BC2_UNORM;
 		pitchCalcurator = [](int w, int h) { return ((w + 3) / 4) * ((h + 3) / 4) * 16; };
 		break;
 	case 0x35545844: //'5TXD':
-		format = DXGI_FORMAT_BC3_UNORM;
+		format = AFDT_BC3_UNORM;
 		pitchCalcurator = [](int w, int h) { return ((w + 3) / 4) * ((h + 3) / 4) * 16; };
 		break;
 	default:
 		ArrangeRawDDS(img, size);
-		format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		format = AFDT_R8G8B8A8_UNORM;
 		pitchCalcurator = [](int w, int h) { return w * h * 4; };
 		break;
 	}
@@ -82,9 +81,7 @@ static ComPtr<ID3D11ShaderResourceView> LoadDDSTexture(const char* name, ivec2& 
 
 	int arraySize = hdr->GetArraySize();
 	int mipCnt = hdr->GetMipCnt();
-	CD3D11_TEXTURE2D_DESC desc(format, hdr->w, hdr->h, arraySize, hdr->GetMipCnt(), D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DEFAULT, 0, 1, 0, hdr->IsCubeMap() ? D3D11_RESOURCE_MISC_TEXTURECUBE : 0);
-	CD3D11_SHADER_RESOURCE_VIEW_DESC srvDesc(hdr->IsCubeMap() ? D3D_SRV_DIMENSION_TEXTURECUBE : D3D_SRV_DIMENSION_TEXTURE2D, desc.Format, 0, -1);
-	std::vector<D3D11_SUBRESOURCE_DATA> r;
+	std::vector<AFTexSubresourceData> r;
 	int offset = 128;
 	for (int a = 0; a < arraySize; a++) {
 		for (int m = 0; m < mipCnt; m++) {
@@ -94,10 +91,8 @@ static ComPtr<ID3D11ShaderResourceView> LoadDDSTexture(const char* name, ivec2& 
 			offset += pitchCalcurator(w, h);
 		}
 	}
-	ComPtr<ID3D11Texture2D> tex;
-	deviceMan11.GetDevice()->CreateTexture2D(&desc, &r[0], &tex);
-	deviceMan11.GetDevice()->CreateShaderResourceView(tex.Get(), &srvDesc, &srv);
 
+	SRVID srv = afCreateTexture2D(format, texSize, arraySize, mipCnt, &r[0]);
 	free(img);
 	return srv;
 }

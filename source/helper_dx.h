@@ -62,6 +62,7 @@ enum BlendMode {
 void afBlendMode(BlendMode mode);
 void afDepthStencilMode(bool depth);
 
+typedef D3D11_SUBRESOURCE_DATA AFTexSubresourceData;
 typedef DXGI_FORMAT AFDTFormat;
 #define AFDT_INVALID DXGI_FORMAT_UNKNOWN
 #define AFDT_R8G8B8A8_UNORM DXGI_FORMAT_R8G8B8A8_UNORM
@@ -70,8 +71,12 @@ typedef DXGI_FORMAT AFDTFormat;
 #define AFDT_R16G16B16A16_FLOAT DXGI_FORMAT_R16G16B16A16_FLOAT
 #define AFDT_DEPTH DXGI_FORMAT_D24_UNORM_S8_UINT
 #define AFDT_DEPTH_STENCIL DXGI_FORMAT_D24_UNORM_S8_UINT
+#define AFDT_BC1_UNORM DXGI_FORMAT_BC1_UNORM
+#define AFDT_BC2_UNORM DXGI_FORMAT_BC2_UNORM
+#define AFDT_BC3_UNORM DXGI_FORMAT_BC3_UNORM
 
 SRVID afCreateTexture2D(AFDTFormat format, const ivec2& size, void *image);
+SRVID afCreateTexture2D(AFDTFormat format, const ivec2& size, int arraySize, int mipCount, const AFTexSubresourceData datas[]);
 SRVID afCreateDynamicTexture(AFDTFormat format, const ivec2& size);
 
 class AFRenderTarget
