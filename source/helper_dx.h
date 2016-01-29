@@ -48,7 +48,7 @@ UBOID afCreateUBO(int size);
 SAMPLERID afCreateSampler(SamplerFilter samplerFilter, SamplerWrap wrap);
 
 void afBindBufferToBindingPoint(UBOID ubo, UINT uniformBlockBinding);
-void afBindTextureToBindingPoint(TexMan::TMID tex, UINT textureBindingPoint);
+void afBindTextureToBindingPoint(SRVID srv, UINT textureBindingPoint);
 void afBindSamplerToBindingPoint(SAMPLERID sampler, UINT textureBindingPoint);
 
 void afDrawIndexedTriangleList(int numIndices, int start = 0);

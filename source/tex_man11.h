@@ -9,13 +9,18 @@ public:
 	TMID CreateWhiteTexture();
 	TMID CreateDynamicTexture(const char* name, const ivec2& size);
 	void Destroy();
-	ComPtr<ID3D11ShaderResourceView> Get(TMID id);
+	SRVID Get(TMID id);
 	ivec2 GetSize(TMID id);
 	void Write(TMID id, const void* buf);
 private:
 	std::map<std::string, TMID> nameToId;
-	std::vector<ComPtr<ID3D11ShaderResourceView>> texs;
+	std::vector<SRVID> texs;
 };
 
 extern TexMan11 texMan;
 typedef TexMan11 TexMan;
+
+inline void afBindTextureToBindingPoint(TexMan::TMID tex, UINT textureBindingPoint)
+{
+	afBindTextureToBindingPoint(texMan.Get(tex), textureBindingPoint);
+}

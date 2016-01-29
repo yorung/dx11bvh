@@ -74,10 +74,9 @@ void afBindBufferToBindingPoint(UBOID ubo, UINT uniformBlockBinding)
 	deviceMan11.GetContext()->PSSetConstantBuffers(uniformBlockBinding, 1, ubo.GetAddressOf());
 }
 
-void afBindTextureToBindingPoint(TexMan::TMID tex, UINT textureBindingPoint)
+void afBindTextureToBindingPoint(SRVID srv, UINT textureBindingPoint)
 {
-	ComPtr<ID3D11ShaderResourceView> tx = texMan.Get(tex);
-	deviceMan11.GetContext()->PSSetShaderResources(textureBindingPoint, 1, tx.GetAddressOf());
+	deviceMan11.GetContext()->PSSetShaderResources(textureBindingPoint, 1, srv.GetAddressOf());
 }
 
 void afBindSamplerToBindingPoint(SAMPLERID sampler, UINT textureBindingPoint)

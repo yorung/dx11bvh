@@ -177,7 +177,7 @@ void TexMan11::Destroy()
 	texs.clear();
 }
 
-ComPtr<ID3D11ShaderResourceView> TexMan11::Get(TMID id)
+SRVID TexMan11::Get(TMID id)
 {
 	if (id >= 0 && id < (TMID)texs.size())
 	{
