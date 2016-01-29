@@ -1,3 +1,8 @@
+struct TexDesc {
+	ivec2 size;
+	int arraySize = 1;
+};
+
 class TexMan
 {
 public:

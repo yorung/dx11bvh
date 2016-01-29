@@ -32,11 +32,11 @@ static void bitScanForward(uint32_t* result, uint32_t mask)
 static void ArrangeRawDDS(void* img, int size)
 {
 	const DDSHeader* hdr = (DDSHeader*)img;
-	DWORD rShift, gShift, bShift, aShift;
-	_BitScanForward(&rShift, hdr->rMask);
-	_BitScanForward(&gShift, hdr->gMask);
-	_BitScanForward(&bShift, hdr->bMask);
-	_BitScanForward(&aShift, hdr->aMask);
+	uint32_t rShift, gShift, bShift, aShift;
+	bitScanForward(&rShift, hdr->rMask);
+	bitScanForward(&gShift, hdr->gMask);
+	bitScanForward(&bShift, hdr->bMask);
+	bitScanForward(&aShift, hdr->aMask);
 	std::for_each((uint32_t*)img + 128 / 4, (uint32_t*)img + size / 4, [&](uint32_t& im) {
 		im = ((hdr->aMask & im) >> aShift << 24) + ((hdr->bMask & im) >> bShift << 16) + ((hdr->gMask & im) >> gShift << 8) + ((hdr->rMask & im) >> rShift);
 		if (hdr->aMask == 0) {
@@ -45,7 +45,7 @@ static void ArrangeRawDDS(void* img, int size)
 	});
 }
 
-static SRVID LoadDDSTexture(const char* name, ivec2& texSize)
+static SRVID LoadDDSTexture(const char* name, TexDesc& texSize)
 {
 	int size;
 	void* img = LoadFile(name, &size);
@@ -76,8 +76,9 @@ static SRVID LoadDDSTexture(const char* name, ivec2& texSize)
 		pitchCalcurator = [](int w, int h) { return w * h * 4; };
 		break;
 	}
-	texSize.x = hdr->w;
-	texSize.y = hdr->h;
+	texSize.size.x = hdr->w;
+	texSize.size.y = hdr->h;
+	texSize.arraySize = hdr->GetArraySize();
 
 	int arraySize = hdr->GetArraySize();
 	int mipCnt = hdr->GetMipCnt();
@@ -92,7 +93,7 @@ static SRVID LoadDDSTexture(const char* name, ivec2& texSize)
 		}
 	}
 
-	SRVID srv = afCreateTexture2D(format, texSize, arraySize, mipCnt, &r[0]);
+	SRVID srv = afCreateTexture2D(format, texSize.size, arraySize, mipCnt, &r[0]);
 	free(img);
 	return srv;
 }
@@ -107,6 +108,17 @@ TexMan::~TexMan()
 	Destroy();
 }
 
+static SRVID LoadTexture(const char* name, TexDesc& desc)
+{
+	int len = strlen(name);
+	if (len > 4 && !stricmp(name + len - 4, ".dds")) {
+		return LoadDDSTexture(name, desc);
+	} else {
+		desc.arraySize = 1;
+		return LoadTextureViaOS(name, desc.size);
+	}
+}
+
 TexMan::TMID TexMan::Create(const char *name)
 {
 	auto it = nameToId.find(name);
@@ -115,18 +127,8 @@ TexMan::TMID TexMan::Create(const char *name)
 		return it->second;
 	}
 
-	SRVID tex;
-
-	WCHAR wname[MAX_PATH];
-	MultiByteToWideChar(CP_ACP, 0, name, -1, wname, dimof(wname));
-	ivec2 texSize;
-	if (!_stricmp(".dds", name + strlen(name) - 4)) {
-		tex = LoadDDSTexture(name, texSize);
-	//	CreateDDSTextureFromFileEx(deviceMan11.GetDevice(), wname, 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false, nullptr, &tex);
-	} else {
-		tex = LoadTextureViaOS(name, texSize);
-	//	CreateWICTextureFromFileEx(deviceMan11.GetDevice(), deviceMan11.GetContext(), wname, 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false, nullptr, &tex);
-	}
+	TexDesc desc;
+	SRVID tex = LoadTexture(name, desc);
 	if (!tex) {
 		return INVALID_TMID;
 	}
