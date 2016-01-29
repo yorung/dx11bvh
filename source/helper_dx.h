@@ -26,6 +26,7 @@ typedef ComPtr<ID3D11SamplerState> SAMPLERID;
 typedef ComPtr<ID3D11ShaderResourceView> SRVID;
 inline void afSafeDeleteBuffer(ComPtr<ID3D11Buffer>& p) { p.Reset(); }
 inline void afSafeDeleteSampler(SAMPLERID& p) { p.Reset(); }
+inline void afSafeDeleteTexture(SRVID& p) { p.Reset(); }
 #define afSafeDeleteVAO SAFE_DELETE
 
 void afWriteBuffer(const IBOID p, const void* buf, int size);

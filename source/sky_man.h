@@ -1,6 +1,7 @@
 class SkyMan
 {
-	TexMan::TMID texId = TexMan::INVALID_TMID;
+	SRVID texId = 0;
+	TexDesc texDesc;
 	ShaderMan::SMID shaderId = ShaderMan::INVALID_SMID;
 	UBOID uboId;
 	ID3D11SamplerState* sampler = nullptr;

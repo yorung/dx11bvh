@@ -7,13 +7,14 @@ SkyMan::~SkyMan()
 	assert(!sampler);
 	assert(!depthStencilState);
 	assert(!blendState);
+	assert(!texId);
 }
 
 void SkyMan::Create(const char *texFileName, const char *shader)
 {
 	Destroy();
 
-	texId = texMan.Create(texFileName);
+	texId = afLoadTexture(texFileName, texDesc);
 	shaderId = shaderMan.Create(shader, nullptr, 0, BM_NONE, false);
 	uboId = afCreateUBO(sizeof(Mat));
 
@@ -56,4 +57,5 @@ void SkyMan::Destroy()
 	SAFE_RELEASE(depthStencilState);
 	SAFE_RELEASE(blendState);
 	afSafeDeleteBuffer(uboId);
+	afSafeDeleteTexture(texId);
 }
