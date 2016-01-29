@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-TexMan11 texMan;
+TexMan texMan;
 
 struct DDSHeader {
 	uint32_t h3[3];
@@ -97,17 +97,17 @@ static SRVID LoadDDSTexture(const char* name, ivec2& texSize)
 	return srv;
 }
 
-TexMan11::TexMan11()
+TexMan::TexMan()
 {
 	texs.push_back(nullptr);	// make ID 0 invalid
 }
 
-TexMan11::~TexMan11()
+TexMan::~TexMan()
 {
 	Destroy();
 }
 
-TexMan11::TMID TexMan11::Create(const char *name)
+TexMan::TMID TexMan::Create(const char *name)
 {
 	auto it = nameToId.find(name);
 	if (it != nameToId.end())
@@ -134,7 +134,7 @@ TexMan11::TMID TexMan11::Create(const char *name)
 	return nameToId[name] = texs.size() - 1;
 }
 
-TexMan11::TMID TexMan11::CreateDynamicTexture(const char* name, const ivec2& size)
+TexMan::TMID TexMan::CreateDynamicTexture(const char* name, const ivec2& size)
 {
 	auto it = nameToId.find(name);
 	if (it != nameToId.end())
@@ -150,7 +150,7 @@ TexMan11::TMID TexMan11::CreateDynamicTexture(const char* name, const ivec2& siz
 }
 
 
-TexMan11::TMID TexMan11::CreateWhiteTexture()
+TexMan::TMID TexMan::CreateWhiteTexture()
 {
 	const std::string name = "$WHITE";
 	auto it = nameToId.find(name);
@@ -167,12 +167,12 @@ TexMan11::TMID TexMan11::CreateWhiteTexture()
 	return nameToId[name] = texs.size() - 1;
 }
 
-void TexMan11::Destroy()
+void TexMan::Destroy()
 {
 	texs.clear();
 }
 
-SRVID TexMan11::Get(TMID id)
+SRVID TexMan::Get(TMID id)
 {
 	if (id >= 0 && id < (TMID)texs.size())
 	{
@@ -181,7 +181,7 @@ SRVID TexMan11::Get(TMID id)
 	return nullptr;
 }
 
-ivec2 TexMan11::GetSize(TMID id)
+ivec2 TexMan::GetSize(TMID id)
 {
 	ComPtr<ID3D11ShaderResourceView> view = Get(id);
 	assert(view);
@@ -202,7 +202,7 @@ ivec2 TexMan11::GetSize(TMID id)
 	return sz;
 }
 
-void TexMan11::Write(TMID id, const void* buf)
+void TexMan::Write(TMID id, const void* buf)
 {
 	ComPtr<ID3D11ShaderResourceView> view = Get(id);
 	assert(view);

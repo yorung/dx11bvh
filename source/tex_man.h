@@ -1,10 +1,10 @@
-class TexMan11
+class TexMan
 {
 public:
 	typedef unsigned int TMID;
 	static const TMID INVALID_TMID = 0;
-	TexMan11();
-	~TexMan11();
+	TexMan();
+	~TexMan();
 	TMID Create(const char *name);
 	TMID CreateWhiteTexture();
 	TMID CreateDynamicTexture(const char* name, const ivec2& size);
@@ -17,8 +17,7 @@ private:
 	std::vector<SRVID> texs;
 };
 
-extern TexMan11 texMan;
-typedef TexMan11 TexMan;
+extern TexMan texMan;
 
 inline void afBindTextureToBindingPoint(TexMan::TMID tex, UINT textureBindingPoint)
 {
