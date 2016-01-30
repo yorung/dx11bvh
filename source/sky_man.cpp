@@ -38,6 +38,7 @@ void SkyMan::Draw()
 	Mat matV, matP;
 	matrixMan.Get(MatrixMan::VIEW, matV);
 	matrixMan.Get(MatrixMan::PROJ, matP);
+	matV._41 = matV._42 = matV._43 = 0;
 	Mat invVP = inv(matV * matP);
 
 	afWriteBuffer(uboId, &invVP, sizeof(invVP));
