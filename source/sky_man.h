@@ -9,7 +9,7 @@ class SkyMan
 	ID3D11BlendState* blendState = nullptr;
 public:
 	~SkyMan();
-	void Create(const char *texFileName, const char *shader);
+	void Create(const char *texFileName, const char* shader);
 	void Draw();
 	void Destroy();
 };

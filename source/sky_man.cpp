@@ -7,10 +7,11 @@ SkyMan::~SkyMan()
 	assert(!sampler);
 	assert(!depthStencilState);
 	assert(!blendState);
+	assert(!uboId);
 	assert(!texId);
 }
 
-void SkyMan::Create(const char *texFileName, const char *shader)
+void SkyMan::Create(const char *texFileName, const char* shader)
 {
 	Destroy();
 
