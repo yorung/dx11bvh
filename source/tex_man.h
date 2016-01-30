@@ -7,11 +7,8 @@ public:
 	~TexMan();
 	TMID Create(const char *name);
 	TMID CreateWhiteTexture();
-	TMID CreateDynamicTexture(const char* name, const ivec2& size);
 	void Destroy();
 	SRVID Get(TMID id);
-	ivec2 GetSize(TMID id);
-	void Write(TMID id, const void* buf);
 private:
 	std::map<std::string, TMID> nameToId;
 	std::vector<SRVID> texs;

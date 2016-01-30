@@ -30,6 +30,7 @@ inline void afSafeDeleteTexture(SRVID& p) { p.Reset(); }
 #define afSafeDeleteVAO SAFE_DELETE
 
 void afWriteBuffer(const IBOID p, const void* buf, int size);
+void afWriteTexture(SRVID srv, const struct TexDesc& desc, const void* buf);
 
 IBOID afCreateIndexBuffer(const AFIndex* indi, int numIndi);
 IBOID afCreateQuadListIndexBuffer(int numQuads);

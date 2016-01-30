@@ -112,6 +112,24 @@ void afWriteBuffer(const IBOID p, const void* buf, int size)
 	deviceMan11.GetContext()->Unmap(p.Get(), 0);
 }
 
+void afWriteTexture(SRVID srv, const TexDesc& desc, const void* buf)
+{
+	ComPtr<ID3D11Resource> res;
+	srv->GetResource(&res);
+	assert(res);
+	ComPtr<ID3D11Texture2D> tx;
+	res.As(&tx);
+	assert(tx);
+
+//	D3D11_TEXTURE2D_DESC desc;
+//	tx->GetDesc(&desc);
+
+	D3D11_MAPPED_SUBRESOURCE m;
+	HRESULT hr = deviceMan11.GetContext()->Map(tx.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &m);
+	memcpy(m.pData, buf, desc.size.x * desc.size.y * 4);
+	deviceMan11.GetContext()->Unmap(tx.Get(), 0);
+}
+
 
 IBOID afCreateQuadListIndexBuffer(int numQuads)
 {

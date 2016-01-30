@@ -113,10 +113,6 @@ void FontMan::MakeFontBitmap(const char* fontName, const CharSignature& sig, DIB
 FontMan::FontMan()
 {
 	ClearCache();
-	texture = TexMan::INVALID_TMID;
-	shader = ShaderMan::INVALID_SMID;
-	dirty = false;
-	vao = 0;
 }
 
 FontMan::~FontMan()
@@ -141,7 +137,7 @@ bool FontMan::Init()
 	if (!texSrc.Create(TEX_W, TEX_H)) {
 		return false;
 	}
-	texture = texMan.CreateDynamicTexture("$FontMan", ivec2(TEX_W, TEX_H));
+	texture = afCreateDynamicTexture(DXGI_FORMAT_R8G8B8A8_UNORM, ivec2(TEX_W, TEX_H));
 	shader = shaderMan.Create("font", elements, dimof(elements), BM_ALPHA, false);
 	assert(shader);
 	ibo = afCreateQuadListIndexBuffer(SPRITE_MAX);
@@ -155,9 +151,7 @@ bool FontMan::Init()
 
 void FontMan::Destroy()
 {
-	// TODO: delete texture
-//	texMan.Delete(texture);
-	texture = TexMan::INVALID_TMID;
+	afSafeDeleteTexture(texture);
 
 //  shaderMan.Delete(shader);
 	shader = ShaderMan::INVALID_SMID;
@@ -277,7 +271,9 @@ void FontMan::FlushToTexture()
 	}
 //	aflog("FontMan::FlushToTexture flushed\n");
 	dirty = false;
-	texMan.Write(texture, texSrc.ReferPixels());
+	TexDesc desc;
+	desc.size = ivec2(TEX_W, TEX_H);
+	afWriteTexture(texture, desc, texSrc.ReferPixels());
 }
 
 void FontMan::Render()

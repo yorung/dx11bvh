@@ -20,19 +20,19 @@ class FontMan
 	typedef std::map<CharSignature, CharCache> Caches;
 	Caches caches;
 	int curX, curY, curLineMaxH;
-	TexMan::TMID texture;
+	SRVID texture = 0;
 	DIB texSrc;
 
 	static const int SPRITE_MAX = 4096;
 	static const int SPRITE_VERTS = SPRITE_MAX * 4;
 	CharSprite charSprites[SPRITE_MAX];
 	int numSprites;
-	ShaderMan::SMID shader;
+	ShaderMan::SMID shader = ShaderMan::INVALID_SMID;
 	IBOID ibo;
 	VBOID vbo;
-	VAOID vao;
+	VAOID vao = 0;
 	SAMPLERID sampler;
-	bool dirty;
+	bool dirty = false;
 	bool Build(const CharSignature& signature);
 	bool Cache(const CharSignature& code);
 	void DrawChar(Vec2& pos, const CharSignature& sig);
