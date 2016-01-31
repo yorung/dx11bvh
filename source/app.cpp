@@ -274,7 +274,7 @@ void App::Draw()
 	matrixMan.Set(MatrixMan::PROJ, devCamera.GetProjMatrix());
 
 //	gridRenderer.Draw();
-//	waterSurface.Draw();
+	waterSurface.Draw();
 
 	for (int i = 0; i < (int)dimof(mesh); i++) {
 		Mesh* it = mesh[i];

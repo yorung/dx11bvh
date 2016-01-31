@@ -13,7 +13,7 @@ struct WaterRipple
 class WaterSurface
 {
 	static BufferMan::BMID constantBufferId;
-	TexMan::TMID texId;
+	SRVID srv;
 	VBOID vbo;
 	IBOID ibo;
 	VAOID vao;
