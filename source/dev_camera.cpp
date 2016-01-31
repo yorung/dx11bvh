@@ -82,7 +82,7 @@ Mat DevCamera::GetProjMatrix()
 	return perspectiveLH(fov * (float)M_PI / 180.f, (float)SCR_W / SCR_H, n, f);
 }
 
-void DevCamera::SetHeight(float height)
+void DevCamera::SetHeight(float height_)
 {
-	height = height;
+	height = height_;
 }
