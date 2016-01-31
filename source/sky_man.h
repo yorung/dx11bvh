@@ -4,9 +4,7 @@ class SkyMan
 	TexDesc texDesc;
 	ShaderMan::SMID shaderId = ShaderMan::INVALID_SMID;
 	UBOID uboId;
-	ID3D11SamplerState* sampler = nullptr;
-	ID3D11DepthStencilState* depthStencilState = nullptr;
-	ID3D11BlendState* blendState = nullptr;
+	SAMPLERID sampler;
 public:
 	~SkyMan();
 	void Create(const char *texFileName, const char* shader);

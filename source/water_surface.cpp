@@ -158,7 +158,7 @@ void WaterSurface::Draw()
 
 	shaderMan.Apply(shaderId);
 
-	afDepthStencilMode(true);
+	afDepthStencilMode(DSM_DEPTH_LESS_WRITE);
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
 	afBindTextureToBindingPoint(srv, 0);
 

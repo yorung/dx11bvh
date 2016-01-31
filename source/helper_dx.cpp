@@ -93,7 +93,6 @@ void afBindTextureToBindingPoint(SRVID srv, UINT textureBindingPoint)
 
 void afBindSamplerToBindingPoint(SAMPLERID sampler, UINT textureBindingPoint)
 {
-	deviceMan11.GetContext()->VSSetSamplers(textureBindingPoint, 1, sampler.GetAddressOf());
 	deviceMan11.GetContext()->PSSetSamplers(textureBindingPoint, 1, sampler.GetAddressOf());
 }
 
@@ -192,15 +191,23 @@ void afBlendMode(BlendMode mode)
 	SAFE_RELEASE(bs);
 }
 
-void afDepthStencilMode(bool depth)
+void afDepthStencilMode(DepthStencilMode mode)
 {
-	ID3D11DepthStencilState* ds;
-	D3D11_DEPTH_STENCIL_DESC dsDesc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT());
-	dsDesc.DepthEnable = depth;
-	dsDesc.StencilEnable = FALSE;
-	deviceMan11.GetDevice()->CreateDepthStencilState(&dsDesc, &ds);
-	deviceMan11.GetContext()->OMSetDepthStencilState(ds, 1);
-	SAFE_RELEASE(ds);
+	ComPtr<ID3D11DepthStencilState> ds;
+	D3D11_DEPTH_STENCIL_DESC desc = CD3D11_DEPTH_STENCIL_DESC(CD3D11_DEFAULT());
+	switch(mode) {
+	case DSM_DISABLE:
+		desc.DepthEnable = FALSE;
+		break;
+	case DSM_DEPTH_LESS_WRITE:
+		break;	// same as default
+	case DSM_DEPTH_LESSEQUAL:
+		desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+		break;
+	}
+	deviceMan11.GetDevice()->CreateDepthStencilState(&desc, &ds);
+	deviceMan11.GetContext()->OMSetDepthStencilState(ds.Get(), 1);
 }
 
 VAOID afCreateVAO(ShaderMan::SMID program, const InputElement elements[], int numElements, int numBuffers, VBOID* const vertexBufferIds, const int* strides, IBOID ibo)

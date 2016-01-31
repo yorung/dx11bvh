@@ -99,7 +99,7 @@ void ShaderMan11::Apply(SMID id)
 		deviceMan11.GetContext()->VSSetShader(it.pVertexShader, nullptr, 0);
 		deviceMan11.GetContext()->PSSetShader(it.pPixelShader, nullptr, 0);
 		afBlendMode(it.blendMode);
-		afDepthStencilMode(it.useDepthBuffer);
+		afDepthStencilMode(it.useDepthBuffer ? DSM_DEPTH_LESS_WRITE : DSM_DISABLE);
 	}
 }
 

@@ -81,7 +81,7 @@ void GridRenderer::Draw()
 	matrixMan.Get(MatrixMan::VIEW, matView);
 	matrixMan.Get(MatrixMan::PROJ, matProj);
 	afBlendMode(BM_NONE);
-	afDepthStencilMode(true);
+	afDepthStencilMode(DSM_DEPTH_LESS_WRITE);
 
 	SolidConstantBuffer cBuf;
 	cBuf.matVP = matView * matProj;

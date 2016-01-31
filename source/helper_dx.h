@@ -62,7 +62,12 @@ enum BlendMode {
 	BM_ALPHA,
 };
 void afBlendMode(BlendMode mode);
-void afDepthStencilMode(bool depth);
+enum DepthStencilMode {
+	DSM_DISABLE,
+	DSM_DEPTH_LESS_WRITE,
+	DSM_DEPTH_LESSEQUAL,
+};
+void afDepthStencilMode(DepthStencilMode mode);
 
 typedef D3D11_SUBRESOURCE_DATA AFTexSubresourceData;
 typedef DXGI_FORMAT AFDTFormat;
