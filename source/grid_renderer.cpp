@@ -2,8 +2,6 @@
 
 GridRenderer gridRenderer;
 
-BufferMan::BMID GridRenderer::constantBufferId = -1;
-
 struct GridVert {
 	Vec3 pos;
 	uint32_t color;
@@ -12,20 +10,21 @@ struct GridVert {
 GridRenderer::GridRenderer()
 {
 	vao = 0;
-	pSamplerState = nullptr;
 }
 
 GridRenderer::~GridRenderer()
 {
-	Destroy();
+	assert(!ubo);
+	assert(!vbo);
+	assert(!ibo);
 }
 
 void GridRenderer::Destroy()
 {
+	afSafeDeleteBuffer(ubo);
 	afSafeDeleteBuffer(ibo);
 	afSafeDeleteBuffer(vbo);
 	afSafeDeleteVAO(vao);
-	SAFE_RELEASE(pSamplerState);
 }
 
 void GridRenderer::Init()
@@ -67,13 +66,7 @@ void GridRenderer::Init()
 
 	vbo = afCreateVertexBuffer(sizeVertices, &vert[0]);
 	ibo = afCreateIndexBuffer(&indi[0], indi.size());
-	if (constantBufferId < 0) {
-		constantBufferId = bufferMan.Create(sizeof(SolidConstantBuffer));
-	}
-
-	CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
-	descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	deviceMan11.GetDevice()->CreateSamplerState(&descSamp, &pSamplerState);
+	ubo = afCreateUBO(sizeof(SolidConstantBuffer));
 
 	int strides[] = {sizeof(GridVert)};
 	VBOID vbos[] = {vbo};
@@ -84,24 +77,17 @@ void GridRenderer::Draw()
 {
 	shaderMan.Apply(shaderId);
 
-	Mat matWorld, matView, matProj;
-	matrixMan.Get(MatrixMan::WORLD, matWorld);
+	Mat matView, matProj;
 	matrixMan.Get(MatrixMan::VIEW, matView);
 	matrixMan.Get(MatrixMan::PROJ, matProj);
-	Mat matW = matWorld;
-	Mat matVP = matView * matProj;
-
-	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
+	afBlendMode(BM_NONE);
+	afDepthStencilMode(true);
 
 	SolidConstantBuffer cBuf;
-	cBuf.matW = matW;
-	cBuf.matVP = matVP;
-	bufferMan.Write(constantBufferId, &cBuf);
-	const auto buf = bufferMan.Get(constantBufferId);
-	deviceMan11.GetContext()->VSSetConstantBuffers(0, 1, &buf);
-
+	cBuf.matVP = matView * matProj;
+	afWriteBuffer(ubo, &cBuf, sizeof(cBuf));
+	afBindBufferToBindingPoint(ubo, 0);
 	afBindVAO(vao);
 	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 	deviceMan11.GetContext()->DrawIndexed(lines * 2, 0, 0);
 }
-

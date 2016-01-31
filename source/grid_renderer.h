@@ -1,16 +1,14 @@
 struct SolidConstantBuffer
 {
-	Mat matW;
 	Mat matVP;
 };
 
 class GridRenderer
 {
-	static BufferMan::BMID constantBufferId;
+	UBOID ubo;
 	VBOID vbo;
 	IBOID ibo;
 	VAOID vao;
-	ID3D11SamplerState* pSamplerState;
 	ShaderMan11::SMID shaderId;
 	int lines;
 public:

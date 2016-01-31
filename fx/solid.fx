@@ -1,7 +1,6 @@
 cbuffer perFrame : register(b0)
 {
-	row_major float4x4 g_matW : packoffset(c0);
-	row_major float4x4 g_matVP : packoffset(c4);
+	float4x4 matVP;
 };
 
 struct VsInput {
@@ -17,7 +16,7 @@ struct VsOutput {
 VsOutput mainVS(VsInput inp)
 {
 	VsOutput outp;
-	outp.pos = mul(float4(inp.pos, 1), mul(g_matW,g_matVP));
+	outp.pos = mul(matVP, float4(inp.pos, 1));
 	outp.col = inp.col;
 	return outp;
 }

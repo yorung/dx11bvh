@@ -273,7 +273,7 @@ void App::Draw()
 	matrixMan.Set(MatrixMan::VIEW, devCamera.GetViewMatrix());
 	matrixMan.Set(MatrixMan::PROJ, devCamera.GetProjMatrix());
 
-//	gridRenderer.Draw();
+	gridRenderer.Draw();
 	waterSurface.Draw();
 
 	for (int i = 0; i < (int)dimof(mesh); i++) {
