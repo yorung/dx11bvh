@@ -9,15 +9,15 @@ public:
 	float power = 0;
 	Vec4 specular;
 	Vec4 emissive;
-	TexMan::TMID tmid = 0;
+	SRVID texture;
 };
 
 class MatMan
 {
-public:
-	typedef int MMID;
 	std::vector<Material> mats;
 public:
+	~MatMan();
+	typedef int MMID;
 	MMID Create(const Material& mat);
 	void Destroy();
 	const Material* Get(MMID id);

@@ -276,9 +276,9 @@ static MatMan::MMID _getMaterial(char*& p, const std::string path)
 	char *tx = _searchChildTag(p, "TextureFilename");
 	if (tx) {
 		std::string txFull = (path.length() ? path + '/' : std::string("")) + _getString(tx);
-		mat.tmid = texMan.Create(txFull.c_str());
+		mat.texture = texMan.Create(txFull.c_str());
 	} else {
-		mat.tmid = texMan.CreateWhiteTexture();
+		mat.texture = texMan.CreateWhiteTexture();
 	}
 	return matMan.Create(mat);
 }
@@ -370,7 +370,7 @@ void MeshX::CreateBoneMesh()
 	mat.emissive.y = 0.4f;
 	mat.emissive.z = 0.4f;
 	mat.emissive.w = 1.0f;
-	mat.tmid = texMan.CreateWhiteTexture();
+	mat.texture = texMan.CreateWhiteTexture();
 
 	MaterialMap map;
 	map.materialId = matMan.Create(mat);

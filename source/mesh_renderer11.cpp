@@ -141,7 +141,7 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 		cBuf.emissive = mat->emissive;
 		afWriteBuffer(uboId, &cBuf, sizeof(cBuf));
 		afBindBufferToBindingPoint(uboId, 2);
-		afBindTextureToBindingPoint(mat->tmid, 0);
+		afBindTextureToBindingPoint(mat->texture, 0);
 		afDrawIndexedTriangleList(matMap.faces * 3, matMap.faceStartIndex * 3);
 	}
 	afBindTextureToBindingPoint(0, 0);

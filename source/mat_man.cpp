@@ -8,13 +8,18 @@ const Material& Material::operator=(const Material& r)
 	power = r.power;
 	specular = r.specular;
 	emissive = r.emissive;
-	tmid = r.tmid;
+	texture = r.texture;
 	return *this;
 }
 
 bool Material::operator==(const Material& r) const
 {
 	return !memcmp(this, &r, sizeof(Material));
+}
+
+MatMan::~MatMan()
+{
+	assert(mats.empty());
 }
 
 MatMan::MMID MatMan::Create(const Material& mat)

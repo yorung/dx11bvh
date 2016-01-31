@@ -367,6 +367,7 @@ void App::Destroy()
 	postEffectUAVTest.Destroy();
 	computeShaderMan.Destroy();
 	computeShaderSkinning.Destroy();
+	matMan.Destroy();
 }
 
 
