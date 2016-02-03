@@ -94,7 +94,7 @@ static void ArrangeRawDDS(void* img, int size)
 	});
 }
 
-static SRVID LoadDDSTexture(const char* name, TexDesc& texSize)
+static SRVID LoadDDSTexture(const char* name, TexDesc& texDesc)
 {
 	int size;
 	void* img = LoadFile(name, &size);
@@ -125,9 +125,10 @@ static SRVID LoadDDSTexture(const char* name, TexDesc& texSize)
 		pitchCalcurator = [](int w, int h) { return w * h * 4; };
 		break;
 	}
-	texSize.size.x = hdr->w;
-	texSize.size.y = hdr->h;
-	texSize.arraySize = hdr->GetArraySize();
+	texDesc.size.x = hdr->w;
+	texDesc.size.y = hdr->h;
+	texDesc.arraySize = hdr->GetArraySize();
+	texDesc.isCubeMap = hdr->IsCubeMap();
 
 	int arraySize = hdr->GetArraySize();
 	int mipCnt = hdr->GetMipCnt();
@@ -143,7 +144,7 @@ static SRVID LoadDDSTexture(const char* name, TexDesc& texSize)
 		}
 	}
 
-	SRVID srv = afCreateTexture2D(format, texSize.size, arraySize, mipCnt, &r[0]);
+	SRVID srv = afCreateTexture2D(format, texDesc.size, arraySize, mipCnt, &r[0]);
 	free(img);
 	return srv;
 }
@@ -154,7 +155,7 @@ SRVID afLoadTexture(const char* name, TexDesc& desc)
 	if (len > 4 && !stricmp(name + len - 4, ".dds")) {
 		return LoadDDSTexture(name, desc);
 	} else {
-		desc.arraySize = 1;
+		desc = TexDesc();
 		return LoadTextureViaOS(name, desc.size);
 	}
 }

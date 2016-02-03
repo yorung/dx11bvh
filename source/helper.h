@@ -35,6 +35,7 @@ VBOID afCreateTiledPlaneVBO(int numTiles);
 struct TexDesc {
 	ivec2 size;
 	int arraySize = 1;
+	bool isCubeMap = false;
 };
 
 SRVID afLoadTexture(const char* name, TexDesc& desc);
