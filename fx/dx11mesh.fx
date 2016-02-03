@@ -54,5 +54,5 @@ SamplerState gSampler : register(s0);
 Texture2D gTexture : register(t0);
 float4 mainPS(VS_OUTPUT _In) : SV_TARGET
 {
-	return gTexture.Sample(gSampler, _In.Tex0);
+	return gTexture.Sample(gSampler, _In.Tex0) * _In.Col;
 }
