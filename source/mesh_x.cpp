@@ -400,16 +400,6 @@ MeshX::MeshX(const char *fileName)
 	CreateBoneMesh();
 }
 
-static uint32_t _conv1To255(float f, int bit)
-{
-	return uint32_t(f * 255) << bit;
-}
-
-static uint32_t _convF4ToU32(Vec4 f)
-{
-	return _conv1To255(f.x, 24) | _conv1To255(f.y, 16) | _conv1To255(f.z, 8) | _conv1To255(f.w, 0);
-}
-
 void MeshX::_pushMaterialMap(Block& block, const MaterialMap& map)
 {
 	if (map.faces) {
@@ -613,7 +603,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 		c.color = 0xffffffff;
 		if (i < nVertexColors) {
 			Vec4 f4 = vertexColors[i];
-			c.color = _convF4ToU32(f4);
+			c.color = Vec4ToUnorm(f4);
 		}
 		color.push_back(c);
 
