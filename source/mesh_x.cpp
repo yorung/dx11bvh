@@ -1043,7 +1043,6 @@ void MeshX::CalcAnimation(int animId, double time, MeshXAnimResult& animResult) 
 	for (auto itAnimation : m_animationSets[revAnimId].animations)
 	{
 		BONE_ID id = itAnimation.first;
-		const Frame& f = m_frames[id];
 		Animation& anim = itAnimation.second;
 		if (anim.animationKeys.size() == 0) {
 			continue;
@@ -1060,7 +1059,7 @@ void MeshX::CalcAnimation(int animId, double time, MeshXAnimResult& animResult) 
 			if (maxTime <= 0) {
 				continue;
 			}
-			double timeMod = fmod(time, maxTime);
+			double timeMod = std::fmod(time, maxTime);
 			int iTime = (int)timeMod % (int)maxTime;
 	
 			for (int i = 0; i < (int)itKey.timedFloatKeys.size() - 1; i++) {
@@ -1125,7 +1124,6 @@ void MeshX::SyncLocalAxisWithBvh(Bvh* bvh, MeshXBvhBinding& bind) const
 	MeshXAnimResult r;
 	CalcFrameMatrices(r, localMats);
 	for (BONE_ID id = 0; id < (BONE_ID)m_frames.size(); id++) {
-		const Frame& f = m_frames[id];
 		bind.axisAlignQuats[id] = m2q(r.boneMat[id]);
 	}
 }
@@ -1211,8 +1209,6 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh, MeshXBvhBinding& bind) const
 		}
 		const Frame* f = &m_frames[myId];
 		assert(f->parentId >= 0);
-		const Frame* parent = &m_frames[f->parentId];
-
 		assert(bvhF.childId >= 0);
 		assert(f->childId >= 0);
 		const BvhFrame* bvhChild = &bvhFrames[bvhF.childId];
@@ -1231,7 +1227,7 @@ void MeshX::ApplyBvhInitialStance(const Bvh* bvh, MeshXBvhBinding& bind) const
 		Vec3 worldTiny = normalize(r.boneMat[childId].GetRow(3) - r.boneMat[myId].GetRow(3));
 
 		Vec3 rotAxis = cross(worldTiny, worldBvh);
-		float rotRad = acosf(dot(worldTiny, worldBvh));
+		float rotRad = std::acos(dot(worldTiny, worldBvh));
 
 		Mat rotMat = r.boneMat[myId];
 		rotMat._41 = rotMat._42 = rotMat._43 = 0;
