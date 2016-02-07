@@ -210,9 +210,11 @@ void afDepthStencilMode(DepthStencilMode mode)
 	deviceMan11.GetContext()->OMSetDepthStencilState(ds.Get(), 1);
 }
 
-VAOID afCreateVAO(ShaderMan::SMID program, const InputElement elements[], int numElements, int numBuffers, VBOID* const vertexBufferIds, const int* strides, IBOID ibo)
+VAOID afCreateVAO(const InputElement elements[], int numElements, int numBuffers, VBOID* const vertexBufferIds, const int* strides, IBOID ibo)
 {
-	return new FakeVAO(program, elements, numElements, numBuffers, vertexBufferIds, strides, nullptr, ibo);
+	(void)elements;
+	(void)numElements;
+	return new FakeVAO(numBuffers, vertexBufferIds, strides, nullptr, ibo);
 }
 
 void AFRenderTarget::InitForDefaultRenderTarget()

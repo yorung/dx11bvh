@@ -30,14 +30,13 @@ public:
 
 class FakeVAO
 {
-	ComPtr<ID3D11InputLayout> inputLayout;
 	std::vector<VBOID> vbos;
 	std::vector<ID3D11Buffer*> d3dBuffers;
 	std::vector<UINT> offsets;
 	std::vector<UINT> strides;
 	ComPtr<ID3D11Buffer> ibo;
 public:
-	FakeVAO(ShaderMan11::SMID shaderId, const D3D11_INPUT_ELEMENT_DESC elements[], int numElements, int numBuffers, VBOID* const buffers, const int strides[], const UINT offsets[], IBOID ibo);
+	FakeVAO(int numBuffers, VBOID* const buffers, const int strides[], const UINT offsets[], IBOID ibo);
 	void Apply();
 };
 typedef FakeVAO* VAOID;
@@ -45,7 +44,7 @@ typedef FakeVAO* VAOID;
 extern ShaderMan11 shaderMan;
 typedef ShaderMan11 ShaderMan;
 
-VAOID afCreateVAO(ShaderMan::SMID program, const InputElement elements[], int numElements, int numBuffers, VBOID* const vertexBufferIds, const int* strides, IBOID ibo);
+VAOID afCreateVAO(const InputElement elements[], int numElements, int numBuffers, VBOID* const vertexBufferIds, const int* strides, IBOID ibo);
 inline void afBindVAO(VAOID vao)
 {
 	if (vao) {

@@ -135,7 +135,7 @@ void WaterSurface::Init()
 
 	int strides[] = { sizeof(WaterVert) };
 	VBOID vbos[] = { vbo };
-	vao = afCreateVAO(shaderId, layout, dimof(layout), 1, vbos, strides, ibo);
+	vao = afCreateVAO(layout, dimof(layout), 1, vbos, strides, ibo);
 	if (constantBufferId < 0) {
 		constantBufferId = bufferMan.Create(sizeof(WaterConstantBuffer));
 	}

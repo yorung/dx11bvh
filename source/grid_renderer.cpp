@@ -70,7 +70,7 @@ void GridRenderer::Init()
 
 	int strides[] = {sizeof(GridVert)};
 	VBOID vbos[] = {vbo};
-	vao = afCreateVAO(shaderId, layout, dimof(layout), 1, vbos, strides, ibo);
+	vao = afCreateVAO(layout, dimof(layout), 1, vbos, strides, ibo);
 }
 
 void GridRenderer::Draw()

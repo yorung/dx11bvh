@@ -144,7 +144,7 @@ bool FontMan::Init()
 	vbo = afCreateDynamicVertexBuffer(SPRITE_MAX * sizeof(FontVertex) * 4);
 	int stride = sizeof(FontVertex);
 	VBOID vboIds[] = {vbo};
-	vao = afCreateVAO(shader, elements, dimof(elements), 1, vboIds, &stride, ibo);
+	vao = afCreateVAO(elements, dimof(elements), 1, vboIds, &stride, ibo);
 	sampler = afCreateSampler(SF_POINT, SW_CLAMP);
 	return true;
 }
