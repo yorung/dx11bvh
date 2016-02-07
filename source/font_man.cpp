@@ -137,7 +137,7 @@ bool FontMan::Init()
 	if (!texSrc.Create(TEX_W, TEX_H)) {
 		return false;
 	}
-	texture = afCreateDynamicTexture(DXGI_FORMAT_R8G8B8A8_UNORM, ivec2(TEX_W, TEX_H));
+	texture = afCreateDynamicTexture(AFDT_R8G8B8A8_UNORM, ivec2(TEX_W, TEX_H));
 	shader = shaderMan.Create("font", elements, dimof(elements), BM_ALPHA, false);
 	assert(shader);
 	ibo = afCreateQuadListIndexBuffer(SPRITE_MAX);
@@ -286,7 +286,7 @@ void FontMan::Render()
 	}
 	FlushToTexture();
 
-	Vec2 scrSize = systemMetrics.GetScreenSize();
+	Vec2 scrSize = systemMisc.GetScreenSize();
 
 	static FontVertex verts[4 * SPRITE_MAX];
 	for (int i = 0; i < numSprites; i++) {
@@ -311,8 +311,7 @@ void FontMan::Render()
 	afBlendMode(BM_ALPHA);
 	afDepthStencilMode(DSM_DISABLE);
 	afDrawIndexedTriangleList(numSprites * 6);
-	afBlendMode(BM_NONE);
-//	afBindVAO(0);
+	afBindVAO(0);
 	numSprites = 0;
 }
 

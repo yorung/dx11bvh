@@ -46,4 +46,9 @@ extern ShaderMan11 shaderMan;
 typedef ShaderMan11 ShaderMan;
 
 VAOID afCreateVAO(ShaderMan::SMID program, const InputElement elements[], int numElements, int numBuffers, VBOID* const vertexBufferIds, const int* strides, IBOID ibo);
-inline void afBindVAO(VAOID vao) { vao->Apply(); }
+inline void afBindVAO(VAOID vao)
+{
+	if (vao) {
+		vao->Apply();
+	}
+}

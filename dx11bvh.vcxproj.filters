@@ -96,9 +96,6 @@
     <ClInclude Include="source\font_man.h">
       <Filter>source</Filter>
     </ClInclude>
-    <ClInclude Include="source\system_metrics.h">
-      <Filter>source</Filter>
-    </ClInclude>
     <ClInclude Include="source\dev_camera.h">
       <Filter>source</Filter>
     </ClInclude>
@@ -109,6 +106,9 @@
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="source\tex_man.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="source\system_misc.h">
       <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
@@ -182,9 +182,6 @@
     <ClCompile Include="source\helper_win.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="source\system_metrics.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="source\dev_camera.cpp">
       <Filter>source</Filter>
     </ClCompile>
@@ -195,6 +192,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\tex_man.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\system_misc.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
