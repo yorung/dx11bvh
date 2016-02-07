@@ -64,8 +64,8 @@ enum BlendMode {
 void afBlendMode(BlendMode mode);
 enum DepthStencilMode {
 	DSM_DISABLE,
-	DSM_DEPTH_LESS_WRITE,
-	DSM_DEPTH_LESSEQUAL,
+	DSM_DEPTH_ENABLE,
+	DSM_DEPTH_CLOSEREQUAL_READONLY,
 };
 void afDepthStencilMode(DepthStencilMode mode);
 

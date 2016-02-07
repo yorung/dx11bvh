@@ -128,7 +128,7 @@ void WaterSurface::Init()
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 	srv = afLoadTexture("resource\\sphere_map.dds", TexDesc());
-	shaderId = shaderMan.Create("water_surface", layout, dimof(layout), BM_NONE, true);
+	shaderId = shaderMan.Create("water_surface", layout, dimof(layout), BM_NONE, DSM_DEPTH_ENABLE);
 
 	vbo = afCreateDynamicVertexBuffer(sizeVertices);
 	ibo = afCreateIndexBuffer(indices, indi.size());
@@ -158,7 +158,7 @@ void WaterSurface::Draw()
 
 	shaderMan.Apply(shaderId);
 
-	afDepthStencilMode(DSM_DEPTH_LESS_WRITE);
+	afDepthStencilMode(DSM_DEPTH_ENABLE);
 	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
 	afBindTextureToBindingPoint(srv, 0);
 

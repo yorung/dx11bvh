@@ -199,9 +199,9 @@ void afDepthStencilMode(DepthStencilMode mode)
 	case DSM_DISABLE:
 		desc.DepthEnable = FALSE;
 		break;
-	case DSM_DEPTH_LESS_WRITE:
+	case DSM_DEPTH_ENABLE:
 		break;	// same as default
-	case DSM_DEPTH_LESSEQUAL:
+	case DSM_DEPTH_CLOSEREQUAL_READONLY:
 		desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 		desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 		break;

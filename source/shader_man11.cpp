@@ -28,7 +28,7 @@ ShaderMan11::~ShaderMan11()
 	Destroy();
 }
 
-ShaderMan11::SMID ShaderMan11::Create(const char *name, const D3D11_INPUT_ELEMENT_DESC elements[], int numElements, BlendMode blendMode, bool useDepthBuffer)
+ShaderMan11::SMID ShaderMan11::Create(const char *name, const D3D11_INPUT_ELEMENT_DESC elements[], int numElements, BlendMode blendMode, DepthStencilMode depthStencilMode)
 {
 	auto it = m_nameToId.find(name);
 	if (it != m_nameToId.end())
@@ -54,7 +54,7 @@ ShaderMan11::SMID ShaderMan11::Create(const char *name, const D3D11_INPUT_ELEMEN
 	effect.elements = elements;
 	effect.numElements = numElements;
 	effect.blendMode = blendMode;
-	effect.useDepthBuffer = useDepthBuffer;
+	effect.depthStencilMode = depthStencilMode;
 
 	m_effects.push_back(effect);
 	return m_nameToId[name] = m_effects.size() - 1;
@@ -86,7 +86,7 @@ void ShaderMan11::Reload()
 	Destroy();
 	for (int i = 0; i < (int)names.size(); i++) {
 		auto& ef = effs[i];
-		Create(names[i].c_str(), ef.elements, ef.numElements, ef.blendMode, ef.useDepthBuffer);
+		Create(names[i].c_str(), ef.elements, ef.numElements, ef.blendMode, ef.depthStencilMode);
 	}
 }
 
@@ -99,7 +99,7 @@ void ShaderMan11::Apply(SMID id)
 		deviceMan11.GetContext()->VSSetShader(it.pVertexShader, nullptr, 0);
 		deviceMan11.GetContext()->PSSetShader(it.pPixelShader, nullptr, 0);
 		afBlendMode(it.blendMode);
-		afDepthStencilMode(it.useDepthBuffer ? DSM_DEPTH_LESS_WRITE : DSM_DISABLE);
+		afDepthStencilMode(it.depthStencilMode);
 	}
 }
 

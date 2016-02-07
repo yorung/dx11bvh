@@ -13,7 +13,7 @@ void SkyMan::Create(const char *texFileName, const char* shader)
 {
 	Destroy();
 	texId = afLoadTexture(texFileName, texDesc);
-	shaderId = shaderMan.Create(shader, nullptr, 0, BM_NONE, false);
+	shaderId = shaderMan.Create(shader, nullptr, 0, BM_NONE, DSM_DEPTH_CLOSEREQUAL_READONLY);
 	uboId = afCreateUBO(sizeof(Mat));
 	sampler = afCreateSampler(SF_LINEAR, SW_REPEAT);
 }
@@ -36,8 +36,6 @@ void SkyMan::Draw()
 	afBindBufferToBindingPoint(uboId, 0);
 	afBindTextureToBindingPoint(texId, 0);
 	afBindSamplerToBindingPoint(sampler, 0);
-	afBlendMode(BM_NONE);
-	afDepthStencilMode(DSM_DEPTH_LESSEQUAL);
 	afDrawTriangleStrip(4);
 	afBindTextureToBindingPoint(0, 0);
 }
