@@ -51,6 +51,7 @@ SAMPLERID afCreateSampler(SamplerFilter samplerFilter, SamplerWrap wrap);
 
 void afBindBufferToBindingPoint(UBOID ubo, UINT uniformBlockBinding);
 void afBindTextureToBindingPoint(SRVID srv, UINT textureBindingPoint);
+#define afBindCubeMapToBindingPoint afBindTextureToBindingPoint
 void afBindSamplerToBindingPoint(SAMPLERID sampler, UINT textureBindingPoint);
 
 void afDrawIndexedTriangleList(int numIndices, int start = 0);

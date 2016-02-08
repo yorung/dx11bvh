@@ -23,6 +23,13 @@ void SkyMan::Draw()
 	if (!texId) {
 		return;
 	}
+	if (!uboId) {
+		return;
+	}
+
+	if (!shaderId) {
+		return;
+	}
 
 	shaderMan.Apply(shaderId);
 
@@ -34,7 +41,8 @@ void SkyMan::Draw()
 
 	afWriteBuffer(uboId, &invVP, sizeof(invVP));
 	afBindBufferToBindingPoint(uboId, 0);
-	afBindTextureToBindingPoint(texId, 0);
+	(texDesc.isCubeMap ? afBindCubeMapToBindingPoint : afBindTextureToBindingPoint)(texId, 0);
+
 	afBindSamplerToBindingPoint(sampler, 0);
 	afDrawTriangleStrip(4);
 	afBindTextureToBindingPoint(0, 0);
