@@ -15,7 +15,7 @@ struct VsToPs
 VsToPs mainVS(uint id : SV_VertexID)
 {
 	VsToPs ret;
-	ret.pos = float4(id & 1 ? 1 : -1, id & 2 ? -1 : 1, 1, 1);
+	ret.pos = float4(id & 2 ? 1 : -1, id & 1 ? -1 : 1, 1, 1);
 	ret.pos2 = ret.pos;
 	return ret;
 }

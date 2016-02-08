@@ -157,12 +157,23 @@ void afDrawTriangleStrip(int numVertices, int start)
 	deviceMan11.GetContext()->Draw(numVertices, start);
 }
 
-void afEnableBackFaceCulling(bool cullBack)
+void afCullMode(CullMode cullMode)
 {
 	ID3D11RasterizerState* rs;
 	CD3D11_RASTERIZER_DESC rasterDesc(D3D11_DEFAULT);
-	rasterDesc.CullMode = cullBack ? D3D11_CULL_BACK : D3D11_CULL_NONE;
-	rasterDesc.FrontCounterClockwise = TRUE;
+	switch (cullMode) {
+	case CM_DISABLE:
+		rasterDesc.CullMode = D3D11_CULL_NONE;
+		break;
+	case CM_CCW:
+		rasterDesc.CullMode = D3D11_CULL_BACK;
+		rasterDesc.FrontCounterClockwise = TRUE;
+		break;
+	case CM_CW:
+		rasterDesc.CullMode = D3D11_CULL_BACK;
+		rasterDesc.FrontCounterClockwise = FALSE;
+		break;
+	}
 	deviceMan11.GetDevice()->CreateRasterizerState(&rasterDesc, &rs);
 	deviceMan11.GetContext()->RSSetState(rs);
 	SAFE_RELEASE(rs);

@@ -14,6 +14,7 @@ private:
 		int numElements;
 		BlendMode blendMode;
 		DepthStencilMode depthStencilMode;
+		CullMode cullMode;
 		Effect() { memset(this, 0, sizeof(*this)); }
 	};
 	std::map<std::string, SMID> m_nameToId;
@@ -21,7 +22,7 @@ private:
 public:
 	ShaderMan11();
 	~ShaderMan11();
-	SMID Create(const char *name, const D3D11_INPUT_ELEMENT_DESC elements[], int numElements, BlendMode blendMode, DepthStencilMode depthStencilMode);
+	SMID Create(const char *name, const D3D11_INPUT_ELEMENT_DESC elements[], int numElements, BlendMode blendMode, DepthStencilMode depthStencilMode, CullMode cullMode);
 	void Destroy();
 	void Reload();
 	void Apply(SMID id);

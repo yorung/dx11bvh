@@ -138,7 +138,7 @@ bool FontMan::Init()
 		return false;
 	}
 	texture = afCreateDynamicTexture(AFDT_R8G8B8A8_UNORM, ivec2(TEX_W, TEX_H));
-	shader = shaderMan.Create("font", elements, dimof(elements), BM_ALPHA, DSM_DISABLE);
+	shader = shaderMan.Create("font", elements, dimof(elements), BM_ALPHA, DSM_DISABLE, CM_DISABLE);
 	assert(shader);
 	ibo = afCreateQuadListIndexBuffer(SPRITE_MAX);
 	vbo = afCreateDynamicVertexBuffer(SPRITE_MAX * sizeof(FontVertex) * 4);

@@ -56,8 +56,13 @@ void afBindSamplerToBindingPoint(SAMPLERID sampler, UINT textureBindingPoint);
 
 void afDrawIndexedTriangleList(int numIndices, int start = 0);
 void afDrawTriangleStrip(int numVertices, int start = 0);
-void afEnableBackFaceCulling(bool cullBack);
 
+enum CullMode {
+	CM_DISABLE,
+	CM_CW,
+	CM_CCW,
+};
+void afCullMode(CullMode cullMode);
 enum BlendMode {
 	BM_NONE,
 	BM_ALPHA,
