@@ -310,8 +310,6 @@ void App::Draw()
 
 	skyMan.Draw();
 
-	fontMan.Render();
-
 	// 0 => 1
 	deviceMan11.GetContext()->OMSetRenderTargets(0, nullptr, nullptr);	// unbind RT to prevent warnings in debug layer
 	computeShaderMan.Draw(rt[0].GetTexture(), rt[1].GetUnorderedAccessView());
@@ -342,6 +340,7 @@ void App::Draw()
 	ID3D11ShaderResourceView* dummy = nullptr;
 	deviceMan11.GetContext()->PSSetShaderResources(0, 1, &dummy);
 
+	fontMan.Render();
 	deviceMan11.Present();
 	fps.Update();
 }
