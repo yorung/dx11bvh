@@ -54,6 +54,7 @@ void afBindTextureToBindingPoint(SRVID srv, UINT textureBindingPoint);
 #define afBindCubeMapToBindingPoint afBindTextureToBindingPoint
 void afBindSamplerToBindingPoint(SAMPLERID sampler, UINT textureBindingPoint);
 
+void afDrawIndexedTriangleStrip(int numIndices, int start = 0);
 void afDrawIndexedTriangleList(int numIndices, int start = 0);
 void afDrawTriangleStrip(int numVertices, int start = 0);
 void afDrawLineList(int numVertices, int start = 0);

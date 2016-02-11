@@ -12,19 +12,18 @@ struct WaterRipple
 
 class WaterSurface
 {
-	static BufferMan::BMID constantBufferId;
+	UBOID ubo;
 	SRVID srv;
 	VBOID vbo;
 	IBOID ibo;
-	VAOID vao;
-	ID3D11SamplerState* pSamplerState;
-	ShaderMan11::SMID shaderId;
+	VAOID vao = 0;
+	SAMPLERID sampler = 0;
+	ShaderMan::SMID shaderId;
 	int lines;
 	void UpdateVert(std::vector<WaterVert>& vert);
 	void Update();
 	std::deque<WaterRipple> ripples;
 public:
-	WaterSurface();
 	~WaterSurface();
 	void Destroy();
 	void Init();

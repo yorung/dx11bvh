@@ -2,8 +2,6 @@
 
 WaterSurface waterSurface;
 
-BufferMan::BMID WaterSurface::constantBufferId = -1;
-
 struct WaterConstantBuffer
 {
 	Mat matW;
@@ -74,24 +72,24 @@ void WaterSurface::UpdateVert(std::vector<WaterVert>& vert)
 	}
 }
 
-WaterSurface::WaterSurface()
-{
-	vao = 0;
-	pSamplerState = nullptr;
-}
-
 WaterSurface::~WaterSurface()
 {
-	Destroy();
+	assert(!ubo);
+	assert(!ibo);
+	assert(!vbo);
+	assert(!vao);
+	assert(!srv);
+	assert(!sampler);
 }
 
 void WaterSurface::Destroy()
 {
+	afSafeDeleteBuffer(ubo);
 	afSafeDeleteBuffer(ibo);
 	afSafeDeleteBuffer(vbo);
 	afSafeDeleteVAO(vao);
 	afSafeDeleteTexture(srv);
-	SAFE_RELEASE(pSamplerState);
+	afSafeDeleteSampler(sampler);
 }
 
 void WaterSurface::Init()
@@ -123,9 +121,9 @@ void WaterSurface::Init()
 	AFIndex* indices = &indi[0];
 	lines = indi.size() / 2;
 
-	static D3D11_INPUT_ELEMENT_DESC layout[] = {
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	static InputElement layout[] = {
+		CInputElement(0, "POSITION", DXGI_FORMAT_R32G32B32_FLOAT, 0),
+		CInputElement(0, "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT, 12),
 	};
 	srv = afLoadTexture("resource\\sphere_map.dds", TexDesc());
 	shaderId = shaderMan.Create("water_surface", layout, dimof(layout), BM_NONE, DSM_DEPTH_ENABLE, CM_CW);
@@ -136,13 +134,8 @@ void WaterSurface::Init()
 	int strides[] = { sizeof(WaterVert) };
 	VBOID vbos[] = { vbo };
 	vao = afCreateVAO(layout, dimof(layout), 1, vbos, strides, ibo);
-	if (constantBufferId < 0) {
-		constantBufferId = bufferMan.Create(sizeof(WaterConstantBuffer));
-	}
-
-	CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
-	descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	deviceMan11.GetDevice()->CreateSamplerState(&descSamp, &pSamplerState);
+	ubo = afCreateUBO(sizeof(WaterConstantBuffer));
+	sampler = afCreateSampler(SF_MIPMAP, SW_REPEAT);
 }
 
 void WaterSurface::Update()
@@ -157,22 +150,16 @@ void WaterSurface::Draw()
 	Update();
 
 	shaderMan.Apply(shaderId);
-
-	afDepthStencilMode(DSM_DEPTH_ENABLE);
-	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
+	afBindSamplerToBindingPoint(sampler, 0);
 	afBindTextureToBindingPoint(srv, 0);
 
 	WaterConstantBuffer cBuf;
-//	matrixMan.Get(MatrixMan::WORLD, cBuf.matW);
 	cBuf.matW = scale(4000);
 	matrixMan.Get(MatrixMan::VIEW, cBuf.matV);
 	matrixMan.Get(MatrixMan::PROJ, cBuf.matP);
 	cBuf.camPos = fastInv(cBuf.matV).GetRow(3);
-	bufferMan.Write(constantBufferId, &cBuf);
-	const auto buf = bufferMan.Get(constantBufferId);
-	deviceMan11.GetContext()->VSSetConstantBuffers(0, 1, &buf);
-
+	afWriteBuffer(ubo, &cBuf, sizeof(cBuf));
+	afBindBufferToBindingPoint(ubo, 0);
 	afBindVAO(vao);
-	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	deviceMan11.GetContext()->DrawIndexed(lines * 2, 0, 0);
+	afDrawIndexedTriangleStrip(lines * 2);
 }
