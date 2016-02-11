@@ -1,18 +1,12 @@
-struct SolidConstantBuffer
-{
-	Mat matVP;
-};
-
 class GridRenderer
 {
 	UBOID ubo;
 	VBOID vbo;
 	IBOID ibo;
-	VAOID vao;
-	ShaderMan11::SMID shaderId;
+	VAOID vao = 0;
+	ShaderMan::SMID shaderId;
 	int lines;
 public:
-	GridRenderer();
 	~GridRenderer();
 	void Destroy();
 	void Init();

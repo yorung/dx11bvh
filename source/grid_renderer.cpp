@@ -4,19 +4,15 @@ GridRenderer gridRenderer;
 
 struct GridVert {
 	Vec3 pos;
-	uint32_t color;
+	Vec3 color;
 };
-
-GridRenderer::GridRenderer()
-{
-	vao = 0;
-}
 
 GridRenderer::~GridRenderer()
 {
 	assert(!ubo);
 	assert(!vbo);
 	assert(!ibo);
+	assert(!vao);
 }
 
 void GridRenderer::Destroy()
@@ -36,7 +32,7 @@ void GridRenderer::Init()
 
 	for (float x = -1000; x <= 1000; x += 100) {
 		GridVert v;
-		v.color = 0xff777777;
+		v.color = Vec3(0.5, 0.5, 0.5);
 		v.pos = Vec3(x, 0, -1000);
 		vert.push_back(v);
 		indi.push_back((AFIndex)indi.size());
@@ -46,7 +42,7 @@ void GridRenderer::Init()
 	}
 	for (float z = -1000; z <= 1000; z += 100) {
 		GridVert v;
-		v.color = 0xff777777;
+		v.color = Vec3(0.5, 0.5, 0.5);
 		v.pos = Vec3(-1000, 0, z);
 		vert.push_back(v);
 		indi.push_back((AFIndex)indi.size());
@@ -58,15 +54,15 @@ void GridRenderer::Init()
 	int sizeVertices = vert.size() * sizeof(GridVert);
 	lines = indi.size() / 2;
 
-	static D3D11_INPUT_ELEMENT_DESC layout[] = {
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	static InputElement layout[] = {
+		CInputElement(0, "POSITION", DXGI_FORMAT_R32G32B32_FLOAT, 0),
+		CInputElement(0, "COLOR", DXGI_FORMAT_R32G32B32_FLOAT, 12),
 	};
 	shaderId = shaderMan.Create("solid", layout, dimof(layout), BM_NONE, DSM_DEPTH_ENABLE, CM_DISABLE);
 
 	vbo = afCreateVertexBuffer(sizeVertices, &vert[0]);
 	ibo = afCreateIndexBuffer(&indi[0], indi.size());
-	ubo = afCreateUBO(sizeof(SolidConstantBuffer));
+	ubo = afCreateUBO(sizeof(Mat));
 
 	int strides[] = {sizeof(GridVert)};
 	VBOID vbos[] = {vbo};
@@ -76,16 +72,12 @@ void GridRenderer::Init()
 void GridRenderer::Draw()
 {
 	shaderMan.Apply(shaderId);
-
 	Mat matView, matProj;
 	matrixMan.Get(MatrixMan::VIEW, matView);
 	matrixMan.Get(MatrixMan::PROJ, matProj);
-
-	SolidConstantBuffer cBuf;
-	cBuf.matVP = matView * matProj;
-	afWriteBuffer(ubo, &cBuf, sizeof(cBuf));
+	Mat matVP = matView * matProj;
+	afWriteBuffer(ubo, &matVP, sizeof(Mat));
 	afBindBufferToBindingPoint(ubo, 0);
 	afBindVAO(vao);
-	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
-	deviceMan11.GetContext()->DrawIndexed(lines * 2, 0, 0);
+	afDrawLineList(lines * 2);
 }

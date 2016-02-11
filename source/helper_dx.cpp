@@ -157,6 +157,12 @@ void afDrawTriangleStrip(int numVertices, int start)
 	deviceMan11.GetContext()->Draw(numVertices, start);
 }
 
+void afDrawLineList(int numVertices, int start)
+{
+	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+	deviceMan11.GetContext()->Draw(numVertices, start);
+}
+
 void afCullMode(CullMode cullMode)
 {
 	ID3D11RasterizerState* rs;

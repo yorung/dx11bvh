@@ -5,12 +5,12 @@ cbuffer perFrame : register(b0)
 
 struct VsInput {
 	float3 pos : POSITION;
-	float4 col : COLOR;
+	float3 col : COLOR;
 };
 
 struct VsOutput {
 	float4 pos : SV_POSITION;
-	float4 col : COLOR;
+	float3 col : COLOR;
 };
 
 VsOutput mainVS(VsInput inp)
@@ -23,5 +23,5 @@ VsOutput mainVS(VsInput inp)
 
 float4 mainPS(VsOutput inp) : SV_TARGET
 {
-	return inp.col;
+	return float4(inp.col, 1);
 }
