@@ -124,8 +124,7 @@ void App::Init(const char* fileName)
 
 inline Vec2 GetScreenPos(const Mat& mLocal)
 {
-	Mat mW, mV, mP, mViewport;
-	matrixMan.Get(MatrixMan::WORLD, mW);
+	Mat mV, mP, mViewport;
 	matrixMan.Get(MatrixMan::VIEW, mV);
 	matrixMan.Get(MatrixMan::PROJ, mP);
 	mViewport._11 = SCR_W / 2;
@@ -133,7 +132,7 @@ inline Vec2 GetScreenPos(const Mat& mLocal)
 	mViewport._41 = SCR_W / 2;
 	mViewport._42 = SCR_H / 2;
 
-	Mat m = mLocal * mW * mV * mP * mViewport;
+	Mat m = mLocal * mV * mP * mViewport;
 
 	Vec2 p;
 	p.x = m._41 / m._44;
@@ -269,7 +268,6 @@ void App::Draw()
 		trackTime += deltaTime;
 	}
 
-	matrixMan.Set(MatrixMan::WORLD, Mat());
 	matrixMan.Set(MatrixMan::VIEW, devCamera.GetViewMatrix());
 	matrixMan.Set(MatrixMan::PROJ, devCamera.GetProjMatrix());
 

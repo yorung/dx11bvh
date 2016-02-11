@@ -1,8 +1,8 @@
 class MatrixMan
 {
 public:
-	enum Type{
-		WORLD,
+	enum Type
+	{
 		VIEW,
 		PROJ,
 

@@ -113,8 +113,7 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 
 	shaderMan.Apply(shaderId);
 
-	Mat matWorld, matView, matProj;
-	matrixMan.Get(MatrixMan::WORLD, matWorld);
+	Mat matView, matProj;
 	matrixMan.Get(MatrixMan::VIEW, matView);
 	matrixMan.Get(MatrixMan::PROJ, matProj);
 
@@ -129,7 +128,7 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 	}
 
 	MeshConstantBuffer cBuf;
-	cBuf.matW = matWorld;
+	cBuf.matW = Mat();
 	cBuf.matV = matView;
 	cBuf.matP = matProj;
 	cBuf.camPos = fastInv(matView).GetRow(3);
