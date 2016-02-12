@@ -5,7 +5,7 @@ typedef D3D11_INPUT_ELEMENT_DESC InputElement;
 
 class CInputElement : public InputElement {
 public:
-	CInputElement(int inputSlot, const char* name, DXGI_FORMAT format, int offset) {
+	CInputElement(const char* name, DXGI_FORMAT format, int offset, int inputSlot = 0) {
 		SemanticName = name;
 		SemanticIndex = 0;
 		Format = format;

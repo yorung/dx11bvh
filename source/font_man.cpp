@@ -127,8 +127,8 @@ void FontMan::ClearCache()
 }
 
 static InputElement elements[] = {
-	CInputElement(0, "POSITION", SF_R32G32_FLOAT, 0),
-	CInputElement(0, "TEXCOORD", SF_R32G32_FLOAT, 8),
+	CInputElement("POSITION", SF_R32G32_FLOAT, 0),
+	CInputElement("TEXCOORD", SF_R32G32_FLOAT, 8),
 };
 
 bool FontMan::Init()

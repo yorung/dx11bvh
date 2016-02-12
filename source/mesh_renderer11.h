@@ -11,7 +11,7 @@ class MeshRenderer11
 	ID3D11Buffer* skinBuffer;
 	ID3D11Buffer* skinnedPosBuffer;
 	IBOID iboId;
-	ID3D11SamplerState* pSamplerState;
+	SAMPLERID sampler;
 	ShaderMan11::SMID shaderId;
 	VAOID vao;
 public:

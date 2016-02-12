@@ -55,8 +55,8 @@ void GridRenderer::Init()
 	lines = indi.size() / 2;
 
 	static InputElement layout[] = {
-		CInputElement(0, "POSITION", DXGI_FORMAT_R32G32B32_FLOAT, 0),
-		CInputElement(0, "COLOR", DXGI_FORMAT_R32G32B32_FLOAT, 12),
+		CInputElement("POSITION", SF_R32G32B32_FLOAT, 0),
+		CInputElement("COLOR", SF_R32G32B32_FLOAT, 12),
 	};
 	shaderId = shaderMan.Create("solid", layout, dimof(layout), BM_NONE, DSM_DEPTH_ENABLE, CM_DISABLE);
 

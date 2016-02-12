@@ -17,8 +17,6 @@ MeshRenderer11::MeshRenderer11()
 	colorBuffer = nullptr;
 	skinBuffer = nullptr;
 	skinnedPosBuffer = nullptr;
-	iboId = nullptr;
-	pSamplerState = nullptr;
 	vao = 0;
 }
 
@@ -32,7 +30,7 @@ void MeshRenderer11::Destroy()
 	SAFE_RELEASE(posBuffer);
 	SAFE_RELEASE(skinBuffer);
 	SAFE_RELEASE(skinnedPosBuffer);
-	SAFE_RELEASE(pSamplerState);
+	afSafeDeleteSampler(sampler);
 	afSafeDeleteVAO(vao);
 	afSafeDeleteBuffer(uboId);
 	afSafeDeleteBuffer(iboId);
@@ -51,9 +49,9 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 {
 	Destroy();
 
-	static D3D11_INPUT_ELEMENT_DESC layout[] = {
-		{ "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 4, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	static InputElement layout[] = {
+		CInputElement("COLOR", SF_R8G8B8A8_UNORM, 0),
+		CInputElement("TEXCOORD", SF_R32G32_FLOAT, 4),
 	};
 	shaderId = shaderMan.Create("dx11mesh", layout, dimof(layout), BM_NONE, DSM_DEPTH_ENABLE, CM_CW);
 
@@ -69,10 +67,7 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 	int strides[] = {sizeof(MeshColor)};
 	VBOID vbos[] = {colorBuffer};
 	vao = afCreateVAO(layout, dimof(layout), 1, vbos, strides, iboId);
-
-	CD3D11_SAMPLER_DESC descSamp(D3D11_DEFAULT);
-	descSamp.AddressU = descSamp.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	deviceMan11.GetDevice()->CreateSamplerState(&descSamp, &pSamplerState);
+	sampler = afCreateSampler(SF_MIPMAP, SW_REPEAT);
 }
 
 void MeshRenderer11::Calc(const Mat BoneMatrices[BONE_MAX], const Block& block) const
@@ -116,8 +111,7 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 	Mat matView, matProj;
 	matrixMan.Get(MatrixMan::VIEW, matView);
 	matrixMan.Get(MatrixMan::PROJ, matProj);
-
-	deviceMan11.GetContext()->PSSetSamplers(0, 1, &pSamplerState);
+	afBindSamplerToBindingPoint(sampler, 0);
 	afBindVAO(vao);
 
 	{

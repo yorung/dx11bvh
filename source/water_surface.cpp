@@ -122,8 +122,8 @@ void WaterSurface::Init()
 	lines = indi.size() / 2;
 
 	static InputElement layout[] = {
-		CInputElement(0, "POSITION", DXGI_FORMAT_R32G32B32_FLOAT, 0),
-		CInputElement(0, "NORMAL", DXGI_FORMAT_R32G32B32_FLOAT, 12),
+		CInputElement("POSITION", SF_R32G32B32_FLOAT, 0),
+		CInputElement("NORMAL", SF_R32G32B32_FLOAT, 12),
 	};
 	srv = afLoadTexture("resource\\sphere_map.dds", TexDesc());
 	shaderId = shaderMan.Create("water_surface", layout, dimof(layout), BM_NONE, DSM_DEPTH_ENABLE, CM_CW);
