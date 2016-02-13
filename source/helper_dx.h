@@ -91,7 +91,7 @@ typedef DXGI_FORMAT AFDTFormat;
 #define AFDT_BC3_UNORM DXGI_FORMAT_BC3_UNORM
 
 SRVID afCreateTexture2D(AFDTFormat format, const IVec2& size, void *image);
-SRVID afCreateTexture2D(AFDTFormat format, const IVec2& size, int arraySize, int mipCount, const AFTexSubresourceData datas[]);
+SRVID afCreateTexture2D(AFDTFormat format, const struct TexDesc& desc, int mipCount, const AFTexSubresourceData datas[]);
 SRVID afCreateDynamicTexture(AFDTFormat format, const IVec2& size);
 
 class AFRenderTarget

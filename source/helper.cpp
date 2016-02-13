@@ -100,7 +100,7 @@ static SRVID LoadDDSTexture(const char* name, TexDesc& texDesc)
 	void* img = LoadFile(name, &size);
 	if (!img) {
 		aflog("LoadDDSTexture failed! %s", name);
-		return 0;
+		return SRVID();
 	}
 	const DDSHeader* hdr = (DDSHeader*)img;
 
@@ -144,7 +144,7 @@ static SRVID LoadDDSTexture(const char* name, TexDesc& texDesc)
 		}
 	}
 
-	SRVID srv = afCreateTexture2D(format, texDesc.size, arraySize, mipCnt, &r[0]);
+	SRVID srv = afCreateTexture2D(format, texDesc, mipCnt, &r[0]);
 	free(img);
 	return srv;
 }
