@@ -124,7 +124,7 @@ namespace Gdiplus {
 #include <gdiplus.h>
 #pragma comment(lib, "gdiplus.lib")
 
-bool LoadImageViaGdiPlus(const char* name, ivec2& size, std::vector<uint32_t>& col)
+bool LoadImageViaGdiPlus(const char* name, IVec2& size, std::vector<uint32_t>& col)
 {
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR gdiplusToken;
@@ -157,7 +157,7 @@ bool LoadImageViaGdiPlus(const char* name, ivec2& size, std::vector<uint32_t>& c
 	return w && h;
 }
 
-SRVID LoadTextureViaOS(const char* name, ivec2& size)
+SRVID LoadTextureViaOS(const char* name, IVec2& size)
 {
 	std::vector<uint32_t> col;
 	if (!LoadImageViaGdiPlus(name, size, col)) {

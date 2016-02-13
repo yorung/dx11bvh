@@ -7,8 +7,8 @@ float Random();
 void GoMyDir();
 void Toast(const char *text);
 void PlayBgm(const char *fileName);
-bool LoadImageViaGdiPlus(const char* name, ivec2& size, std::vector<uint32_t>& col);
-SRVID LoadTextureViaOS(const char* name, ivec2& size);
+bool LoadImageViaGdiPlus(const char* name, IVec2& size, std::vector<uint32_t>& col);
+SRVID LoadTextureViaOS(const char* name, IVec2& size);
 
 template <class T, size_t N> inline size_t dimof(T(&)[N])
 {
@@ -33,7 +33,7 @@ IBOID afCreateTiledPlaneIBO(int numTiles, int* numIndies = nullptr);
 VBOID afCreateTiledPlaneVBO(int numTiles);
 
 struct TexDesc {
-	ivec2 size;
+	IVec2 size;
 	int arraySize = 1;
 	bool isCubeMap = false;
 };

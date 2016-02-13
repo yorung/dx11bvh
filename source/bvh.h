@@ -16,8 +16,8 @@ struct BvhFrame
 	BONE_ID parentId;
 	BONE_ID childId;
 	BONE_ID siblingId;
-	ivec3 rotIndices;
-	ivec3 posIndices;
+	IVec3 rotIndices;
+	IVec3 posIndices;
 	Mat frameTransformMatrix;
 	Mat boneOffsetMatrix;
 	Mat result;

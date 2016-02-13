@@ -31,7 +31,7 @@ UBOID afCreateUBO(int size)
 	return ubo;
 }
 
-SRVID afCreateTexture2D(AFDTFormat format, const ivec2& size, void *image)
+SRVID afCreateTexture2D(AFDTFormat format, const IVec2& size, void *image)
 {
 	CD3D11_TEXTURE2D_DESC desc(format, size.x, size.y, 1, 1, D3D11_BIND_SHADER_RESOURCE);
 	D3D11_SUBRESOURCE_DATA r = { image, (uint32_t)size.x * 4, 0 };
@@ -42,7 +42,7 @@ SRVID afCreateTexture2D(AFDTFormat format, const ivec2& size, void *image)
 	return srv;
 }
 
-SRVID afCreateTexture2D(AFDTFormat format, const ivec2& size, int arraySize, int mipCount, const AFTexSubresourceData datas[])
+SRVID afCreateTexture2D(AFDTFormat format, const IVec2& size, int arraySize, int mipCount, const AFTexSubresourceData datas[])
 {
 	bool isCubemap = arraySize == 6;
 	ComPtr<ID3D11Texture2D> tex;
@@ -54,7 +54,7 @@ SRVID afCreateTexture2D(AFDTFormat format, const ivec2& size, int arraySize, int
 	return srv;
 }
 
-SRVID afCreateDynamicTexture(AFDTFormat format, const ivec2& size)
+SRVID afCreateDynamicTexture(AFDTFormat format, const IVec2& size)
 {
 	CD3D11_TEXTURE2D_DESC desc(format, size.x, size.y, 1, 1, D3D11_BIND_SHADER_RESOURCE, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE);
 	ComPtr<ID3D11Texture2D> tex;
@@ -249,7 +249,7 @@ void AFRenderTarget::InitForDefaultRenderTarget()
 	depthStencilView->AddRef();
 }
 
-void AFRenderTarget::Init(ivec2 size, DXGI_FORMAT colorFormat)
+void AFRenderTarget::Init(IVec2 size, DXGI_FORMAT colorFormat)
 {
 	Destroy();
 	texSize = size;

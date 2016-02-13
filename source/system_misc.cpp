@@ -2,12 +2,12 @@
 
 SystemMisc systemMisc;
 
-void SystemMisc::SetScreenSize(ivec2 size)
+void SystemMisc::SetScreenSize(IVec2 size)
 {
 	screenSize = size;
 }
 
-ivec2 SystemMisc::GetScreenSize()
+IVec2 SystemMisc::GetScreenSize()
 {
 	return screenSize;
 }

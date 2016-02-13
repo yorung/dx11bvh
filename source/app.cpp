@@ -68,7 +68,7 @@ void App::Init(const char* fileName)
 
 	for (int i = 0; i < (int)dimof(rt); i++) {
 //		rt[i].Init(ivec2(SCR_W, SCR_H), i == 2 ? DXGI_FORMAT_R32_UINT : DXGI_FORMAT_R8G8B8A8_UNORM);
-		rt[i].Init(ivec2(SCR_W, SCR_H), DXGI_FORMAT_R8G8B8A8_UNORM);
+		rt[i].Init(IVec2(SCR_W, SCR_H), DXGI_FORMAT_R8G8B8A8_UNORM);
 	}
 
 	fontMan.Init();

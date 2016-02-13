@@ -222,7 +222,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		devCamera.MouseWheel((short)HIWORD(wParam) / (float)WHEEL_DELTA);
 		break;
 	case WM_SIZE:
-		systemMisc.SetScreenSize(ivec2(LOWORD(lParam), HIWORD(lParam)));
+		systemMisc.SetScreenSize(IVec2(LOWORD(lParam), HIWORD(lParam)));
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);

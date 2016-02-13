@@ -59,33 +59,33 @@ struct Vec4
 #endif
 };
 
-struct ivec2
+struct IVec2
 {
 	int x, y;
-	ivec2() : x(0), y(0) {}
-	ivec2(int X, int Y) : x(X), y(Y) {}
-	ivec2 operator+(const ivec2& r) const { return ivec2(x + r.x, y + r.y); }
-	ivec2 operator-(const ivec2& r) const { return ivec2(x - r.x, y - r.y); }
+	IVec2() : x(0), y(0) {}
+	IVec2(int X, int Y) : x(X), y(Y) {}
+	IVec2 operator+(const IVec2& r) const { return IVec2(x + r.x, y + r.y); }
+	IVec2 operator-(const IVec2& r) const { return IVec2(x - r.x, y - r.y); }
 	operator Vec2() const { return Vec2((float)x, (float)y); }
-	ivec2 operator =(const Vec2 r) { x = (int)r.x; y = (int)r.y; return *this; }
+	IVec2 operator =(const Vec2 r) { x = (int)r.x; y = (int)r.y; return *this; }
 };
 
-struct ivec3
+struct IVec3
 {
 	int x, y, z;
-	ivec3() : x(0), y(0), z(0) {}
-	ivec3(int X, int Y, int Z) : x(X), y(Y), z(Z) {}
+	IVec3() : x(0), y(0), z(0) {}
+	IVec3(int X, int Y, int Z) : x(X), y(Y), z(Z) {}
 };
 
-struct ivec4
+struct IVec4
 {
 	int x, y, z, w;
-	ivec4() : x(0), y(0), z(0), w(0) {}
-	ivec4(int X, int Y, int Z, int W) : x(X), y(Y), z(Z), w(W) {}
-	ivec4 operator+(const ivec4& r) const { return ivec4(x + r.x, y + r.y, z + r.z, w + r.w); }
-	ivec4 operator+=(const ivec4& r) { return *this = *this + r; }
-	ivec4 operator/(int r) const { return ivec4(x / r, y / r, z / r, w / r); }
-	ivec4 operator/=(int r) { return *this = *this / r; }
+	IVec4() : x(0), y(0), z(0), w(0) {}
+	IVec4(int X, int Y, int Z, int W) : x(X), y(Y), z(Z), w(W) {}
+	IVec4 operator+(const IVec4& r) const { return IVec4(x + r.x, y + r.y, z + r.z, w + r.w); }
+	IVec4 operator+=(const IVec4& r) { return *this = *this + r; }
+	IVec4 operator/(int r) const { return IVec4(x / r, y / r, z / r, w / r); }
+	IVec4 operator/=(int r) { return *this = *this / r; }
 };
 
 inline affloat dot(const Vec3& l, const Vec3& r)
@@ -145,12 +145,12 @@ inline Vec2 min(const Vec2& a, const Vec2& b) {
 	return Vec2(std::min(a.x, b.x), std::min(a.y, b.y));
 }
 
-inline ivec2 max(const ivec2& a, const ivec2& b) {
-	return ivec2(std::max(a.x, b.x), std::max(a.y, b.y));
+inline IVec2 max(const IVec2& a, const IVec2& b) {
+	return IVec2(std::max(a.x, b.x), std::max(a.y, b.y));
 }
 
-inline ivec2 min(const ivec2& a, const ivec2& b) {
-	return ivec2(std::min(a.x, b.x), std::min(a.y, b.y));
+inline IVec2 min(const IVec2& a, const IVec2& b) {
+	return IVec2(std::min(a.x, b.x), std::min(a.y, b.y));
 }
 
 template <class V> inline affloat lengthSq(const V& v)
@@ -544,17 +544,17 @@ inline Mat makeViewportMatrix(const Vec2& screenSize)
 	return vp;
 }
 
-inline ivec4 uint32ToIvec4(uint32_t col)
+inline IVec4 uint32ToIvec4(uint32_t col)
 {
-	return ivec4(col >> 24, (col & 0x00ff0000) >> 16, (col & 0xff00) >> 8, col & 0xff);
+	return IVec4(col >> 24, (col & 0x00ff0000) >> 16, (col & 0xff00) >> 8, col & 0xff);
 }
 
-inline ivec4 UnormToIvec4(uint32_t col)
+inline IVec4 UnormToIvec4(uint32_t col)
 {
-	return ivec4(col >> 24, (col & 0x00ff0000) >> 16, (col & 0xff00) >> 8, col & 0xff);
+	return IVec4(col >> 24, (col & 0x00ff0000) >> 16, (col & 0xff00) >> 8, col & 0xff);
 }
 
-inline uint32_t ivec4ToUnorm(const ivec4& v)
+inline uint32_t ivec4ToUnorm(const IVec4& v)
 {
 	return (uint32_t(0xff && v.x) << 24) | (uint32_t(0xff & v.y) << 16) | (uint32_t(0xff & v.z) << 8) | (uint32_t(v.w) & 0xff);
 }

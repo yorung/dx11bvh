@@ -137,7 +137,7 @@ bool FontMan::Init()
 	if (!texSrc.Create(TEX_W, TEX_H)) {
 		return false;
 	}
-	texture = afCreateDynamicTexture(AFDT_R8G8B8A8_UNORM, ivec2(TEX_W, TEX_H));
+	texture = afCreateDynamicTexture(AFDT_R8G8B8A8_UNORM, IVec2(TEX_W, TEX_H));
 	shader = shaderMan.Create("font", elements, dimof(elements), BM_ALPHA, DSM_DISABLE, CM_DISABLE);
 	assert(shader);
 	ibo = afCreateQuadListIndexBuffer(SPRITE_MAX);
@@ -272,7 +272,7 @@ void FontMan::FlushToTexture()
 //	aflog("FontMan::FlushToTexture flushed\n");
 	dirty = false;
 	TexDesc desc;
-	desc.size = ivec2(TEX_W, TEX_H);
+	desc.size = IVec2(TEX_W, TEX_H);
 	afWriteTexture(texture, desc, texSrc.ReferPixels());
 }
 

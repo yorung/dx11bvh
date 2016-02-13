@@ -90,13 +90,13 @@ typedef DXGI_FORMAT AFDTFormat;
 #define AFDT_BC2_UNORM DXGI_FORMAT_BC2_UNORM
 #define AFDT_BC3_UNORM DXGI_FORMAT_BC3_UNORM
 
-SRVID afCreateTexture2D(AFDTFormat format, const ivec2& size, void *image);
-SRVID afCreateTexture2D(AFDTFormat format, const ivec2& size, int arraySize, int mipCount, const AFTexSubresourceData datas[]);
-SRVID afCreateDynamicTexture(AFDTFormat format, const ivec2& size);
+SRVID afCreateTexture2D(AFDTFormat format, const IVec2& size, void *image);
+SRVID afCreateTexture2D(AFDTFormat format, const IVec2& size, int arraySize, int mipCount, const AFTexSubresourceData datas[]);
+SRVID afCreateDynamicTexture(AFDTFormat format, const IVec2& size);
 
 class AFRenderTarget
 {
-	ivec2 texSize;
+	IVec2 texSize;
 	ID3D11RenderTargetView* renderTargetView = nullptr;
 	ID3D11ShaderResourceView* shaderResourceView = nullptr;
 	ID3D11UnorderedAccessView* unorderedAccessView = nullptr;
@@ -104,7 +104,7 @@ class AFRenderTarget
 public:
 	~AFRenderTarget() { Destroy(); }
 	void InitForDefaultRenderTarget();
-	void Init(ivec2 size, DXGI_FORMAT colorFormat);
+	void Init(IVec2 size, DXGI_FORMAT colorFormat);
 	void Destroy();
 	void BeginRenderToThis();
 	ID3D11ShaderResourceView* GetTexture() { return shaderResourceView; }

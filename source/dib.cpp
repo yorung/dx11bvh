@@ -297,7 +297,7 @@ bool DIB::ApplySoftAA(DIB& target)
 	for (int y = 0; y < target.getH(); y++) {
 		for (int x = 0; x < target.getW(); x++) {
 			pixel color[] = { getPixel(x * 2, y * 2), getPixel(x * 2 + 1, y * 2), getPixel(x * 2, y * 2 + 1), getPixel(x * 2 + 1, y * 2 + 1) };
-			ivec4 sum;
+			IVec4 sum;
 			for (int i = 0; i < (int)dimof(color); i++) {
 				sum += UnormToIvec4(color[i]);
 			}

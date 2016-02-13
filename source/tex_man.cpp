@@ -26,7 +26,7 @@ SRVID TexMan::CreateWhiteTexture()
 		return it->second;
 	}
 	uint32_t white = 0xffffffff;
-	return nameToId[name] = afCreateTexture2D(AFDT_R8G8B8A8_UNORM, ivec2(1, 1), &white);
+	return nameToId[name] = afCreateTexture2D(AFDT_R8G8B8A8_UNORM, IVec2(1, 1), &white);
 }
 
 void TexMan::Destroy()

@@ -45,7 +45,7 @@ VBOID afCreateTiledPlaneVBO(int numTiles)
 	std::vector<Vec2> v;
 	for (int y = 0; y <= numTiles; y++) {
 		for (int x = 0; x <= numTiles; x++) {
-			v.push_back((Vec2)ivec2(x, y) / (float)numTiles * 2 - Vec2(1, 1));
+			v.push_back((Vec2)IVec2(x, y) / (float)numTiles * 2 - Vec2(1, 1));
 		}
 	}
 	return afCreateVertexBuffer(v.size() * sizeof(v[0]), &v[0]);
