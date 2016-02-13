@@ -9,7 +9,7 @@ class GridRenderer
 public:
 	~GridRenderer();
 	void Destroy();
-	void Init();
+	void Create(int numGrid, float pitch);
 	void Draw();
 };
 

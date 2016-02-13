@@ -23,32 +23,27 @@ void GridRenderer::Destroy()
 	afSafeDeleteVAO(vao);
 }
 
-void GridRenderer::Init()
+void GridRenderer::Create(int numGrid, float pitch)
 {
 	Destroy();
 
 	std::vector<GridVert> vert;
 	std::vector<AFIndex> indi;
 
-	for (float x = -1000; x <= 1000; x += 100) {
+	auto add = [&](float x, float z) {
 		GridVert v;
 		v.color = Vec3(0.5, 0.5, 0.5);
-		v.pos = Vec3(x, 0, -1000);
+		v.pos = Vec3(x, 0, z);
 		vert.push_back(v);
 		indi.push_back((AFIndex)indi.size());
-		v.pos = Vec3(x, 0, 1000);
-		vert.push_back(v);
-		indi.push_back((AFIndex)indi.size());
-	}
-	for (float z = -1000; z <= 1000; z += 100) {
-		GridVert v;
-		v.color = Vec3(0.5, 0.5, 0.5);
-		v.pos = Vec3(-1000, 0, z);
-		vert.push_back(v);
-		indi.push_back((AFIndex)indi.size());
-		v.pos = Vec3(1000, 0, z);
-		vert.push_back(v);
-		indi.push_back((AFIndex)indi.size());
+	};
+
+	float half = pitch * numGrid / 2;
+	for(int i = 0; i <= numGrid; i++) {
+		add(i * pitch - half, -half);
+		add(i * pitch - half, half);
+		add(-half, i * pitch - half);
+		add(half, i * pitch - half);
 	}
 
 	int sizeVertices = vert.size() * sizeof(GridVert);

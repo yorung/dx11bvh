@@ -73,7 +73,7 @@ void App::Init(const char* fileName)
 
 	fontMan.Init();
 	debugRenderer.Init();
-	gridRenderer.Init();
+	gridRenderer.Create(20, 100.f);
 	waterSurface.Init();
 	postEffectCopy.Create("post_effect_copy");
 	postEffectMono.Create("post_effect_mono");
