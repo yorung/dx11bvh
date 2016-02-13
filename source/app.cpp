@@ -67,8 +67,7 @@ void App::Init(const char* fileName)
 	Destroy();
 
 	for (int i = 0; i < (int)dimof(rt); i++) {
-//		rt[i].Init(ivec2(SCR_W, SCR_H), i == 2 ? DXGI_FORMAT_R32_UINT : DXGI_FORMAT_R8G8B8A8_UNORM);
-		rt[i].Init(IVec2(SCR_W, SCR_H), DXGI_FORMAT_R8G8B8A8_UNORM);
+		rt[i].Init(IVec2(SCR_W, SCR_H), AFDT_R8G8B8A8_UNORM);
 	}
 
 	fontMan.Init();
@@ -127,11 +126,7 @@ inline Vec2 GetScreenPos(const Mat& mLocal)
 	Mat mV, mP, mViewport;
 	matrixMan.Get(MatrixMan::VIEW, mV);
 	matrixMan.Get(MatrixMan::PROJ, mP);
-	mViewport._11 = SCR_W / 2;
-	mViewport._22 = -SCR_H / 2;
-	mViewport._41 = SCR_W / 2;
-	mViewport._42 = SCR_H / 2;
-
+	mViewport = makeViewportMatrix(systemMisc.GetScreenSize());
 	Mat m = mLocal * mV * mP * mViewport;
 
 	Vec2 p;
@@ -336,9 +331,7 @@ void App::Draw()
 		postEffectMono.Draw(rt[0].GetTexture());
 	}
 
-
-	ID3D11ShaderResourceView* dummy = nullptr;
-	deviceMan11.GetContext()->PSSetShaderResources(0, 1, &dummy);
+	afBindTextureToBindingPoint(0, 0);
 
 	fontMan.Render();
 	deviceMan11.Present();
