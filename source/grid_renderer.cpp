@@ -80,4 +80,5 @@ void GridRenderer::Draw()
 	afBindBufferToBindingPoint(ubo, 0);
 	afBindVAO(vao);
 	afDrawLineList(lines * 2);
+	afBindVAO(0);
 }

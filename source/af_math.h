@@ -5,13 +5,6 @@ typedef float affloat;
 
 inline affloat clamp(affloat x, affloat mi, affloat ma) { return std::max(std::min(x, ma), mi); }
 
-template <class VEC3> inline VEC3 cross(const VEC3& l, const VEC3& r)
-{
-#define _(u,v) (l.u * r.v - l.v * r.u)
-	return VEC3(_(y,z), _(z,x), _(x,y));
-#undef _
-}
-
 struct Vec2
 {
 	affloat x, y;
@@ -103,6 +96,18 @@ inline affloat dot(const Vec3& l, const Vec3& r)
 inline affloat dot(const Vec2& l, const Vec2& r)
 {
 	return l.x * r.x + l.y * r.y;
+}
+
+inline Vec3 cross(const Vec3& l, const Vec3& r)
+{
+#define _(u,v) (l.u * r.v - l.v * r.u)
+	return Vec3(_(y, z), _(z, x), _(x, y));
+#undef _
+}
+
+inline affloat cross(const Vec2& l, const Vec2& r)
+{
+	return l.x * r.y - l.y * r.x;
 }
 
 inline float frac(float v)
@@ -418,6 +423,13 @@ inline Vec3 transform(const Vec3& v, const Mat& m)
 #undef _
 }
 
+inline Vec4 transform(const Vec4& v, const Mat& m)
+{
+#define _(c) (m._1##c * v.x + m._2##c * v.y + m._3##c * v.z + m._4##c * v.w)
+	return Vec4(_(1), _(2), _(3), _(4));
+#undef _
+}
+
 inline Vec3 transform(const Vec3& v, const Quat& q)
 {
 	return (q.Conjugate() * Quat(0, v) * q).v;
@@ -467,6 +479,14 @@ inline Mat perspectiveLH(affloat fov, affloat aspect, affloat n, affloat f)
 	return proj;
 }
 
+#ifdef GL_TRUE
+static const affloat NDC_SPACE_NEAR = 1;
+static const affloat NDC_SPACE_FAR = -1;
+#else
+static const affloat NDC_SPACE_NEAR = 0;
+static const affloat NDC_SPACE_FAR = 1;
+#endif
+
 inline Mat perspectiveRH(affloat fov, affloat aspect, affloat n, affloat f)
 {
 	affloat cotHalfFov = 1 / std::tan(fov * 0.5f);
@@ -511,6 +531,17 @@ inline Mat lookatRH(const Vec3& eye, const Vec3& at, const Vec3& up)
 	Vec3 x = normalize(cross(up, z));
 	Vec3 y = cross(z, x);
 	return fastInv(Mat(x.x, x.y, x.z, 0, y.x, y.y, y.z, 0, z.x, z.y, z.z, 0, eye.x, eye.y, eye.z, 1));
+}
+
+inline Mat makeViewportMatrix(const Vec2& screenSize)
+{
+	Mat vp;
+	Vec2 sz = screenSize / 2;
+	vp._11 = sz.x;
+	vp._22 = -sz.y;
+	vp._41 = sz.x;
+	vp._42 = sz.y;
+	return vp;
 }
 
 inline ivec4 uint32ToIvec4(uint32_t col)

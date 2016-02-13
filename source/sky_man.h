@@ -1,6 +1,6 @@
 class SkyMan
 {
-	SRVID texId = 0;
+	SRVID texId;
 	TexDesc texDesc;
 	ShaderMan::SMID shaderId = ShaderMan::INVALID_SMID;
 	UBOID uboId;

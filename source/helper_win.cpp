@@ -161,7 +161,7 @@ SRVID LoadTextureViaOS(const char* name, ivec2& size)
 {
 	std::vector<uint32_t> col;
 	if (!LoadImageViaGdiPlus(name, size, col)) {
-		return nullptr;
+		return SRVID();
 	}
 	return afCreateTexture2D(AFDT_R8G8B8A8_UNORM, size, &col[0]);
 }

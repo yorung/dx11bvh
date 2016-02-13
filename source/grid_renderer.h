@@ -3,7 +3,7 @@ class GridRenderer
 	UBOID ubo;
 	VBOID vbo;
 	IBOID ibo;
-	VAOID vao = 0;
+	VAOID vao;
 	ShaderMan::SMID shaderId;
 	int lines;
 public:
