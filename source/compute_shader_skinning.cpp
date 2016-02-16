@@ -39,20 +39,19 @@ void ComputeShaderSkinning::Create(const char *shader)
 	Compile(shader, pBlobCS);
 	HRESULT hr = deviceMan11.GetDevice()->CreateComputeShader(pBlobCS->GetBufferPointer(), pBlobCS->GetBufferSize(), nullptr, &computeShader);
 
-	if (constantBufferId < 0)
-	{
+	if (constantBufferId < 0) {
 		constantBufferId = bufferMan.Create(sizeof(BoneBuffer));
 	}
 }
 
 void ComputeShaderSkinning::Dispatch(const Mat bone[BONE_MAX], ID3D11ShaderResourceView* srvPos, ID3D11ShaderResourceView* srvSkin, ID3D11UnorderedAccessView* unorderedAccessView, int nVert)
 {
-	bufferMan.Write(constantBufferId, bone);
 	auto buf = bufferMan.Get(constantBufferId);
+	afWriteBuffer(buf, bone, sizeof(BoneBuffer));
 
 	ID3D11ShaderResourceView* srvList[] = {srvPos, srvSkin};
 	deviceMan11.GetContext()->CSSetShader(computeShader, nullptr, 0);
-	deviceMan11.GetContext()->CSSetConstantBuffers(0, 1, &buf);
+	deviceMan11.GetContext()->CSSetConstantBuffers(0, 1, buf.GetAddressOf());
 	deviceMan11.GetContext()->CSSetShaderResources(0, 2, srvList);
 	deviceMan11.GetContext()->CSSetUnorderedAccessViews(0, 1, &unorderedAccessView, nullptr);
 

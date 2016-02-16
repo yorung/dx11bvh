@@ -2,13 +2,11 @@ class BufferMan
 {
 public:
 	typedef int BMID;
-	std::vector<ID3D11Buffer*> insts;
+	std::vector<UBOID> insts;
 public:
 	BMID Create(int size);
 	void Destroy();
-	ID3D11Buffer* Get(BMID id);
-	void Write(BMID id, const void* buf);
+	UBOID Get(BMID id);
 };
 
 extern BufferMan bufferMan;
-

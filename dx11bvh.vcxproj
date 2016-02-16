@@ -87,7 +87,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="source\af_math.h" />
     <ClInclude Include="source\app.h" />
-    <ClInclude Include="source\buffer_man11.h" />
+    <ClInclude Include="source\buffer_man.h" />
     <ClInclude Include="source\bvh.h" />
     <ClInclude Include="source\compute_shader_man.h" />
     <ClInclude Include="source\compute_shader_skinning.h" />
@@ -118,7 +118,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="source\app.cpp" />
-    <ClCompile Include="source\buffer_man11.cpp" />
+    <ClCompile Include="source\buffer_man.cpp" />
     <ClCompile Include="source\bvh.cpp" />
     <ClCompile Include="source\compute_shader_man.cpp" />
     <ClCompile Include="source\compute_shader_skinning.cpp" />
