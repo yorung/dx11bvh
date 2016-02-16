@@ -257,7 +257,7 @@ static char* _searchChildTag(char* from, const char *tag, std::string* name = nu
 	return nullptr;
 }
 
-static MatMan::MMID _getMaterial(char*& p, const std::string path)
+static MMID _getMaterial(char*& p, const std::string path)
 {
 	Material mat;
 	mat.faceColor.x = _getF(p);
@@ -268,11 +268,9 @@ static MatMan::MMID _getMaterial(char*& p, const std::string path)
 	mat.specular.x = _getF(p);
 	mat.specular.y = _getF(p);
 	mat.specular.z = _getF(p);
-	mat.specular.w = 1.0f;
 	mat.emissive.x = _getF(p);
 	mat.emissive.y = _getF(p);
 	mat.emissive.z = _getF(p);
-	mat.emissive.w = 1.0f;
 	char *tx = _searchChildTag(p, "TextureFilename");
 	if (tx) {
 		std::string txFull = (path.length() ? path + '/' : std::string("")) + _getString(tx);
@@ -365,11 +363,9 @@ void MeshX::CreateBoneMesh()
 	mat.specular.x = 1.0f;
 	mat.specular.y = 1.0f;
 	mat.specular.z = 1.0f;
-	mat.specular.w = 1.0f;
 	mat.emissive.x = 0.4f;
 	mat.emissive.y = 0.4f;
 	mat.emissive.z = 0.4f;
-	mat.emissive.w = 1.0f;
 	mat.texture = texMan.CreateWhiteTexture();
 
 	MaterialMap map;
@@ -532,7 +528,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 		materialIndices.push_back(_getI(p));
 	}
 
-	std::vector<MatMan::MMID> materialIds;
+	std::vector<MMID> materialIds;
 	materialIds.resize(nMaterials);
 	for (int i = 0; i < nMaterials; i++) {
 		p = _searchChildTag(p, "Material");
@@ -572,7 +568,7 @@ bool MeshX::ParseMesh(char* imgFrame, Block& block, BONE_ID frameId)
 	map.faces = 0;
 
 	for (int i = 0, primitiveIdx = 0; i < nMaterialFaces; i++) {
-		MatMan::MMID id = materialIds[materialIndices[i]];
+		MMID id = materialIds[materialIndices[i]];
 		if (map.materialId != id) {
 			_pushMaterialMap(block, map);
 			map.materialId = id;

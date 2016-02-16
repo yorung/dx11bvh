@@ -39,13 +39,7 @@
     <ClInclude Include="source\device_man11.h">
       <Filter>source</Filter>
     </ClInclude>
-    <ClInclude Include="source\mat_man.h">
-      <Filter>source</Filter>
-    </ClInclude>
     <ClInclude Include="source\matrix_man.h">
-      <Filter>source</Filter>
-    </ClInclude>
-    <ClInclude Include="source\mesh_renderer11.h">
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="source\mesh_x.h">
@@ -111,6 +105,9 @@
     <ClInclude Include="source\buffer_man.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="source\mesh_renderer.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -123,12 +120,6 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\device_man11.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\mat_man.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\mesh_renderer11.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\mesh_x.cpp">
@@ -195,6 +186,9 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\buffer_man.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\mesh_renderer.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>

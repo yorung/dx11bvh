@@ -90,7 +90,7 @@ struct MeshSkin
 
 struct MaterialMap
 {
-	MatMan::MMID materialId;
+	MMID materialId;
 	int faceStartIndex;
 	int faces;
 };

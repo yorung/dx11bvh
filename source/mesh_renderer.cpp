@@ -6,12 +6,13 @@ struct MeshConstantBuffer
 	Mat matV;
 	Mat matP;
 	Vec4 faceColor;
-	Vec4 emissive;
-	Vec3 camPos;
+	Vec3 emissive;
 	float padding1;
+	Vec3 camPos;
+	float padding2;
 };
 
-MeshRenderer11::MeshRenderer11()
+MeshRenderer::MeshRenderer()
 {
 	posBuffer = nullptr;
 	colorBuffer = nullptr;
@@ -20,12 +21,12 @@ MeshRenderer11::MeshRenderer11()
 	vao = 0;
 }
 
-MeshRenderer11::~MeshRenderer11()
+MeshRenderer::~MeshRenderer()
 {
 	Destroy();
 }
 
-void MeshRenderer11::Destroy()
+void MeshRenderer::Destroy()
 {
 	SAFE_RELEASE(posBuffer);
 	SAFE_RELEASE(skinBuffer);
@@ -37,7 +38,7 @@ void MeshRenderer11::Destroy()
 	afSafeDeleteBuffer(colorBuffer);
 }
 
-void MeshRenderer11::Init(const Block& block)
+void MeshRenderer::Init(const Block& block)
 {
 	block.Verify();
 	if (!block.vertices.empty() && !block.indices.empty() && !block.color.empty()) {
@@ -45,7 +46,7 @@ void MeshRenderer11::Init(const Block& block)
 	}
 }
 
-void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const MeshColor* color, const MeshSkin* skin, int numIndices, const AFIndex* indices)
+void MeshRenderer::Init(int numVertices, const MeshVertex* vertices, const MeshColor* color, const MeshSkin* skin, int numIndices, const AFIndex* indices)
 {
 	Destroy();
 
@@ -70,7 +71,7 @@ void MeshRenderer11::Init(int numVertices, const MeshVertex* vertices, const Mes
 	sampler = afCreateSampler(SF_MIPMAP, SW_REPEAT);
 }
 
-void MeshRenderer11::Calc(const Mat BoneMatrices[BONE_MAX], const Block& block) const
+void MeshRenderer::Calc(const Mat BoneMatrices[BONE_MAX], const Block& block) const
 {
 	ID3D11ShaderResourceView* srvPos;
 	ID3D11ShaderResourceView* srvSkin;
@@ -102,7 +103,7 @@ void MeshRenderer11::Calc(const Mat BoneMatrices[BONE_MAX], const Block& block) 
 	SAFE_RELEASE(uav);
 }
 
-void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Block& block) const
+void MeshRenderer::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Block& block) const
 {
 	Calc(BoneMatrices, block);
 
@@ -138,4 +139,51 @@ void MeshRenderer11::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bl
 		afDrawIndexedTriangleList(matMap.faces * 3, matMap.faceStartIndex * 3);
 	}
 	afBindTextureToBindingPoint(0, 0);
+}
+
+MatMan matMan;
+
+const Material& Material::operator=(const Material& r)
+{
+	faceColor = r.faceColor;
+	power = r.power;
+	specular = r.specular;
+	emissive = r.emissive;
+	texture = r.texture;
+	return *this;
+}
+
+bool Material::operator==(const Material& r) const
+{
+	return !memcmp(this, &r, sizeof(Material));
+}
+
+MatMan::~MatMan()
+{
+	assert(mats.empty());
+}
+
+MMID MatMan::Create(const Material& mat)
+{
+	auto it = std::find_if(mats.begin(), mats.end(), [&mat](const Material& m) { return m == mat; });
+	if (it != mats.end()) {
+		int n = (int)std::distance(mats.begin(), it);
+		return n;
+	}
+	mats.push_back(mat);
+	return mats.size() - 1;
+}
+
+void MatMan::Destroy()
+{
+	mats.clear();
+}
+
+const Material* MatMan::Get(MMID id)
+{
+	if (id >= 0 && id < (MMID)mats.size())
+	{
+		return &mats[id];
+	}
+	return nullptr;
 }

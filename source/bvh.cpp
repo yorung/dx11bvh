@@ -355,11 +355,9 @@ void Bvh::CreateBoneMesh()
 	mat.specular.x = 1.0f;
 	mat.specular.y = 1.0f;
 	mat.specular.z = 1.0f;
-	mat.specular.w = 1.0f;
 	mat.emissive.x = 0.4f;
 	mat.emissive.y = 0.4f;
 	mat.emissive.z = 0.4f;
-	mat.emissive.w = 1.0f;
 	mat.texture = texMan.CreateWhiteTexture();
 
 	MaterialMap map;
@@ -633,7 +631,6 @@ void Bvh::GetRotAnim(Quat quats[BONE_MAX], double time) const
 	const Pose& pose = motion.poses[frame];
 
 	for (BONE_ID i = 0; (unsigned)i < m_frames.size(); i++)	{
-		const BvhFrame& f = m_frames[i];
 		quats[i] = pose.quats[i];
 	}
 }

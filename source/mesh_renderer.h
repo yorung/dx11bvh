@@ -3,7 +3,35 @@ struct MeshVertex;
 struct MeshColor;
 struct MeshSkin;
 
-class MeshRenderer11
+typedef int MMID;
+
+class Material
+{
+public:
+	Material() {}
+	Material(const Material& r) { *this = r; }
+	const Material& operator=(const Material& r);
+	bool operator==(const Material& r) const;
+	Vec4 faceColor;
+	Vec3 specular;
+	float power = 0;
+	Vec3 emissive;
+	SRVID texture;
+};
+
+class MatMan
+{
+	std::vector<Material> mats;
+public:
+	~MatMan();
+	MMID Create(const Material& mat);
+	void Destroy();
+	const Material* Get(MMID id);
+};
+
+extern MatMan matMan;
+
+class MeshRenderer
 {
 	UBOID uboId;
 	ID3D11Buffer* posBuffer;
@@ -12,16 +40,14 @@ class MeshRenderer11
 	ID3D11Buffer* skinnedPosBuffer;
 	IBOID iboId;
 	SAMPLERID sampler;
-	ShaderMan11::SMID shaderId;
+	ShaderMan::SMID shaderId;
 	VAOID vao;
 public:
-	MeshRenderer11();
-	~MeshRenderer11();
+	MeshRenderer();
+	~MeshRenderer();
 	void Destroy();
 	void Init(int numVertices, const MeshVertex* vertices, const MeshColor* color, const MeshSkin* skin, int numIndices, const AFIndex* indices);
 	void Init(const Block& block);
 	void Calc(const Mat BoneMatrices[BONE_MAX], const Block& block) const;
 	void Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Block& block) const;
 };
-
-typedef MeshRenderer11 MeshRenderer;

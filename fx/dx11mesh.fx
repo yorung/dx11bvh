@@ -4,9 +4,10 @@ cbuffer perMaterial : register(b2)
 	row_major float4x4 matV;
 	row_major float4x4 matP;
 	float4 faceColor;
-	float4 emissive;
-	float3 camPos;
+	float3 emissive;
 	float padding1;
+	float3 camPos;
+	float padding2;
 };
 
 struct Vertex
