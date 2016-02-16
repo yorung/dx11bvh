@@ -1,14 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dx11bvh", "dx11bvh.vcxproj", "{05C758EE-83E4-430C-BA5B-9C07A4FA446B}"
-	ProjectSection(ProjectDependencies) = postProject
-		{7C14C439-2B19-4F61-A058-1656E0586E8C} = {7C14C439-2B19-4F61-A058-1656E0586E8C}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXTK_Desktop_2015", "DirectXTK\DirectXTK_Desktop_2015.vcxproj", "{7C14C439-2B19-4F61-A058-1656E0586E8C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,14 +19,6 @@ Global
 		{05C758EE-83E4-430C-BA5B-9C07A4FA446B}.Release|Win32.ActiveCfg = Release|Win32
 		{05C758EE-83E4-430C-BA5B-9C07A4FA446B}.Release|Win32.Build.0 = Release|Win32
 		{05C758EE-83E4-430C-BA5B-9C07A4FA446B}.Release|x64.ActiveCfg = Release|Win32
-		{7C14C439-2B19-4F61-A058-1656E0586E8C}.Debug|Win32.ActiveCfg = Debug|Win32
-		{7C14C439-2B19-4F61-A058-1656E0586E8C}.Debug|Win32.Build.0 = Debug|Win32
-		{7C14C439-2B19-4F61-A058-1656E0586E8C}.Debug|x64.ActiveCfg = Debug|x64
-		{7C14C439-2B19-4F61-A058-1656E0586E8C}.Debug|x64.Build.0 = Debug|x64
-		{7C14C439-2B19-4F61-A058-1656E0586E8C}.Release|Win32.ActiveCfg = Release|Win32
-		{7C14C439-2B19-4F61-A058-1656E0586E8C}.Release|Win32.Build.0 = Release|Win32
-		{7C14C439-2B19-4F61-A058-1656E0586E8C}.Release|x64.ActiveCfg = Release|x64
-		{7C14C439-2B19-4F61-A058-1656E0586E8C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
