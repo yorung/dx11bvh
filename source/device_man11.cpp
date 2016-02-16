@@ -12,18 +12,19 @@ DeviceMan11::~DeviceMan11()
 
 void DeviceMan11::Create(HWND hWnd)
 {
-	DXGI_SWAP_CHAIN_DESC sd;
-	ZeroMemory(&sd, sizeof(sd));
+	RECT rc;
+	GetClientRect(hWnd, &rc);
+
+	DXGI_SWAP_CHAIN_DESC sd = {};
 	sd.BufferCount = 1;
-	sd.BufferDesc.Width = SCR_W;
-	sd.BufferDesc.Height = SCR_H;
+	sd.BufferDesc.Width = rc.right - rc.left;
+	sd.BufferDesc.Height = rc.bottom - rc.top;
 	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	sd.BufferDesc.RefreshRate.Numerator = 60;
 	sd.BufferDesc.RefreshRate.Denominator = 1;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	sd.OutputWindow = hWnd;
 	sd.SampleDesc.Count = 1;
-	sd.SampleDesc.Quality = 0;
 	sd.Windowed = TRUE;
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
