@@ -54,7 +54,7 @@ void MeshRenderer::Init(int numVertices, const MeshVertex* vertices, const MeshC
 		CInputElement("COLOR", SF_R8G8B8A8_UNORM, 0),
 		CInputElement("TEXCOORD", SF_R32G32_FLOAT, 4),
 	};
-	shaderId = shaderMan.Create("dx11mesh", layout, dimof(layout), BM_NONE, DSM_DEPTH_ENABLE, CM_CW);
+	shaderId = shaderMan.Create("skin", layout, dimof(layout), BM_NONE, DSM_DEPTH_ENABLE, CM_CW);
 
 	deviceMan11.GetDevice()->CreateBuffer(&CD3D11_BUFFER_DESC(numVertices * sizeof(MeshVertex), D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS, D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, sizeof(MeshVertex)), nullptr, &skinnedPosBuffer);
 	D3D11_SUBRESOURCE_DATA subresData = { vertices, 0, 0 };

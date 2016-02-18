@@ -77,12 +77,12 @@ void App::Init(const char* fileName)
 	postEffectCopy.Create("post_effect_copy");
 	postEffectMono.Create("post_effect_mono");
 	postEffectUAVTest.Create("post_effect_uav_test");
-	computeShaderMan.Create("fx\\post_effect_cs.fx");
-	computeShaderSkinning.Create("fx\\skin_cs.fx");
+	computeShaderMan.Create("hlsl/post_effect_cs.hlsl");
+	computeShaderSkinning.Create("hlsl/skin_cs.hlsl");
 
 	g_type = "mesh";
 
-	const char* meshFileName = "resource\\tiny.x";
+	const char* meshFileName = "resource/tiny.x";
 	const char* ext = fileName ? strrchr(fileName, '.') : nullptr;
 	if (ext && !_stricmp(ext, ".x")) {
 		meshFileName = fileName;

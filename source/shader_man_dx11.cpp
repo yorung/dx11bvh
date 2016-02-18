@@ -5,7 +5,7 @@ ShaderMan11 shaderMan;
 static void Compile(const char* name, bool ps, ID3DBlob*& blob)
 {
 	char path[MAX_PATH];
-	sprintf_s(path, sizeof(path), "fx/%s.fx", name);
+	sprintf_s(path, sizeof(path), "hlsl/%s.hlsl", name);
 
 	blob = nullptr;
 	ID3DBlob* err = 0;
