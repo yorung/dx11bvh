@@ -315,6 +315,10 @@ void FontMan::Render()
 
 void FontMan::DrawChar(Vec2& pos, const CharSignature& sig)
 {
+	if (!vao) {
+		return;
+	}
+
 	if (numSprites >= SPRITE_MAX) {
 		return;
 	}

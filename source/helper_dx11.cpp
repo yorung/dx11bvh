@@ -97,6 +97,7 @@ void afBindSamplerToBindingPoint(SAMPLERID sampler, UINT textureBindingPoint)
 
 void afWriteBuffer(const IBOID p, const void* buf, int size)
 {
+	assert(p);
 #ifdef _DEBUG
 	D3D11_BUFFER_DESC desc;
 	p->GetDesc(&desc);
@@ -168,6 +169,12 @@ void afDrawLineList(int numVertices, int start)
 	deviceMan11.GetContext()->Draw(numVertices, start);
 }
 
+void afDrawIndexedInstancedTriangleList(int instanceCount, int numIndices, int start)
+{
+	deviceMan11.GetContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	deviceMan11.GetContext()->DrawIndexedInstanced(numIndices, instanceCount, start, 0, 0);
+}
+
 void afCullMode(CullMode cullMode)
 {
 	ID3D11RasterizerState* rs;
@@ -232,6 +239,20 @@ void afDepthStencilMode(DepthStencilMode mode)
 	deviceMan11.GetContext()->OMSetDepthStencilState(ds.Get(), 1);
 }
 
+IVec2 afGetTextureSize(SRVID srv)
+{
+	ComPtr<ID3D11Resource> res;
+	srv->GetResource(&res);
+	assert(res);
+	ComPtr<ID3D11Texture2D> tx;
+	res.As(&tx);
+	assert(tx);
+
+	D3D11_TEXTURE2D_DESC desc;
+	tx->GetDesc(&desc);
+	return IVec2((int)desc.Width, (int)desc.Height);
+}
+
 VAOID afCreateVAO(const InputElement elements[], int numElements, int numBuffers, VBOID* const vertexBufferIds, const int* strides, IBOID ibo)
 {
 	(void)elements;
@@ -248,8 +269,10 @@ void AFRenderTarget::InitForDefaultRenderTarget()
 	depthStencilView->AddRef();
 }
 
-void AFRenderTarget::Init(IVec2 size, DXGI_FORMAT colorFormat)
+void AFRenderTarget::Init(IVec2 size, DXGI_FORMAT colorFormat, DXGI_FORMAT depthStencilFormat)
 {
+	(void)depthStencilFormat;
+
 	Destroy();
 	texSize = size;
 	CD3D11_TEXTURE2D_DESC tDesc(colorFormat, size.x, size.y, 1, 1, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS);

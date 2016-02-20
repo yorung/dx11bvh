@@ -30,7 +30,7 @@ class FontMan
 	ShaderMan::SMID shader = ShaderMan::INVALID_SMID;
 	IBOID ibo;
 	VBOID vbo;
-	VAOID vao;
+	VAOID vao = 0;
 	SAMPLERID sampler;
 	bool dirty = false;
 	bool Build(const CharSignature& signature);

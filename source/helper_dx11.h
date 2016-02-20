@@ -1,6 +1,8 @@
 #define SF_R32G32_FLOAT DXGI_FORMAT_R32G32_FLOAT
 #define SF_R32G32B32_FLOAT DXGI_FORMAT_R32G32B32_FLOAT
 #define SF_R8G8B8A8_UNORM DXGI_FORMAT_R8G8B8A8_UNORM
+#define SF_R32_UINT DXGI_FORMAT_R32_UINT
+#define SF_R8G8B8A8_UINT DXGI_FORMAT_R8G8B8A8_UINT
 typedef D3D11_INPUT_ELEMENT_DESC InputElement;
 
 class CInputElement : public InputElement {
@@ -58,6 +60,7 @@ void afDrawIndexedTriangleStrip(int numIndices, int start = 0);
 void afDrawIndexedTriangleList(int numIndices, int start = 0);
 void afDrawTriangleStrip(int numVertices, int start = 0);
 void afDrawLineList(int numVertices, int start = 0);
+void afDrawIndexedInstancedTriangleList(int instanceCount, int numIndices, int start = 0);
 
 enum CullMode {
 	CM_DISABLE,
@@ -93,6 +96,7 @@ typedef DXGI_FORMAT AFDTFormat;
 SRVID afCreateTexture2D(AFDTFormat format, const IVec2& size, void *image);
 SRVID afCreateTexture2D(AFDTFormat format, const struct TexDesc& desc, int mipCount, const AFTexSubresourceData datas[]);
 SRVID afCreateDynamicTexture(AFDTFormat format, const IVec2& size);
+IVec2 afGetTextureSize(SRVID tex);
 
 class AFRenderTarget
 {
@@ -104,7 +108,7 @@ class AFRenderTarget
 public:
 	~AFRenderTarget() { Destroy(); }
 	void InitForDefaultRenderTarget();
-	void Init(IVec2 size, DXGI_FORMAT colorFormat);
+	void Init(IVec2 size, AFDTFormat colorFormat, AFDTFormat depthStencilFormat = AFDT_INVALID);
 	void Destroy();
 	void BeginRenderToThis();
 	ID3D11ShaderResourceView* GetTexture() { return shaderResourceView; }

@@ -20,3 +20,4 @@ public:
 };
 
 extern DeviceMan11 deviceMan11;
+#define deviceMan deviceMan11

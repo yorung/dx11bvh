@@ -10,8 +10,7 @@ TexMan::~TexMan()
 SRVID TexMan::Create(const char *name)
 {
 	auto it = nameToId.find(name);
-	if (it != nameToId.end())
-	{
+	if (it != nameToId.end()) {
 		return it->second;
 	}
 	return nameToId[name] = afLoadTexture(name, TexDesc());
@@ -21,8 +20,7 @@ SRVID TexMan::CreateWhiteTexture()
 {
 	const std::string name = "$WHITE";
 	auto it = nameToId.find(name);
-	if (it != nameToId.end())
-	{
+	if (it != nameToId.end()) {
 		return it->second;
 	}
 	uint32_t white = 0xffffffff;
@@ -31,5 +29,8 @@ SRVID TexMan::CreateWhiteTexture()
 
 void TexMan::Destroy()
 {
+	for (auto& it : nameToId) {
+		afSafeDeleteTexture(it.second);
+	}
 	nameToId.clear();
 }

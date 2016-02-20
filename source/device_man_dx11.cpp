@@ -1,4 +1,6 @@
-#include <stdafx.h>
+#include "stdafx.h"
+
+#ifdef __d3d11_h__
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3dcompiler.lib")
@@ -43,13 +45,13 @@ void DeviceMan11::Create(HWND hWnd)
 	SAFE_RELEASE(pBackBuffer);
 
 	ID3D11Texture2D* pDepthStencil;
-	pDevice->CreateTexture2D(&CD3D11_TEXTURE2D_DESC(DXGI_FORMAT_D24_UNORM_S8_UINT, SCR_W, SCR_H, 1, 0, D3D11_BIND_DEPTH_STENCIL), nullptr, &pDepthStencil);
+	pDevice->CreateTexture2D(&CD3D11_TEXTURE2D_DESC(DXGI_FORMAT_D24_UNORM_S8_UINT, sd.BufferDesc.Width, sd.BufferDesc.Height, 1, 0, D3D11_BIND_DEPTH_STENCIL), nullptr, &pDepthStencil);
 	pDevice->CreateDepthStencilView(pDepthStencil, &CD3D11_DEPTH_STENCIL_VIEW_DESC(D3D11_DSV_DIMENSION_TEXTURE2D, DXGI_FORMAT_D24_UNORM_S8_UINT), &pDepthStencilView);
 	SAFE_RELEASE(pDepthStencil);
 
 	pImmediateContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilView);
 
-	D3D11_VIEWPORT vp = { 0, 0, SCR_W, SCR_H, 0.0f, 1.0f };
+	D3D11_VIEWPORT vp = { 0, 0, (float)sd.BufferDesc.Width, (float)sd.BufferDesc.Height, 0.0f, 1.0f };
 	pImmediateContext->RSSetViewports(1, &vp);
 }
 
@@ -71,7 +73,15 @@ void DeviceMan11::Destroy()
 	if (pDevice) {
 		int cnt;
 		cnt = pDevice->Release();
-		assert(!cnt);
+		if (cnt) {
+			ComPtr<ID3D11Debug> dbg;
+			pDevice->QueryInterface(IID_PPV_ARGS(&dbg));
+			dbg->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+			dbg.Reset();
+			MessageBoxA(GetActiveWindow(), SPrintf("%d DX11 interface leak detected.", cnt), "DX11 leaks", MB_OK);
+		}
 		pDevice = nullptr;
 	}
 }
+
+#endif

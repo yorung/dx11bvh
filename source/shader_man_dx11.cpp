@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#ifdef __d3d11_h__
+
 ShaderMan11 shaderMan;
 
 static void Compile(const char* name, bool ps, ID3DBlob*& blob)
@@ -71,6 +73,7 @@ void ShaderMan11::Destroy()
 	}
 	m_effects.clear();
 	m_nameToId.clear();
+	m_effects.push_back(Effect());	// make ID 0 invalid
 }
 
 void ShaderMan11::Reload()
@@ -104,16 +107,6 @@ void ShaderMan11::Apply(SMID id)
 	}
 }
 
-ID3DBlob* ShaderMan11::GetVSBlob(SMID id)
-{
-	if (id >= 0 && id < (SMID)m_effects.size())
-	{
-		Effect& it = m_effects[id];
-		return it.pBlobVS;
-	}
-	return nullptr;
-}
-
 FakeVAO::FakeVAO(int numBuffers, VBOID* const vbos_, const int strides_[], const UINT offsets_[], IBOID ibo_)
 {
 	ibo = ibo_;
@@ -134,3 +127,5 @@ void FakeVAO::Apply()
 	deviceMan11.GetContext()->IASetVertexBuffers(0, vbos.size(), &d3dBuffers[0], &strides[0], &offsets[0]);
 	deviceMan11.GetContext()->IASetIndexBuffer(ibo.Get(), AFIndexTypeToDevice, 0);
 }
+
+#endif

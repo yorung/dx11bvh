@@ -26,7 +26,6 @@ public:
 	void Destroy();
 	void Reload();
 	void Apply(SMID id);
-	ID3DBlob* GetVSBlob(SMID id);
 };
 
 class FakeVAO
