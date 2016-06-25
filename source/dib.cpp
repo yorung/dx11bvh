@@ -275,7 +275,7 @@ bool DIB::Blt(DIB& target, int dstX, int dstY)
 	if (dstX + getW() > target.getW()) {
 		return false;
 	}
-	if (dstX + getH() > target.getH()) {
+	if (dstY + getH() > target.getH()) {
 		return false;
 	}
 	for (int y = 0; y < getH(); y++) {
