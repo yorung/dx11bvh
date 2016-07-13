@@ -12,7 +12,6 @@ struct WaterRipple
 
 class WaterSurface
 {
-	UBOID ubo;
 	SRVID srv;
 	VBOID vbo;
 	IBOID ibo;

@@ -74,7 +74,6 @@ void WaterSurface::UpdateVert(std::vector<WaterVert>& vert)
 
 WaterSurface::~WaterSurface()
 {
-	assert(!ubo);
 	assert(!ibo);
 	assert(!vbo);
 	assert(!vao);
@@ -84,7 +83,6 @@ WaterSurface::~WaterSurface()
 
 void WaterSurface::Destroy()
 {
-	afSafeDeleteBuffer(ubo);
 	afSafeDeleteBuffer(ibo);
 	afSafeDeleteBuffer(vbo);
 	afSafeDeleteVAO(vao);
@@ -134,7 +132,6 @@ void WaterSurface::Init()
 	int strides[] = { sizeof(WaterVert) };
 	VBOID vbos[] = { vbo };
 	vao = afCreateVAO(layout, dimof(layout), 1, vbos, strides, ibo);
-	ubo = afCreateUBO(sizeof(WaterConstantBuffer));
 	sampler = afCreateSampler(SF_MIPMAP, SW_REPEAT);
 }
 
@@ -158,8 +155,11 @@ void WaterSurface::Draw()
 	matrixMan.Get(MatrixMan::VIEW, cBuf.matV);
 	matrixMan.Get(MatrixMan::PROJ, cBuf.matP);
 	cBuf.camPos = fastInv(cBuf.matV).GetRow(3);
+
+	UBOID ubo = afCreateUBO(sizeof(WaterConstantBuffer));
 	afWriteBuffer(ubo, &cBuf, sizeof(cBuf));
 	afBindBufferToBindingPoint(ubo, 0);
 	afBindVAO(vao);
 	afDrawIndexedTriangleStrip(lines * 2);
+	afSafeDeleteBuffer(ubo);
 }
