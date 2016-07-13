@@ -143,21 +143,6 @@ void MeshRenderer::Draw(const Mat BoneMatrices[BONE_MAX], int nBones, const Bloc
 
 MatMan matMan;
 
-const Material& Material::operator=(const Material& r)
-{
-	faceColor = r.faceColor;
-	power = r.power;
-	specular = r.specular;
-	emissive = r.emissive;
-	texture = r.texture;
-	return *this;
-}
-
-bool Material::operator==(const Material& r) const
-{
-	return !memcmp(this, &r, sizeof(Material));
-}
-
 MatMan::~MatMan()
 {
 	assert(mats.empty());
@@ -186,4 +171,19 @@ const Material* MatMan::Get(MMID id)
 		return &mats[id];
 	}
 	return nullptr;
+}
+
+const Material& Material::operator=(const Material& r)
+{
+	faceColor = r.faceColor;
+	power = r.power;
+	specular = r.specular;
+	emissive = r.emissive;
+	texture = r.texture;
+	return *this;
+}
+
+bool Material::operator==(const Material& r) const
+{
+	return !memcmp(this, &r, sizeof(Material));
 }
