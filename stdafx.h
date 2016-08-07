@@ -56,7 +56,6 @@ static const int BONE_MAX = 70;
 #include "source/buffer_man.h"
 #include "source/shader_man_dx11.h"
 #include "source/font_man.h"
-#include "source/sky_man.h"
 #include "source/matrix_man.h"
 #include "source/mesh_renderer.h"
 #include "source/joint_db.h"
@@ -64,10 +63,7 @@ static const int BONE_MAX = 70;
 #include "source/bvh.h"
 #include "source/debug_renderer.h"
 #include "source/grid_renderer.h"
-#include "source/water_surface.h"
 #include "source/fps.h"
-#include "source/post_effect_man.h"
-#include "source/compute_shader_man.h"
 #include "source/compute_shader_skinning.h"
 
 #include "source/dev_camera.h"

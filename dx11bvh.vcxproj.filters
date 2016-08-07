@@ -57,15 +57,6 @@
     <ClInclude Include="source\helper.h">
       <Filter>source</Filter>
     </ClInclude>
-    <ClInclude Include="source\water_surface.h">
-      <Filter>source</Filter>
-    </ClInclude>
-    <ClInclude Include="source\post_effect_man.h">
-      <Filter>source</Filter>
-    </ClInclude>
-    <ClInclude Include="source\compute_shader_man.h">
-      <Filter>source</Filter>
-    </ClInclude>
     <ClInclude Include="source\compute_shader_skinning.h">
       <Filter>source</Filter>
     </ClInclude>
@@ -82,9 +73,6 @@
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="source\dev_camera.h">
-      <Filter>source</Filter>
-    </ClInclude>
-    <ClInclude Include="source\sky_man.h">
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="source\tex_man.h">
@@ -134,15 +122,6 @@
     <ClCompile Include="source\helper.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="source\water_surface.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\post_effect_man.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\compute_shader_man.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="source\compute_shader_skinning.cpp">
       <Filter>source</Filter>
     </ClCompile>
@@ -165,9 +144,6 @@
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\dev_camera.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\sky_man.cpp">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="source\tex_man.cpp">
@@ -210,49 +186,13 @@
     <FxCompile Include="hlsl\font.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="hlsl\post_effect_copy.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="hlsl\post_effect_cs.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="hlsl\post_effect_mono.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="hlsl\post_effect_uav_test.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="hlsl\projection_equirectangular.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="hlsl\projection_equirectangular_to_stereographic.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="hlsl\projection_little_planet.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="hlsl\skin.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="hlsl\skin_cs.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="hlsl\sky_cubemap.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="hlsl\sky_cubemap_high.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="hlsl\sky_photosphere.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="hlsl\sky_spheremap.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="hlsl\solid.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="hlsl\water_surface.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

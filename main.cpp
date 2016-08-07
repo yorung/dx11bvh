@@ -80,7 +80,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE,
 	}
 
 	app.Destroy();
-	skyMan.Destroy();
 	texMan.Destroy();
 	shaderMan.Destroy();
 	bufferMan.Destroy();
@@ -199,7 +198,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 	case WM_LBUTTONDOWN:
 		SetCapture(hWnd);
-		waterSurface.CreateRipple();
 		devCamera.LButtonDown(LOWORD(lParam) / (float)SCR_W, HIWORD(lParam) / (float)SCR_H);
 		break;
 	case WM_RBUTTONUP:
@@ -208,7 +206,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_RBUTTONDOWN:
 		SetCapture(hWnd);
-		waterSurface.CreateRipple();
 		devCamera.RButtonDown(LOWORD(lParam) / (float)SCR_W, HIWORD(lParam) / (float)SCR_H);
 		break;
 	case WM_LBUTTONUP:

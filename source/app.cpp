@@ -28,56 +28,13 @@ App::~App()
 {
 }
 
-void App::ApplySky()
-{
-	switch(skyNum) {
-	case 0:
-		//skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "sky_cubemap_high");
-		skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\Media\\Lobby\\LobbyCube.dds", "sky_cubemap");
-		break;
-	case 1:
-		skyMan.Create("resource\\OutputCube2.dds", "projection_equirectangular");
-		//skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "projection_equirectangular");
-		break;
-	case 2:
-		skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\C++\\Direct3D\\StateManager\\Media\\skybox02.dds", "projection_little_planet");
-		break;
-	case 3:
-		skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\Media\\trees\\tree35S.dds", "sky_spheremap");
-		//skyMan.Create("C:\\Program Files (x86)\\Microsoft DirectX SDK (August 2009)\\Samples\\Media\\SubD10\\msd_MicrosoftCharacterMaya100_heroChr_mechanicalCM_tga_001.dds", "sky_spheremap");
-		//skyMan.Create("resource\\sphere_map.dds", "sky_spheremap");
-		break;
-	case 4:
-		skyMan.Create("resource\\PANO_20141115_141959.dds", "sky_photosphere");
-		break;
-	case 5:
-		skyMan.Create("resource\\Equirectangular-projection.jpg", "sky_photosphere");
-		break;
-	case 6:
-		skyMan.Create("resource\\warcraft.dds", "sky_photosphere");
-		break;
-	case 7:
-		skyMan.Create("resource\\PANO_20141115_141959.dds", "projection_equirectangular_to_stereographic");
-		break;
-	}
-}
-
 void App::Init(const char* fileName)
 {
 	Destroy();
 
-	for (int i = 0; i < (int)dimof(rt); i++) {
-		rt[i].Init(IVec2(SCR_W, SCR_H), AFDT_R8G8B8A8_UNORM);
-	}
-
 	fontMan.Init();
 	debugRenderer.Init();
 	gridRenderer.Create(20, 100.f);
-	waterSurface.Init();
-	postEffectCopy.Create("post_effect_copy");
-	postEffectMono.Create("post_effect_mono");
-	postEffectUAVTest.Create("post_effect_uav_test");
-	computeShaderMan.Create("hlsl/post_effect_cs.hlsl");
 	computeShaderSkinning.Create("hlsl/skin_cs.hlsl");
 
 	g_type = "mesh";
@@ -118,7 +75,6 @@ void App::Init(const char* fileName)
 	devCamera.SetHeight(radius / 2);
 
 	lastTime = GetTime();
-	ApplySky();
 }
 
 inline Vec2 GetScreenPos(const Mat& mLocal)
@@ -193,39 +149,6 @@ void App::DrawCameraParams()
 
 void App::Update()
 {
-	if (GetKeyState(VK_F1) & 0x80) {
-		skyNum = 0;
-		ApplySky();
-	}
-	if (GetKeyState(VK_F2) & 0x80) {
-		skyNum = 1;
-		ApplySky();
-	}
-	if (GetKeyState(VK_F3) & 0x80) {
-		skyNum = 2;
-		ApplySky();
-	}
-	if (GetKeyState(VK_F4) & 0x80) {
-		skyNum = 3;
-		ApplySky();
-	}
-	if (GetKeyState(VK_F5) & 0x80) {
-		skyNum = 4;
-		ApplySky();
-	}
-	if (GetKeyState(VK_F6) & 0x80) {
-		skyNum = 5;
-		ApplySky();
-	}
-	if (GetKeyState(VK_F7) & 0x80) {
-		skyNum = 6;
-		ApplySky();
-	}
-	if (GetKeyState(VK_F8) & 0x80) {
-		skyNum = 7;
-		ApplySky();
-	}
-
 	if (GetKeyState('P') & 0x80) {
 		g_type = "pivot";
 	}
@@ -245,12 +168,12 @@ void App::Update()
 
 void App::Draw()
 {
+	AFRenderTarget rt;
+	rt.InitForDefaultRenderTarget();
+	rt.BeginRenderToThis();
 //	fontMan.DrawString(Vec2(0, 110), 16, "TEXT SPRITE TEST!!!!!!!!!!!!!text sprite 1234567890");
 //	fontMan.DrawString(Vec2(10, 130), 32, "@#$%^&*()");
 //	fontMan.DrawString(Vec2(10, 170), 40, L"あいうえお한글漢字");
-
-	// render to rt[0]
-	rt[0].BeginRenderToThis();
 
 	ID3D11DeviceContext* context = deviceMan11.GetContext();
 
@@ -267,7 +190,6 @@ void App::Draw()
 	matrixMan.Set(MatrixMan::PROJ, devCamera.GetProjMatrix());
 
 	gridRenderer.Draw();
-	waterSurface.Draw();
 
 	for (int i = 0; i < (int)dimof(mesh); i++) {
 		Mesh* it = mesh[i];
@@ -303,34 +225,6 @@ void App::Draw()
 		fontMan.DrawString(pos, 16, buf);
 	}
 
-	skyMan.Draw();
-
-	// 0 => 1
-	deviceMan11.GetContext()->OMSetRenderTargets(0, nullptr, nullptr);	// unbind RT to prevent warnings in debug layer
-	computeShaderMan.Draw(rt[0].GetTexture(), rt[1].GetUnorderedAccessView());
-
-	AFRenderTarget defaultTarget;
-	defaultTarget.InitForDefaultRenderTarget();
-
-	if (GetKeyState('U') & 0x01) {
-		// 1 => 2
-		ID3D11UnorderedAccessView* view = rt[2].GetUnorderedAccessView();
-		deviceMan11.GetContext()->OMSetRenderTargetsAndUnorderedAccessViews(0, nullptr, nullptr, 1, 1, &view, nullptr);
-		postEffectUAVTest.Draw(rt[1].GetTexture());
-
-		// 2 => front
-		defaultTarget.BeginRenderToThis();
-		postEffectMono.Draw(rt[2].GetTexture());
-	} else {
-		// 1 => 0
-		rt[0].BeginRenderToThis();
-		postEffectCopy.Draw(rt[1].GetTexture());
-
-		// 0 => front
-		defaultTarget.BeginRenderToThis();
-		postEffectMono.Draw(rt[0].GetTexture());
-	}
-
 	afBindTextureToBindingPoint(0, 0);
 
 	fontMan.Render();
@@ -344,18 +238,10 @@ void App::Destroy()
 		SAFE_DELETE(it);
 	}
 	SAFE_DELETE(meshTiny);
-	for (auto& it : rt) {
-		it.Destroy();
-	}
 
 	fontMan.Destroy();
 	debugRenderer.Destroy();
 	gridRenderer.Destroy();
-	waterSurface.Destroy();
-	postEffectMono.Destroy();
-	postEffectCopy.Destroy();
-	postEffectUAVTest.Destroy();
-	computeShaderMan.Destroy();
 	computeShaderSkinning.Destroy();
 	matMan.Destroy();
 }
