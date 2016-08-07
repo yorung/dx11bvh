@@ -9,3 +9,5 @@ ScreenShot/
 *.opensdf
 *.ipch
 *.bak
+
+*.VC.db
