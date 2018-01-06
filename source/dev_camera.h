@@ -3,8 +3,8 @@ class DevCamera
 	float dist = 1.0f;
 	float lastX = 0;
 	float lastY = 0;
-	float rotX = 0;
-	float rotY = 0;
+	float rotX = 2.83f;
+	float rotY = 0.429f;
 	float height = 0;
 	bool lButton = false;
 	bool rButton = false;

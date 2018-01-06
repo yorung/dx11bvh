@@ -54,9 +54,9 @@ void App::Init(const char* fileName)
 		meshTiny->SyncLocalAxisWithBvh(bvh, bind[0]);
 	} else {
 		const char* bvhNames[] = {
-			"D:\\github\\aachan.bvh",
-			"D:\\github\\kashiyuka.bvh",
-			"D:\\github\\nocchi.bvh",
+			"resource/aachan.bvh",
+			"resource/kashiyuka.bvh",
+			"resource/nocchi.bvh",
 		};
 		for (int i = 0; i < (int)dimof(bvhNames); i++) {
 			Bvh* bvh = new Bvh(bvhNames[i]);
@@ -71,8 +71,12 @@ void App::Init(const char* fileName)
 	}
 #endif
 	float scale = std::max(0.00001f, radius);
-	devCamera.SetDistance(scale * 3);
+	devCamera.SetDistance(1072.f);
+//	devCamera.SetDistance(scale * 3);
 	devCamera.SetHeight(radius / 2);
+
+	PlaySoundA("resource/Perfume_globalsite_sound.wav", NULL, SND_FILENAME | SND_ASYNC);
+	trackTime = 0;
 
 	lastTime = GetTime();
 }
@@ -147,6 +151,7 @@ void App::DrawCameraParams()
 	draw();
 }
 
+#if 0
 void App::Update()
 {
 	if (GetKeyState('P') & 0x80) {
@@ -165,6 +170,12 @@ void App::Update()
 		}
 	}
 }
+#endif
+void App::Update()
+{
+	g_type = "mesh";
+	animationNumber = 9;
+}
 
 void App::Draw()
 {
@@ -182,9 +193,9 @@ void App::Draw()
 	lastTime = currentTime;
 
 
-	if (GetKeyState(VK_RETURN) & 0x01) {
+//	if (GetKeyState(VK_RETURN) & 0x01) {
 		trackTime += deltaTime;
-	}
+//	}
 
 	matrixMan.Set(MatrixMan::VIEW, devCamera.GetViewMatrix());
 	matrixMan.Set(MatrixMan::PROJ, devCamera.GetProjMatrix());
