@@ -75,8 +75,10 @@ void App::Init(const char* fileName)
 //	devCamera.SetDistance(scale * 3);
 	devCamera.SetHeight(radius / 2);
 
-	PlaySoundA("resource/external/Perfume_globalsite_sound.wav", NULL, SND_FILENAME | SND_ASYNC);
-	trackTime = 0;
+//	PlaySoundA("resource/external/Perfume_globalsite_sound.wav", NULL, SND_FILENAME | SND_ASYNC);
+//	trackTime = -0.40;
+
+	trackTime = -5;
 
 	lastTime = GetTime();
 }
@@ -197,6 +199,17 @@ void App::Draw()
 		trackTime += deltaTime;
 //	}
 
+	static bool bBGMTriggered = false;
+	if (!bBGMTriggered)
+	{
+		if (trackTime >= -0.35)
+		{
+			PlaySoundA("resource/external/Perfume_globalsite_sound.wav", NULL, SND_FILENAME | SND_ASYNC);
+			bBGMTriggered = true;
+		}
+	}
+
+
 	matrixMan.Set(MatrixMan::VIEW, devCamera.GetViewMatrix());
 	matrixMan.Set(MatrixMan::PROJ, devCamera.GetProjMatrix());
 
@@ -210,12 +223,13 @@ void App::Draw()
 
 			Bvh* bvh = dynamic_cast<Bvh*>(it);
 
+			double clampedTrackTime = std::max(0.1, trackTime);
 			if (bvh) {
-				bvh->Draw(animationNumber == 9 ? 0 : animationNumber, trackTime);
+				bvh->Draw(animationNumber == 9 ? 0 : animationNumber, clampedTrackTime);
 				if (animationNumber == 9) {
-					meshX->CalcAnimationFromBvh(bvh, bind[i], trackTime, meshXAnimResult, 270 / radius);
+					meshX->CalcAnimationFromBvh(bvh, bind[i], clampedTrackTime, meshXAnimResult, 270 / radius);
 				} else {
-					meshX->CalcAnimation(animationNumber, trackTime, meshXAnimResult);
+					meshX->CalcAnimation(animationNumber, clampedTrackTime, meshXAnimResult);
 				}
 				meshX->Draw(meshXAnimResult);
 				if (GetKeyState('T') & 0x01) {
