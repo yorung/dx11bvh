@@ -42,7 +42,7 @@
 //using namespace SimpleMath;
 using Microsoft::WRL::ComPtr;
 
-static const int BONE_MAX = 70;
+constexpr int BONE_MAX = 70;
 
 // TODO: reference additional headers your program requires here
 #include "source/af_math.h"
@@ -70,5 +70,5 @@ static const int BONE_MAX = 70;
 #include "source/app.h"
 
 
-#define SCR_W 1024
-#define SCR_H 600
+constexpr int SCR_W = 1024;
+constexpr int SCR_H = 600;
