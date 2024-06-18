@@ -12,4 +12,6 @@ external/
 *.ipch
 *.bak
 
-*.VC.db
+*.VC.db*
+v17/
+FileContentIndex/
