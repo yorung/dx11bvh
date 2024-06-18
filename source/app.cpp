@@ -39,7 +39,7 @@ void App::Init(const char* fileName)
 
 	g_type = "mesh";
 
-	const char* meshFileName = "resource/tiny.x";
+	const char* meshFileName = "resource/external/tiny.x";
 	const char* ext = fileName ? strrchr(fileName, '.') : nullptr;
 	if (ext && !_stricmp(ext, ".x")) {
 		meshFileName = fileName;
@@ -54,9 +54,9 @@ void App::Init(const char* fileName)
 		meshTiny->SyncLocalAxisWithBvh(bvh, bind[0]);
 	} else {
 		const char* bvhNames[] = {
-			"D:\\github\\aachan.bvh",
-			"D:\\github\\kashiyuka.bvh",
-			"D:\\github\\nocchi.bvh",
+			"resource/external/aachan.bvh",
+			"resource/external/kashiyuka.bvh",
+			"resource/external/nocchi.bvh",
 		};
 		for (int i = 0; i < (int)dimof(bvhNames); i++) {
 			Bvh* bvh = new Bvh(bvhNames[i]);
